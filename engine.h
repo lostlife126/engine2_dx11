@@ -5,14 +5,16 @@
 #include "rendererManager.h"
 
 
-
 class Engine
 {
 public:
 
-	World world;
-	SceneManager sceneManager;
-	RendererManager rendererManager;
+	Engine();
+	~Engine();
+
+	World* world;
+	SceneManager* sceneManager;
+	RendererManager* rendererManager;
 
 	bool isRun = false;
 	bool isInitialized = false;

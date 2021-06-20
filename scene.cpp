@@ -3,12 +3,22 @@
 
 void Scene::update()
 {
+	frustrumCulling();
 	return;
 }
 
 void Scene::init()
 {
 	camera = new Camera;
+	camera->fov = 70.0f;
+	camera->aspect = 1.33333f;
+	camera->near = 0.1f;
+	camera->far = 100.0f;
+	camera->pos = Vect3f(0.0f, 0.0f, 1.5f);
+	camera->up = Vect3f(0.0f, 1.0f, 0.0f);
+	camera->front = Vect3f(0.0f, 0.0f, -1.0f);
+
+	camera->setMatrices();
 	allObjects.push_back(new Object);
 	return;
 }

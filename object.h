@@ -10,6 +10,17 @@ public:
 	{
 		mesh = new Mesh;
 		mesh->init();
+		mat = Matrix4::setOne();
+	}
+
+	Mesh* getMesh()
+	{
+		return mesh;
+	}
+
+	Matrix4* getMatrix()
+	{
+		return &mat;
 	}
 
 private:

@@ -19,6 +19,11 @@ public:
 
 	std::queue<Object*>* getVisibleObjects();
 
+	Camera* getCamera()
+	{
+		return camera;
+	}
+
 private:
 	void load();
 

@@ -3,7 +3,7 @@
 
 void Mesh::init()
 {
-	loadObj("1.txt");
+	loadObj("chest.txt");
 }
 
 void Mesh::loadObj(std::string path)
@@ -12,7 +12,7 @@ void Mesh::loadObj(std::string path)
 	file.open(path.c_str());
 	if (!file.good())
 	{
-		std::cout << "error loading file" << std::endl;
+		std::cout << "Error loading file:"<<path.c_str() << std::endl;
 		return;
 	}
 
