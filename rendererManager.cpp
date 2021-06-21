@@ -23,6 +23,6 @@ void RendererManager::init(SceneManager* sm)
 	sceneManager = sm;
 	renderer = new Renderer;
 	renderer->camera = sm->getScene()->getCamera();
-	renderer->zBuff = new Buffer<float>(1024, 768);
+	renderer->zBuff = new Buffer<float>(2048, 1536);
 	return;
 }

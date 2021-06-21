@@ -12,10 +12,10 @@ void toViewport(Buffer<float>* zBuff, Vect3f* v)
 
 void toBoundBox(Buffer<float>* zBuff, Vect3f* v, int& xmin, int& xmax, int& ymin, int& ymax)
 {
-	xmin = int(min(v[0].x, v[1].x, v[2].x));
-	xmax = int(max(v[0].x, v[1].x, v[2].x));
-	ymin = int(min(v[0].y, v[1].y, v[2].y));
-	ymax = int(max(v[0].y, v[1].y, v[2].y));
+	xmin = floor(min(v[0].x, v[1].x, v[2].x));
+	xmax = ceil(max(v[0].x, v[1].x, v[2].x));
+	ymin = floor(min(v[0].y, v[1].y, v[2].y));
+	ymax = ceil(max(v[0].y, v[1].y, v[2].y));
 	xmin = max(xmin, 0);
 	xmax = min(xmax, zBuff->width-1);
 	ymin = max(ymin, 0);

@@ -14,7 +14,7 @@ void Scene::init()
 	camera->aspect = 1.33333f;
 	camera->near = 0.1f;
 	camera->far = 100.0f;
-	camera->pos = Vect3f(0.0f, 0.0f, 1.5f);
+	camera->pos = Vect3f(0.0f, 0.0f, 2.0f);
 	camera->up = Vect3f(0.0f, 1.0f, 0.0f);
 	camera->front = Vect3f(0.0f, 0.0f, -1.0f);
 
