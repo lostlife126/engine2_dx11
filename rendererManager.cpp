@@ -11,9 +11,15 @@ void RendererManager::renderScene()
 		renderer->drawObject(obj->front());
 		obj->pop();
 	}
-	renderer->zBuff->rescale();
-	ImageBMP image(*(renderer->zBuff));
-	image.save("1.bmp");
+	
+
+	for (int i = 0; i < renderer->zBuff->size; i++)
+	{
+		renderer->zBuff->data[i] = gammaTable[int(renderer->zBuff->data[i]*255.0f)];
+	}
+
+	renderer->zBuff->saveBMP("zBuff.bmp");
+	renderer->pixBuff->saveBMP("screen.bmp");
 
 	return;
 }
@@ -23,6 +29,7 @@ void RendererManager::init(SceneManager* sm)
 	sceneManager = sm;
 	renderer = new Renderer;
 	renderer->camera = sm->getScene()->getCamera();
-	renderer->zBuff = new Buffer<float>(2048, 1536);
+	renderer->zBuff = new Buffer<float>(width, height);
+	renderer->pixBuff = new Buffer<uint32_t>(width, height);
 	return;
 }

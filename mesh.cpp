@@ -1,18 +1,17 @@
 #include "mesh.h"
 
-
-void Mesh::init()
+void Mesh::load(const std::string& path)
 {
-	loadObj("chest.txt");
+	loadObj(path);
 }
 
-void Mesh::loadObj(std::string path)
+void Mesh::loadObj(const std::string& path)
 {
 	std::ifstream file;
 	file.open(path.c_str());
 	if (!file.good())
 	{
-		std::cout << "Error loading file:"<<path.c_str() << std::endl;
+		std::cout << "Error loading file: "<<path.c_str() << std::endl;
 		return;
 	}
 

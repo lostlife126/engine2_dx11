@@ -7,13 +7,9 @@ void splitStr(std::string& str, char delim, std::vector<std::string>& splitStrin
 	while (std::getline(ss, token, delim))
 	{
 		if (token == "")
-		{
 			splitString.push_back("0");
-		}
 		else
-		{
 			splitString.push_back(token);
-		}
 	}
 	return;
 }
@@ -21,6 +17,7 @@ void splitStr(std::string& str, char delim, std::vector<std::string>& splitStrin
 float edge(Vect3f& a, Vect3f& b, Vect3f& c)
 {
 	return (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x);
+	//return (c.x - a.x) * (b.y - a.y) - (c.y - a.y) * (b.x - a.x);
 }
 
 float min(float a, float b)

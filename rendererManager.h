@@ -12,4 +12,7 @@ public:
 private:
 	SceneManager* sceneManager;
 	Renderer* renderer;
+
+	int width = 1024;
+	int height = 768;
 };

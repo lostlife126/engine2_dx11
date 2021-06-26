@@ -10,7 +10,7 @@ class Mesh
 {
 public:
 
-	void init();
+	void load(const std::string& path);
 
 	std::string caption;
 
@@ -26,5 +26,5 @@ public:
 	int numFaces;
 
 private:
-	void loadObj(std::string path);
+	void loadObj(const std::string& path);
 };
