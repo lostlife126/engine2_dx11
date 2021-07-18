@@ -1,33 +1,35 @@
 #include "sceneManager.h"
-
-SceneManager::SceneManager(): 
-	scene(nullptr) 
-{}
-
-SceneManager::~SceneManager()
+namespace MyEngine
 {
-	close();
-}
+	SceneManager::SceneManager() :
+		scene(nullptr)
+	{}
 
-void SceneManager::update()
-{
-	scene->update();
-	return;
-}
+	SceneManager::~SceneManager()
+	{
+		close();
+	}
 
-void SceneManager::init()
-{
-	scene = new Scene;
-	scene->init();
-	return;
-}
+	void SceneManager::update()
+	{
+		scene->update();
+		return;
+	}
 
-Scene* SceneManager::getScene()
-{
-	return scene;
-}
+	void SceneManager::init(ID3D11Device* deviceContext)
+	{
+		scene = new Scene;
+		scene->init(deviceContext);
+		return;
+	}
 
-void SceneManager::close()
-{
-	delete scene;
+	Scene* SceneManager::getScene()
+	{
+		return scene;
+	}
+
+	void SceneManager::close()
+	{
+		delete scene;
+	}
 }

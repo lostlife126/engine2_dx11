@@ -1,20 +1,27 @@
 #pragma once
-#include "basicStructs.h"
-#include "buffer.h"
-#include "object.h"
-#include "camera.h"
+#include <queue>
+#include "sceneManager.h"
+#include "videoDriverDX11.h"
+#include "shader.h"
 
-
-class Renderer
+namespace MyEngine
 {
-public:
+	class Renderer
+	{
+	public:
+		void renderScene();
+		void init(SceneManager* sm, HWND hwnd_);
+		VideoDriverDX11* driverDX11;
+		SceneManager* sceneManager;
+		Shader shader;
 
-	Buffer<float>* zBuff;
-	Buffer<uint32_t>* pixBuff;
-	Camera* camera;
-	
+	private:
+		
 
-	void drawObject(Object* obj);
-	void rasterize(Vect3f* v, Vect3f* uv, Texture* texture);
 
-};
+		int m_width = 1024;
+		int m_height = 768;
+		HWND hwnd;
+
+	};
+}

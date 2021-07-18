@@ -5,7 +5,7 @@
 
 int main(int argc, char** argv)
 {
-	Engine engine;
+	MyEngine::Engine engine;
 
 	engine.start();
 

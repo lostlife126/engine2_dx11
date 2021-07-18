@@ -3,37 +3,37 @@
 #include <vector>
 #include <queue>
 #include "camera.h"
-#include "object.h"
+#include "model.h"
 
+#include <d3d11.h>
+#include <d3dx11.h>
 
-
-class Scene
+namespace MyEngine
 {
-public:
 
-	Scene();
-	~Scene();
-
-	void update();
-	void init();
-
-	std::queue<Object*>* getVisibleObjects();
-
-	Camera* getCamera()
+	class Scene
 	{
-		return camera;
-	}
+	public:
 
-private:
-	void load();
+		Scene();
+		~Scene();
 
-	std::vector<Object*> allObjects;
-	std::queue<Object*> visibleObjects;
-	Camera* camera = nullptr;
+		void update();
+		void init(ID3D11Device* deviceContext);
 
-	void frustrumCulling();
-};
+		std::queue<Model*>* getVisibleObjects();
+		std::vector<Model*> allObjects;
+		CameraDX11 camera;
+
+	private:
+		void load();
+
+		std::queue<Model*> visibleObjects;
+
+		void frustrumCulling();
+	};
 
 
 
 
+}

@@ -1,25 +1,35 @@
 #pragma once
 
-#include "world.h"
+#include "log.h"
+#include "window.h"
+#include "inputManager.h"
 #include "sceneManager.h"
-#include "rendererManager.h"
+#include "renderer.h"
+#include <d3d11.h>
+#include <d3dx11.h>
 
-
-class Engine
+namespace MyEngine
 {
-public:
 
-	Engine();
-	~Engine();
+	class Engine
+	{
+	public:
 
-	World* world;
-	SceneManager* sceneManager;
-	RendererManager* rendererManager;
+		Engine();
+		~Engine();
 
-	bool isRun = false;
-	bool isInitialized = false;
+		InputManager* inputManager;
+		SceneManager* sceneManager;
+		Renderer* rendererManager;
+		Window* m_window;
+		DescWindow desc;
 
-	void run();
-	void start();
-	void init();
-};
+		bool isRun = false;
+		bool isInitialized = false;
+		Log log;
+
+		void run();
+		void start();
+		void init();
+	};
+}
