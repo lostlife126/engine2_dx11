@@ -84,13 +84,13 @@ namespace MyEngine
 		{
 			printf("key press %c\n", arg.wc); 
 			if (arg.wc == 'w')
-				scene->camera.move(0.04f, 0.0f);
+				scene->camera.moveForward();
 			if (arg.wc == 's')
-				scene->camera.move(-0.04f, 0.0f);
+				scene->camera.moveBack();
 			if (arg.wc == 'a')
-				scene->camera.move(0.0f, -0.04f);
+				scene->camera.moveLeft();
 			if (arg.wc == 'd')
-				scene->camera.move(0.0f, 0.04f);
+				scene->camera.moveRight();
 			if (arg.wc == 'q')
 				manager->changeLock();
 			if (arg.wc == 'e')

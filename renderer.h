@@ -3,17 +3,23 @@
 #include "sceneManager.h"
 #include "videoDriverDX11.h"
 #include "shader.h"
+#include "font.h"
+#include "string.h"
+#include "sstream"
 
 namespace MyEngine
 {
 	class Renderer
 	{
 	public:
-		void renderScene();
+		void renderScene(float dt, double time);
 		void init(SceneManager* sm, HWND hwnd_);
 		VideoDriverDX11* driverDX11;
 		SceneManager* sceneManager;
-		Shader shader;
+
+		Font font;
+		Text* text_fps;
+		Text* text_time;
 
 	private:
 		

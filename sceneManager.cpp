@@ -10,9 +10,9 @@ namespace MyEngine
 		close();
 	}
 
-	void SceneManager::update()
+	void SceneManager::update(float dt)
 	{
-		scene->update();
+		scene->update(dt);
 		return;
 	}
 

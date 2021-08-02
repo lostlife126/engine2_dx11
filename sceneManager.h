@@ -10,7 +10,7 @@ namespace MyEngine
 	public:
 		SceneManager();
 		~SceneManager();
-		void update();
+		void update(float dt);
 		void init(ID3D11Device* deviceContext);
 		void close();
 		Scene* getScene();

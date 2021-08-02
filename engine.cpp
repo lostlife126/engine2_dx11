@@ -5,10 +5,12 @@ namespace MyEngine
 
 	void Engine::run()
 	{
+		fpsCounter.nulling();
 		while (isRun)
 		{
-			sceneManager->update();
-			rendererManager->renderScene();
+			float dt = fpsCounter.frame();
+			sceneManager->update(dt);
+			rendererManager->renderScene(dt, fpsCounter.time);
 			m_window->runEvent();
 
 		//	isRun = true;

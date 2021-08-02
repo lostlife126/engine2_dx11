@@ -1,8 +1,23 @@
 #pragma once
 
+#include <d3d11.h>
+#include <d3dx11.h>
+#include <d3dcompiler.h>
+#include <xnamath.h>
+
 namespace MyEngine
 {
+	class Buffer
+	{
+	public:
 
+		static ID3D11Buffer* createVertexBuffer(ID3D11Device* device, int size, const void* data, bool dynamic);
+		static ID3D11Buffer* createIndexBuffer(ID3D11Device* device, int size, const void* data, bool dynamic);
+		static ID3D11Buffer* createConstantBuffer(ID3D11Device* device, int size, bool dynamic);
+	};
+
+
+	/*
 	const int gammaTable[256] = { 0, 21, 28, 34, 39, 43, 46,
 			50, 53, 56, 59, 61, 64, 66, 68, 70, 72, 74, 76, 78, 80, 82, 84,
 			85, 87, 89, 90, 92, 93, 95, 96, 98, 99, 101, 102, 103, 105, 106,
@@ -226,4 +241,5 @@ namespace MyEngine
 		}
 
 	};
+	*/
 }

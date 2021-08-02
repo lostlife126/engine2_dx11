@@ -48,6 +48,9 @@ namespace MyEngine
 		XMMATRIX m_Projection;
 		XMMATRIX m_World;
 
+		int width_screen;
+		int height_screen;
+
 		VideoDriverDX11()
 		{
 			m_driverType = D3D_DRIVER_TYPE_NULL;

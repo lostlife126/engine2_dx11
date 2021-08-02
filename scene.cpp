@@ -2,9 +2,10 @@
 namespace MyEngine
 {
 
-	void Scene::update()
+	void Scene::update(float dt)
 	{
 		frustrumCulling();
+		light[0]->update(dt);
 		return;
 	}
 
@@ -23,6 +24,7 @@ namespace MyEngine
 		camera->setMatrices();*/
 		allObjects.push_back(new Model);
 		allObjects[0]->load(deviceContext, "chest_mesh.obj", "chest_albedo2.png");
+		light.push_back(new Light);
 		return;
 	}
 

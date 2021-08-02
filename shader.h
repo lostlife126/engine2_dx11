@@ -8,6 +8,7 @@
 #include <d3dcompiler.h>
 #include <xnamath.h>
 #include<d3dx10math.h>
+#include "buffer.h"
 
 namespace MyEngine
 {
@@ -19,7 +20,16 @@ namespace MyEngine
 		XMMATRIX m_Projection;
 	};
 
+	struct LightBufferType
+	{
+		XMFLOAT4 ambient;
+		XMFLOAT4 diffuse;
+		XMFLOAT3 direction;
+		float padding;
+	};
+
 	// класс шейдер в котором пр€чутс€ вершинные и пиксельные шейдеры
+
 	class Shader
 	{
 	public:
@@ -27,8 +37,37 @@ namespace MyEngine
 		ID3D11PixelShader* m_pShader; // пиксельный шейдер
 		ID3D11VertexShader* m_vShader; // вершинный шейдер
 		ID3D11InputLayout* m_layout; // формат данных шейдера
-		ID3D11Buffer* m_matrixBuffer; // буфер матриц (константный буфер)
+
 		ID3D11SamplerState* m_sampleState;
+
+		D3D11_INPUT_ELEMENT_DESC* m_layout_format;
+		ID3D11ShaderResourceView* m_texture = nullptr;
+
+
+		const int maxLayout = 8;
+		int numLayout = 0;
+
+		void addInputElement(const char* name, DXGI_FORMAT format)
+		{
+			if (numLayout == 0)
+			{
+				m_layout_format = new D3D11_INPUT_ELEMENT_DESC[maxLayout];
+			}
+
+			D3D11_INPUT_ELEMENT_DESC& layout = m_layout_format[numLayout];
+			layout.SemanticName = name;
+			layout.SemanticIndex = 0;
+			layout.Format = format;
+			layout.InputSlot = 0;
+			if (numLayout == 0)
+				layout.AlignedByteOffset = 0;
+			else
+				layout.AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
+			layout.InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+			layout.InstanceDataStepRate = 0;
+			numLayout++;
+			return;
+		}
 
 		// инициализаци€ вершинного и пиксельного шейдеров
 		void initShaders(ID3D11Device* device, const char* vShaderFile, const char* pShaderFile)
@@ -38,7 +77,7 @@ namespace MyEngine
 
 			// вершинный шейдер
 			ID3D10Blob* vShaderBuff; // буфер дл€ него
-			hr = compileShaderFromFile("mesh_vs.fx", "VS", "vs_4_0", &vShaderBuff); // компилим вершинный файл mesh_vs.fx
+			compileShaderFromFile(vShaderFile, "VS", "vs_4_0", &vShaderBuff); // компилим вершинный файл 
 			// создаем шейдер
 			hr = device->CreateVertexShader(vShaderBuff->GetBufferPointer(), vShaderBuff->GetBufferSize(), NULL, &m_vShader);
 			if (FAILED(hr))
@@ -48,62 +87,29 @@ namespace MyEngine
 
 			// пиксельный шейдер аналогично
 			ID3D10Blob* pShaderBuff;
-			hr = compileShaderFromFile("mesh_ps.fx", "PS", "ps_4_0", &pShaderBuff);
+			compileShaderFromFile(pShaderFile, "PS", "ps_4_0", &pShaderBuff);
 			hr = device->CreatePixelShader(pShaderBuff->GetBufferPointer(), pShaderBuff->GetBufferSize(), NULL, &m_pShader);
 			if (FAILED(hr))
 			{
-				Log::Get()->Error("Error creating vertex shader.");
+				Log::Get()->Error("Error creating pixel shader.");
 			}
 
-			D3D11_INPUT_ELEMENT_DESC layout[3];
-
-			layout[0].SemanticName = "POSITION";
-			layout[0].SemanticIndex = 0;
-			layout[0].Format = DXGI_FORMAT_R32G32B32_FLOAT;
-			layout[0].InputSlot = 0;
-			layout[0].AlignedByteOffset = 0;
-			layout[0].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
-			layout[0].InstanceDataStepRate = 0;
-
-			layout[1].SemanticName = "TEXCOORD";
-			layout[1].SemanticIndex = 0;
-			layout[1].Format = DXGI_FORMAT_R32G32_FLOAT;
-			layout[1].InputSlot = 0;
-			layout[1].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
-			layout[1].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
-			layout[1].InstanceDataStepRate = 0;
-
-			layout[2].SemanticName = "NORMAL";
-			layout[2].SemanticIndex = 0;
-			layout[2].Format = DXGI_FORMAT_R32G32B32_FLOAT;
-			layout[2].InputSlot = 0;
-			layout[2].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
-			layout[2].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
-			layout[2].InstanceDataStepRate = 0;
-
-
-			UINT numElements = ARRAYSIZE(layout);
-
-			hr = device->CreateInputLayout(layout, numElements, vShaderBuff->GetBufferPointer(), vShaderBuff->GetBufferSize(), &m_layout);
+			hr = device->CreateInputLayout(m_layout_format, numLayout, vShaderBuff->GetBufferPointer(), vShaderBuff->GetBufferSize(), &m_layout);
 			if (FAILED(hr))
 			{
 				Log::Get()->Error("Error creating vertex layout.");
 			}
 			vShaderBuff->Release(); vShaderBuff = nullptr;
 			pShaderBuff->Release(); pShaderBuff = nullptr;
+			return;
+		}
 
-			D3D11_BUFFER_DESC md;
-			md.Usage = D3D11_USAGE_DYNAMIC;
-			md.ByteWidth = sizeof(MatrixBufferType);
-			md.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-			md.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-			md.MiscFlags = 0;
-			md.StructureByteStride = 0;
-
-			hr = device->CreateBuffer(&md, NULL, &m_matrixBuffer);
+		void loadTexture(ID3D11Device* device, const char* filename)
+		{
+			HRESULT hr = D3DX11CreateShaderResourceViewFromFileA(device, filename, NULL, NULL, &m_texture, NULL);
 			if (FAILED(hr))
 			{
-				Log::Get()->Error("Can't create constant buffer.");
+				Log::Get()->Error("Can't create texture from file.");
 			}
 
 			D3D11_SAMPLER_DESC sd;
@@ -126,9 +132,6 @@ namespace MyEngine
 			{
 				Log::Get()->Error("Can't create sampler state.");
 			}
-
-
-			return;
 		}
 
 		// метод дл€ загрузки шейдера из файла в ID3DBlob
@@ -136,7 +139,7 @@ namespace MyEngine
 		// entryPoint - точка в файле с которой начинаетс€ шейдер
 		// shaderModel - верси€ шейдера
 		// ppBlobOut - буфер куда кладем загруженный шейдер
-		HRESULT compileShaderFromFile(const char* filename, LPCSTR entryPoint, LPCSTR shaderModel, ID3DBlob** ppBlobOut)
+		void compileShaderFromFile(const char* filename, LPCSTR entryPoint, LPCSTR shaderModel, ID3DBlob** ppBlobOut)
 		{
 			HRESULT hr = S_OK;
 			// TODO - гл€нь зачем нужен этот флаг
@@ -152,47 +155,19 @@ namespace MyEngine
 				pErrorBlob->Release(); pErrorBlob = nullptr;
 			}
 
-			return hr;
+			return;
 		}
 	
-		void renderShader(ID3D11DeviceContext* deviceContext, int indexCount)
+		void draw(ID3D11DeviceContext* deviceContext)
 		{
 			deviceContext->IASetInputLayout(m_layout);
 			deviceContext->VSSetShader(m_vShader, NULL, 0);
 			deviceContext->PSSetShader(m_pShader, NULL, 0);
-
-			deviceContext->PSSetSamplers(0, 1, &m_sampleState);
-			deviceContext->DrawIndexed(indexCount, 0, 0);
+			if (m_texture)
+				deviceContext->PSSetShaderResources(0, 1, &m_texture);
+			if (m_sampleState)
+				deviceContext->PSSetSamplers(0, 1, &m_sampleState);
 			return;
-		}
-
-		void setShaderParameters(ID3D11DeviceContext* deviceContext, XMMATRIX worldMatrix, XMMATRIX viewMatrix, XMMATRIX projectionMatrix, ID3D11ShaderResourceView* tex)
-		{
-			HRESULT hr;
-			D3D11_MAPPED_SUBRESOURCE mappedRes;
-			MatrixBufferType* p_data;
-			unsigned int bufferNum = 0;
-
-			worldMatrix = XMMatrixTranspose(worldMatrix);
-			viewMatrix = XMMatrixTranspose(viewMatrix);
-			projectionMatrix = XMMatrixTranspose(projectionMatrix);
-
-			hr = deviceContext->Map(m_matrixBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedRes);
-			p_data = (MatrixBufferType*)mappedRes.pData;
-			p_data->m_World = worldMatrix;
-			p_data->m_View = viewMatrix;
-			p_data->m_Projection = projectionMatrix;
-			deviceContext->Unmap(m_matrixBuffer, 0);
-			deviceContext->VSSetConstantBuffers(bufferNum, 1, &m_matrixBuffer);
-
-			deviceContext->PSSetShaderResources(0, 1, &tex);
-			return;
-		}
-
-		void render(ID3D11DeviceContext* deviceContext, int indexCount, XMMATRIX worldMatrix, XMMATRIX viewMatrix, XMMATRIX projectionMatrix, ID3D11ShaderResourceView* tex)
-		{
-			setShaderParameters(deviceContext, worldMatrix, viewMatrix, projectionMatrix, tex);
-			renderShader(deviceContext, indexCount);
 		}
 };
 

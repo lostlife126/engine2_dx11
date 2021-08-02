@@ -18,8 +18,8 @@ namespace MyEngine
 		HRESULT hr = S_OK;
 		RECT rc;
 		GetClientRect(hwnd, &rc);
-		UINT width = rc.right - rc.left;
-		UINT height = rc.bottom - rc.top;
+		width_screen = rc.right - rc.left;
+		height_screen = rc.bottom - rc.top;
 		UINT createDeviceFlags = 0;
 
 		D3D_DRIVER_TYPE driverTypes[] =
@@ -41,8 +41,8 @@ namespace MyEngine
 		DXGI_SWAP_CHAIN_DESC sd;
 		ZeroMemory(&sd, sizeof(sd));
 		sd.BufferCount = 1;
-		sd.BufferDesc.Width = width;
-		sd.BufferDesc.Height = height;
+		sd.BufferDesc.Width = width_screen;
+		sd.BufferDesc.Height = height_screen;
 		sd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 		sd.BufferDesc.RefreshRate.Numerator = 60;
 		sd.BufferDesc.RefreshRate.Denominator = 1;
@@ -95,8 +95,8 @@ namespace MyEngine
 
 		D3D11_TEXTURE2D_DESC descDepth;
 		ZeroMemory(&descDepth, sizeof(descDepth));
-		descDepth.Width = width;
-		descDepth.Height = height;
+		descDepth.Width = width_screen;
+		descDepth.Height = height_screen;
 		descDepth.MipLevels = 1;
 		descDepth.ArraySize = 1;
 		descDepth.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
@@ -125,8 +125,8 @@ namespace MyEngine
 		m_pContextImmediate->OMSetRenderTargets(1, &m_pRenderTargetView, m_pDepthStencilView);
 
 		D3D11_VIEWPORT vp;
-		vp.Width = float(width);
-		vp.Height = float(height);
+		vp.Width = float(width_screen);
+		vp.Height = float(height_screen);
 		vp.MinDepth = 0.0f;
 		vp.MaxDepth = 1.0f;
 		vp.TopLeftX = 0;
