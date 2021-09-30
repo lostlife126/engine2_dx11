@@ -2,50 +2,52 @@
 namespace MyEngine
 {
 
+	CameraDX11* Scene::getCamera()
+	{
+		return m_camera;
+	}
+
 	void Scene::update(float dt)
 	{
+		
+		m_camera->render(dt);
 		frustrumCulling();
 		light[0]->update(dt);
 		return;
 	}
 
-	void Scene::init(ID3D11Device* deviceContext)
+	void Scene::init(VideoDriverDX11* driver_)
 	{
-		/*
-		camera = new CameraSoft;
-		camera->fov = 70.0f;
-		camera->aspect = 1.33333f;
-		camera->nearPoint = 0.1f;
-		camera->farPoint = 100.0f;
-		camera->pos = Vect3f(0.0f, 0.0f, 2.0f);
-		camera->up = Vect3f(0.0f, 1.0f, 0.0f);
-		camera->front = Vect3f(0.0f, 0.0f, -1.0f);
-		
-		camera->setMatrices();*/
-		allObjects.push_back(new Model);
-		allObjects[0]->load(deviceContext, "chest_mesh.obj", "chest_albedo2.png");
+		driver = driver_;
+		m_camera = new CameraDX11;
+		addObject("chest_mesh.obj", "chest_albedo2.png");
 		light.push_back(new Light);
 		return;
 	}
 
-	void Scene::load()
+	void Scene::addObject(const char* pathMesh, const char* pathTexture)
 	{
-		return;
+		allObjects.push_back(new Model);
+		allObjects.back()->load(driver->getDevice(), pathMesh, pathTexture);
+	}
+
+	void Scene::drawAll()
+	{
+		for (auto obj : allObjects)
+		{
+			obj->render(driver->getDeviceContext(), obj->m_World, m_camera->m_View, m_camera->m_Projection);
+		}
 	}
 
 	void Scene::frustrumCulling()
 	{
 		for (int i = 0; i < allObjects.size(); i++)
 		{
-			visibleObjects.push(allObjects[i]);
+		//	visibleObjects.push(allObjects[i]);
 		}
 		return;
 	}
 
-	std::queue<Model*>* Scene::getVisibleObjects()
-	{
-		return &visibleObjects;
-	}
 
 	Scene::Scene()
 	{}

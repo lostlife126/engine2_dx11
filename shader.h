@@ -34,15 +34,16 @@ namespace MyEngine
 	{
 	public:
 
-		ID3D11PixelShader* m_pShader; // пиксельный шейдер
-		ID3D11VertexShader* m_vShader; // вершинный шейдер
-		ID3D11InputLayout* m_layout; // формат данных шейдера
+		ID3D11VertexShader* m_vShader = nullptr; // вершинный шейдер
+		ID3D11PixelShader* m_pShader = nullptr; // пиксельный шейдер
+		ID3D11InputLayout* m_layout = nullptr; // формат данных шейдера
 
-		ID3D11SamplerState* m_sampleState;
+		ID3D11SamplerState* m_sampleState = nullptr;
 
-		D3D11_INPUT_ELEMENT_DESC* m_layout_format;
+		D3D11_INPUT_ELEMENT_DESC* m_layout_format = nullptr;
 		ID3D11ShaderResourceView* m_texture = nullptr;
 
+		ID3D11Buffer* m_buffer; // константный буфер (либо матрица либо свет)
 
 		const int maxLayout = 8;
 		int numLayout = 0;
@@ -50,9 +51,7 @@ namespace MyEngine
 		void addInputElement(const char* name, DXGI_FORMAT format)
 		{
 			if (numLayout == 0)
-			{
 				m_layout_format = new D3D11_INPUT_ELEMENT_DESC[maxLayout];
-			}
 
 			D3D11_INPUT_ELEMENT_DESC& layout = m_layout_format[numLayout];
 			layout.SemanticName = name;
@@ -78,40 +77,59 @@ namespace MyEngine
 			// вершинный шейдер
 			ID3D10Blob* vShaderBuff; // буфер для него
 			compileShaderFromFile(vShaderFile, "VS", "vs_4_0", &vShaderBuff); // компилим вершинный файл 
+			if (vShaderBuff == nullptr)
+				Log::Get()->Error("Error reading file vertex shader.");
 			// создаем шейдер
 			hr = device->CreateVertexShader(vShaderBuff->GetBufferPointer(), vShaderBuff->GetBufferSize(), NULL, &m_vShader);
 			if (FAILED(hr))
-			{
 				Log::Get()->Error("Error creating vertex shader.");
-			}
+			else
+				Log::Get()->Debug("Created vertex shader.");
 
 			// пиксельный шейдер аналогично
 			ID3D10Blob* pShaderBuff;
 			compileShaderFromFile(pShaderFile, "PS", "ps_4_0", &pShaderBuff);
+			if (pShaderBuff == nullptr)
+				Log::Get()->Error("Error reading file pixel shader.");
 			hr = device->CreatePixelShader(pShaderBuff->GetBufferPointer(), pShaderBuff->GetBufferSize(), NULL, &m_pShader);
 			if (FAILED(hr))
-			{
 				Log::Get()->Error("Error creating pixel shader.");
-			}
+			else
+				Log::Get()->Debug("Created pixel shader.");
 
 			hr = device->CreateInputLayout(m_layout_format, numLayout, vShaderBuff->GetBufferPointer(), vShaderBuff->GetBufferSize(), &m_layout);
 			if (FAILED(hr))
-			{
 				Log::Get()->Error("Error creating vertex layout.");
-			}
+			else
+				Log::Get()->Debug("Created vertex layout.");
+
 			vShaderBuff->Release(); vShaderBuff = nullptr;
 			pShaderBuff->Release(); pShaderBuff = nullptr;
+
+		//	this->createConstantBuffer(device);
+
 			return;
 		}
+
+	//	virtual void createConstantBuffer(ID3D11Device* device)
+	//	{
+	//		return;
+	//	}
 
 		void loadTexture(ID3D11Device* device, const char* filename)
 		{
 			HRESULT hr = D3DX11CreateShaderResourceViewFromFileA(device, filename, NULL, NULL, &m_texture, NULL);
 			if (FAILED(hr))
-			{
 				Log::Get()->Error("Can't create texture from file.");
-			}
+			else
+				Log::Get()->Debug("Created texture from file.");
 
+			setSampleState(device);
+
+		}
+
+		void setSampleState(ID3D11Device* device)
+		{
 			D3D11_SAMPLER_DESC sd;
 			sd.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
 			sd.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
@@ -127,11 +145,11 @@ namespace MyEngine
 			sd.MinLOD = 0;
 			sd.MaxLOD = D3D11_FLOAT32_MAX;
 
-			hr = device->CreateSamplerState(&sd, &m_sampleState);
+			HRESULT hr = device->CreateSamplerState(&sd, &m_sampleState);
 			if (FAILED(hr))
-			{
 				Log::Get()->Error("Can't create sampler state.");
-			}
+			else
+				Log::Get()->Debug("Created sampler state.");
 		}
 
 		// метод для загрузки шейдера из файла в ID3DBlob
@@ -157,7 +175,7 @@ namespace MyEngine
 
 			return;
 		}
-	
+
 		void draw(ID3D11DeviceContext* deviceContext)
 		{
 			deviceContext->IASetInputLayout(m_layout);
@@ -169,6 +187,63 @@ namespace MyEngine
 				deviceContext->PSSetSamplers(0, 1, &m_sampleState);
 			return;
 		}
-};
+	};
+
+	class ModelShader : public Shader
+	{
+	public:
+
+		void setShaderParameters(ID3D11DeviceContext* deviceContext, XMMATRIX worldMatrix, XMMATRIX viewMatrix, XMMATRIX projectionMatrix)
+		{
+			HRESULT hr;
+			D3D11_MAPPED_SUBRESOURCE mappedRes;
+			MatrixBufferType* p_data;
+			unsigned int bufferNum = 0;
+
+			worldMatrix = XMMatrixTranspose(worldMatrix);
+			viewMatrix = XMMatrixTranspose(viewMatrix);
+			projectionMatrix = XMMatrixTranspose(projectionMatrix);
+
+			hr = deviceContext->Map(m_buffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedRes);
+			p_data = (MatrixBufferType*)mappedRes.pData;
+			p_data->m_World = worldMatrix;
+			p_data->m_View = viewMatrix;
+			p_data->m_Projection = projectionMatrix;
+			deviceContext->Unmap(m_buffer, 0);
+			deviceContext->VSSetConstantBuffers(bufferNum, 1, &m_buffer);
+		}
+
+		void createConstantBuffer(ID3D11Device* device)
+		{
+			m_buffer = Buffer::createConstantBuffer(device, sizeof(MatrixBufferType), true);
+			return;
+		}
+
+	};
+
+	class LightShader : public Shader
+	{
+	public:
+
+		void setShaderParameters(ID3D11DeviceContext* deviceContext, XMFLOAT3 lightDir, XMFLOAT4 lightAmbient, XMFLOAT4 lightDiffuse)
+		{
+			HRESULT hr;
+			D3D11_MAPPED_SUBRESOURCE mappedRes;
+			LightBufferType* p_data;
+			unsigned int bufferNum = 0;
+
+			hr = deviceContext->Map(m_buffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedRes);
+			p_data = (LightBufferType*)mappedRes.pData;
+			p_data->ambient = lightAmbient;
+			p_data->diffuse = lightDiffuse;
+			p_data->direction = lightDir;
+			deviceContext->Unmap(m_buffer, 0);
+			bufferNum = 0;
+			deviceContext->PSSetConstantBuffers(bufferNum, 1, &m_buffer);
+		}
+
+
+	};
+
 
 }

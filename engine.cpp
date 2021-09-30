@@ -9,11 +9,10 @@ namespace MyEngine
 		while (isRun)
 		{
 			float dt = fpsCounter.frame();
-			sceneManager->update(dt);
-			rendererManager->renderScene(dt, fpsCounter.time);
+			scene->update(dt);
+			drawScene();
 			m_window->runEvent();
 
-		//	isRun = true;
 		}
 		return;
 	}
@@ -28,23 +27,21 @@ namespace MyEngine
 	void Engine::init()
 	{
 		m_window = new Window;
-		if (!m_window->create(desc))
-		{
-			Log::Get()->Error("Can't create window.");
-			return;
-		}
+		m_window->create(desc);
 
 		inputManager = new InputManager();
 		inputManager->init();
 		inputManager->addListeners();
 		m_window->setInputManager(inputManager);
-		rendererManager = new Renderer;
-		rendererManager->init(sceneManager, m_window->getHWND());
-		sceneManager = new SceneManager;
-		sceneManager->init(rendererManager->driverDX11->m_pDevice);
-		rendererManager->sceneManager = sceneManager;
-		inputManager->getListener()->scene = sceneManager->getScene();
-		inputManager->getListener()->renderer = rendererManager;
+
+		renderer = new Renderer;
+		renderer->init(m_window->getHWND());
+
+		scene = new Scene;
+		scene->init(renderer->driverDX11);
+
+		inputManager->getListener()->scene = scene;
+		inputManager->getListener()->renderer = renderer;
 
 		isRun = false;
 		isInitialized = true;
@@ -52,12 +49,37 @@ namespace MyEngine
 
 	Engine::~Engine()
 	{
-		delete sceneManager;
-		delete rendererManager;
+		delete scene;
+		delete renderer;
 	}
 
 	Engine::Engine()
 	{
+
+	}
+
+	void Engine::drawScene()
+	{
+		renderer->driverDX11->setRenderTargets();
+		renderer->driverDX11->clearRenderTargets();
+
+		scene->drawAll();
+
+		renderer->driverDX11->beginScene();
+		
+		renderer->driverDX11->turnZBufferOff();
+
+
+		renderer->driverDX11->renderOrtho();
+		renderer->driverDX11->turnZBufferOn();
+
+		//turnOffZ();
+		// full screen window render
+		// light shader render
+		// turnOnZ()
+
+		renderer->driverDX11->endScene();
+
 
 	}
 }

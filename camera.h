@@ -28,17 +28,17 @@ namespace MyEngine
 		{
 			XMVECTOR pos_ = XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
 			XMVECTOR at_ = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
-			XMVECTOR up_ = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+			XMVECTOR up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
 			pos = XMFLOAT4(0.0f, 0.0f, 1.0f, 0.0f);
 			dir = XMFLOAT4(0.0f, 0.0f, -1.0f, 0.0f);
-			up = XMFLOAT4(0.0f, 1.0f, 0.0f, 0.0f);
+			speed = XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f);
 			ax = 0.0f;
 			ay = 1.5f;
 
 			invertY = false;
 			aspect = 1.33333f;
 			aView = 0.6f;
-			m_View = XMMatrixLookAtLH(pos_, at_, up_);
+			m_View = XMMatrixLookAtLH(pos_, at_, up);
 			m_Projection = XMMatrixPerspectiveFovLH(aView, aspect, 0.1f, 1000.0f);
 		}
 

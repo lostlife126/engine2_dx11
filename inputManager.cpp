@@ -46,10 +46,7 @@ namespace MyEngine
 
 	void InputManager::changeLock()
 	{
-		if (lockMouse)
-			lockMouse = false;
-		else
-			lockMouse = true;
+		lockMouse = !lockMouse;
 	}
 
 	void InputManager::run(const UINT& msg, WPARAM wParam, LPARAM lParam)

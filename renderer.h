@@ -1,6 +1,6 @@
 #pragma once
 #include <queue>
-#include "sceneManager.h"
+#include "scene.h"
 #include "videoDriverDX11.h"
 #include "shader.h"
 #include "font.h"
@@ -13,9 +13,8 @@ namespace MyEngine
 	{
 	public:
 		void renderScene(float dt, double time);
-		void init(SceneManager* sm, HWND hwnd_);
+		void init(HWND hwnd_);
 		VideoDriverDX11* driverDX11;
-		SceneManager* sceneManager;
 
 		Font font;
 		Text* text_fps;

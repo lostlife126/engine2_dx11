@@ -1,6 +1,4 @@
-
 #include "Log.h"
-//#include <clocale>
 #include <ctime>
 #include <string>
 
@@ -11,8 +9,6 @@
 
 namespace MyEngine
 {
-	//------------------------------------------------------------------
-
 	Log* Log::m_instance = nullptr;
 
 	Log::Log()
@@ -24,7 +20,7 @@ namespace MyEngine
 			m_init();
 		}
 		else
-			Error("Log уже был создан");
+			Error("Log was created.");
 	}
 
 	Log::~Log()
@@ -35,20 +31,18 @@ namespace MyEngine
 
 	void Log::m_init()
 	{
-		//setlocale(LC_ALL, "rus");
-
 		if (fopen_s(&m_file, LOGNAME, "w") == 0)
 		{
 			char timer[9];
 			_strtime_s(timer, 9);
 			char date[9];
 			_strdate_s(date, 9);
-			fprintf(m_file, "Лог создан: %s %s.\n", date, timer);
+			fprintf(m_file, "Log created: %s %s.\n", date, timer);
 			fprintf(m_file, "---------------------------------------\n\n");
 		}
 		else
 		{
-			printf("Ошибка при создании файла лога...\n");
+			printf("Error creating file...\n");
 			m_file = nullptr;
 		}
 	}
@@ -63,7 +57,7 @@ namespace MyEngine
 		char date[9];
 		_strdate_s(date, 9);
 		fprintf(m_file, "\n---------------------------------------\n");
-		fprintf(m_file, "Конец лога: %s %s.", date, timer);
+		fprintf(m_file, "End log: %s %s.", date, timer);
 		fclose(m_file);
 	}
 

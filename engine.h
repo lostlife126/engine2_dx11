@@ -3,7 +3,7 @@
 #include "log.h"
 #include "window.h"
 #include "inputManager.h"
-#include "sceneManager.h"
+#include "scene.h"
 #include "renderer.h"
 #include <d3d11.h>
 #include <d3dx11.h>
@@ -52,8 +52,8 @@ namespace MyEngine
 		~Engine();
 
 		InputManager* inputManager;
-		SceneManager* sceneManager;
-		Renderer* rendererManager;
+		Scene* scene;
+		Renderer* renderer;
 		Window* m_window;
 		DescWindow desc;
 		FPSCounter fpsCounter;
@@ -66,5 +66,7 @@ namespace MyEngine
 		void run();
 		void start();
 		void init();
+
+		void drawScene();
 	};
 }

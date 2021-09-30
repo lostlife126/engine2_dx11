@@ -6,8 +6,7 @@
 #include "model.h"
 #include "light.h"
 
-#include <d3d11.h>
-#include <d3dx11.h>
+#include "videoDriverDX11.h"
 
 namespace MyEngine
 {
@@ -19,20 +18,20 @@ namespace MyEngine
 		Scene();
 		~Scene();
 
-		void update(float dt);
-		void init(ID3D11Device* deviceContext);
+		void init(VideoDriverDX11* driver);
 
-		std::queue<Model*>* getVisibleObjects();
-		std::vector<Model*> allObjects;
-		CameraDX11 camera;
-		std::vector<Light*> light;
+		void update(float dt);
+		void drawAll();
+
+		void addObject(const char* pathMesh, const char* pathTexture);
+
+		CameraDX11* getCamera();
 
 	private:
-		void load();
-
-		std::queue<Model*> visibleObjects;
-
-
+		CameraDX11* m_camera;
+		std::vector<Light*> light;
+		std::vector<Model*> allObjects;
+		VideoDriverDX11* driver;
 
 		void frustrumCulling();
 	};

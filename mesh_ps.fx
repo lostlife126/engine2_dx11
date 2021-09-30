@@ -1,37 +1,29 @@
-Texture2D ObjTexture;
-SamplerState SampleType;
-
-cbuffer LightBuffer
-{
-    float4 ambientColor;
-    float4 diffuseColor;
-    float3 lightDirection;
-};
+Texture2D shaderTexture;
+SamplerState SampleTypeWrap;
 
 struct PixelInputType
 {
-    float4 pos : SV_POSITION;
+    float4 position : SV_POSITION;
     float2 tex : TEXCOORD0;
     float3 normal : NORMAL;
 };
 
-float4 PS(PixelInputType input) : SV_TARGET
+struct PixelOutputType
 {
-    float4 texColor;
-    float3 lightDir;
-    float lightIntensity;
-    float4 color;
+    float4 color : SV_Target0;
+    float4 normal : SV_Target1;
+};
 
-    texColor = ObjTexture.Sample( SampleType, input.tex );
-    color = ambientColor;
-    lightDir = -lightDirection;
-    lightIntensity = saturate(dot(input.normal, lightDir));
-    if(lightIntensity > 0.0f)
-    {
-        color += (diffuseColor * lightIntensity);
-    }
-    color = saturate(color);
-    color = color * texColor;
-    return color;
+PixelOutputType PS(PixelInputType input) : SV_TARGET
+{
+    PixelOutputType output;
 
+
+    // Sample the color from the texture and store it for output to the render target.
+    output.color = shaderTexture.Sample(SampleTypeWrap, input.tex);
+	
+    // Store the normal for output to the render target.
+    output.normal = float4(input.normal, 1.0f);
+
+    return output;
 }

@@ -32,6 +32,23 @@ namespace MyEngine
 			yl = 0.0f; yr = 0.0f; dy = 0.0f;
 			zl = 0.0f; zr = 0.0f; dz = 0.0f;
 		}
+
+		void fill(std::vector<XMFLOAT3>& v)
+		{
+			setZero();
+			for (int i = 0; i < v.size(); i++)
+			{
+				xl = (xl < v[i].x) ? xl : v[i].x;
+				xr = (xr > v[i].x) ? xr : v[i].x;
+				yl = (yl < v[i].y) ? yl : v[i].y;
+				yr = (yr > v[i].y) ? yr : v[i].y;
+				zl = (zl < v[i].z) ? zl : v[i].z;
+				zr = (zr > v[i].z) ? zr : v[i].z;
+			}
+			dx = xr - xl;
+			dy = yr - yl;
+			dz = zr - zl;
+		}
 	};
 
 	void loadObjInfo(const char* path, int& nVertices, int& nTexels, int& nNormals, int& nFaces);
@@ -50,10 +67,8 @@ namespace MyEngine
 		std::vector<VertexData> vertices;
 		std::vector<DWORD> indices;
 
-		Shader* m_shader;
-
-		ID3D11Buffer* m_lightBuffer; // буфер где лежат источники света
-		ID3D11Buffer* m_matrixBuffer; // буфер матриц (константный буфер)
+		ModelShader* m_shader;
+		BoxAABB box;
 
 		void loadObj(const char* path)
 		{
@@ -194,7 +209,6 @@ namespace MyEngine
 				vertices[indt[i * 3 + 1]].tex = t[indt[i * 3 + 1]];
 				vertices[indt[i * 3 + 2]].tex = t[indt[i * 3 + 2]];
 
-
 				vertices[indt[i * 3    ]].norm = n[indn[i * 3    ]];
 				vertices[indt[i * 3 + 1]].norm = n[indn[i * 3 + 1]];
 				vertices[indt[i * 3 + 2]].norm = n[indn[i * 3 + 2]];
@@ -203,16 +217,14 @@ namespace MyEngine
 				indices[3 * i + 1] = indt[3 * i + 1];
 				indices[3 * i + 2] = indt[3 * i + 2];
 			}
+			box.fill(v);
 			return;
 		}
-
-
 
 		Model()
 		{
 			m_World = XMMatrixIdentity();
 		}
-
 
 		void load(ID3D11Device* device, const char* mesh_path, const char* tex_path)
 		{
@@ -220,9 +232,8 @@ namespace MyEngine
 		
 			p_vBuff = Buffer::createVertexBuffer(device, sizeof(VertexData) * numVertices, &(vertices[0]), false);
 			p_iBuff = Buffer::createIndexBuffer(device, sizeof(DWORD) * numIndices, &(indices[0]), false);
-			m_matrixBuffer = Buffer::createConstantBuffer(device, sizeof(MatrixBufferType), true);
-			m_lightBuffer = Buffer::createConstantBuffer(device, sizeof(LightBufferType), true);
-			m_shader = new Shader;
+
+			m_shader = new ModelShader;
 			m_shader->addInputElement("POSITION", DXGI_FORMAT_R32G32B32_FLOAT);
 			m_shader->addInputElement("TEXCOORD", DXGI_FORMAT_R32G32_FLOAT);
 			m_shader->addInputElement("NORMAL", DXGI_FORMAT_R32G32B32_FLOAT);
@@ -257,46 +268,15 @@ namespace MyEngine
 			return;
 		}
 
-		void render(ID3D11DeviceContext* deviceContext, XMMATRIX worldMatrix, XMMATRIX viewMatrix, XMMATRIX projectionMatrix,
-			XMFLOAT3 lightDir, XMFLOAT4 lightAmbient, XMFLOAT4 lightDiffuse)
+		void render(ID3D11DeviceContext* deviceContext, XMMATRIX worldMatrix, XMMATRIX viewMatrix, XMMATRIX projectionMatrix)
 		{
+			// ????
 			renderBuffers(deviceContext);
-			setShaderParameters(deviceContext, worldMatrix, viewMatrix, projectionMatrix, lightDir, lightAmbient, lightDiffuse);
+			// пишем входящие данные в шейдер
+			m_shader->setShaderParameters(deviceContext, worldMatrix, viewMatrix, projectionMatrix);
+			//
 			m_shader->draw(deviceContext);
 			deviceContext->DrawIndexed(numIndices, 0, 0);
-		}
-
-		void setShaderParameters(ID3D11DeviceContext* deviceContext, XMMATRIX worldMatrix, XMMATRIX viewMatrix, XMMATRIX projectionMatrix,
-			 XMFLOAT3 lightDir, XMFLOAT4 lightAmbient, XMFLOAT4 lightDiffuse)
-		{
-			HRESULT hr;
-			D3D11_MAPPED_SUBRESOURCE mappedRes;
-			MatrixBufferType* p_data1;
-			LightBufferType* p_data2;
-			unsigned int bufferNum = 0;
-
-			worldMatrix = XMMatrixTranspose(worldMatrix);
-			viewMatrix = XMMatrixTranspose(viewMatrix);
-			projectionMatrix = XMMatrixTranspose(projectionMatrix);
-
-			hr = deviceContext->Map(m_matrixBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedRes);
-			p_data1 = (MatrixBufferType*)mappedRes.pData;
-			p_data1->m_World = worldMatrix;
-			p_data1->m_View = viewMatrix;
-			p_data1->m_Projection = projectionMatrix;
-			deviceContext->Unmap(m_matrixBuffer, 0);
-			deviceContext->VSSetConstantBuffers(bufferNum, 1, &m_matrixBuffer);
-
-			hr = deviceContext->Map(m_lightBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedRes);
-			p_data2 = (LightBufferType*)mappedRes.pData;
-			p_data2->ambient = lightAmbient;
-			p_data2->diffuse = lightDiffuse;
-			p_data2->direction = lightDir;
-			deviceContext->Unmap(m_lightBuffer, 0);
-			bufferNum = 0;
-			deviceContext->PSSetConstantBuffers(bufferNum, 1, &m_lightBuffer);
-
-			return;
 		}
 
 		ID3D11Buffer* p_vBuff = nullptr;

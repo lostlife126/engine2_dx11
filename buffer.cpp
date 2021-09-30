@@ -28,13 +28,9 @@ namespace MyEngine
 		sd.SysMemSlicePitch = 0;
 		HRESULT hr = device->CreateBuffer(&bd, &sd, &vb);
 		if (FAILED(hr))
-		{
 			Log::Get()->Error("Error creating vertex buffer!");
-		}
 		else
-		{
 			Log::Get()->Debug("Vertex buffer was created.");
-		}
 		return vb;
 	}
 
@@ -62,13 +58,9 @@ namespace MyEngine
 		sd.SysMemSlicePitch = 0;
 		HRESULT hr = device->CreateBuffer(&bd, &sd, &ib);
 		if (FAILED(hr))
-		{
 			Log::Get()->Error("Error creating index buffer!");
-		}
 		else
-		{
 			Log::Get()->Debug("Index buffer was created.");
-		}
 		return ib;
 	}
 
@@ -93,13 +85,9 @@ namespace MyEngine
 
 		HRESULT hr = device->CreateBuffer(&bd, NULL, &cb);
 		if (FAILED(hr))
-		{
 			Log::Get()->Error("Error creating constant buffer!");
-		}
 		else
-		{
 			Log::Get()->Debug("Constant buffer was created.");
-		}
 		return cb;
 	}
 }

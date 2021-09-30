@@ -10,6 +10,7 @@
 namespace MyEngine
 {
 	// chunk is class for incapsulating functions of drawing
+	/*
 	class ChunkDX11
 	{
 	public:
@@ -96,6 +97,6 @@ namespace MyEngine
 			renderBuffers(deviceContext);
 		}
 
-
+		*/
 	};
 }

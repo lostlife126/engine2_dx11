@@ -64,9 +64,9 @@ namespace MyEngine
 		bool MouseWheel(const MouseEventWheel& arg) 
 		{ 
 			if(arg.wheel > 0)
-				scene->camera.zoom(1.1f);
+				scene->getCamera()->zoom(1.1f);
 			else
-				scene->camera.zoom(0.91f);
+				scene->getCamera()->zoom(0.91f);
 			return false; 
 		}
 		// движение мыши
@@ -74,7 +74,7 @@ namespace MyEngine
 		{ 
 			if (lockedMouse)
 			{
-				scene->camera.turn(arg.dx * 0.001f, arg.dy * 0.001f);
+				scene->getCamera()->turn(arg.dx * 0.001f, arg.dy * 0.001f);
 			}
 			return false; 
 		}
@@ -84,13 +84,13 @@ namespace MyEngine
 		{
 			printf("key press %c\n", arg.wc); 
 			if (arg.wc == 'w')
-				scene->camera.moveForward();
+				scene->getCamera()->moveForward();
 			if (arg.wc == 's')
-				scene->camera.moveBack();
+				scene->getCamera()->moveBack();
 			if (arg.wc == 'a')
-				scene->camera.moveLeft();
+				scene->getCamera()->moveLeft();
 			if (arg.wc == 'd')
-				scene->camera.moveRight();
+				scene->getCamera()->moveRight();
 			if (arg.wc == 'q')
 				manager->changeLock();
 			if (arg.wc == 'e')
