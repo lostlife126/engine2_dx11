@@ -9,7 +9,7 @@
 #include "camera.h"
 #include "log.h"
 #include <xnamath.h>
-#include<d3dx10math.h>
+
 #include "shader.h"
 
 #pragma comment(lib, "d3d11.lib")
@@ -28,19 +28,19 @@ namespace MyEngine
 		XMFLOAT2  tex;
 	};
 
-	const int NUM_BUFFERS = 2;
+	const int NUM_BUFFERS = 3; // diffuse, normal, ao
 
 	class VideoDriverDX11
 	{
 
 	private:
-		HWND hwnd;
-		D3D_DRIVER_TYPE m_driverType;
-		D3D_FEATURE_LEVEL m_featureLevel;
+		HWND hwnd; // хэндлер окна
+		D3D_DRIVER_TYPE m_driverType; // тип драйвера
+		D3D_FEATURE_LEVEL m_featureLevel; // версия 
 
-		ID3D11Device* m_device;
-		ID3D11DeviceContext* m_deviceContext;
-		IDXGISwapChain* m_swapChain;
+		ID3D11Device* m_device; // девайс
+		ID3D11DeviceContext* m_deviceContext; // контекст
+		IDXGISwapChain* m_swapChain; // свопчейн
 
 		ID3D11Texture2D* m_renderTargetTextureArray[NUM_BUFFERS];
 		ID3D11ShaderResourceView* m_shaderResourceViewArray[NUM_BUFFERS];
@@ -62,10 +62,10 @@ namespace MyEngine
 		ID3D11Buffer* m_vScreen = nullptr;
 		ID3D11Buffer* m_iScreen = nullptr;
 
-		Shader* m_lightShader;
+	//	Shader* m_lightShader;
 
-		XMMATRIX m_matrixProjection;
-		XMMATRIX m_matrixOrtho;
+		XMMATRIX m_matrixProjection; // матрица проекции
+		XMMATRIX m_matrixOrtho; // ортоматрица
 
 		bool createDevice();
 		bool solidState;
@@ -74,6 +74,8 @@ namespace MyEngine
 		int m_heightScreen;
 
 	public:
+
+		void renderShader(Light* light);
 
 		void createBuffers();
 
@@ -107,13 +109,11 @@ namespace MyEngine
 			solidState = true;
 		}
 
-		void setRenderTargets();
-		void clearRenderTargets();
-		void resetViewport();
+		void setRenderTargetBuffers();
+		void setRenderTargetBackBuffer();
+		void clearRenderTarget();
 
-		void renderOrtho();
-
-		void setBackBufferTarget();
+		void renderToScreen();
 
 		void turnZBufferOn();
 		void turnZBufferOff();
@@ -135,7 +135,7 @@ namespace MyEngine
 		void init(HWND hwnd_);
 
 
-
+		LightShader* m_lightShader;
 
 
 	};

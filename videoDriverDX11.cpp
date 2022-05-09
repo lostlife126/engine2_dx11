@@ -13,6 +13,15 @@ namespace MyEngine
 		float right = left + (float)m_widthScreen;
 		float top = (float)(m_heightScreen / 2);
 		float bottom = top - (float)m_heightScreen;
+		m_viewport.Width = float(m_widthScreen);
+		m_viewport.Height = float(m_heightScreen);
+		m_viewport.MinDepth = 0.0f;
+		m_viewport.MaxDepth = 1.0f;
+		m_viewport.TopLeftX = 0;
+		m_viewport.TopLeftY = 0;
+
+		createBuffers();
+
 		std::vector<ScreenVertexData> vScreen(4);
 		std::vector<DWORD> iScreen(6);
 		vScreen[0].pos = XMFLOAT3(left, top, 0.0f);
@@ -39,7 +48,6 @@ namespace MyEngine
 		m_lightShader->addInputElement("POSITION", DXGI_FORMAT_R32G32B32_FLOAT);
 		m_lightShader->addInputElement("TEXCOORD", DXGI_FORMAT_R32G32_FLOAT);
 		m_lightShader->initShaders(m_device, "light_vs.fx", "light_ps.fx");
-	//	m_shader->loadTexture(device, "chest_albedo.png");
 		m_lightShader->setSampleState(m_device);
 	}
 
@@ -52,6 +60,9 @@ namespace MyEngine
 		texDesc.MipLevels = 1;
 		texDesc.ArraySize = 1;
 		texDesc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+		texDesc.SampleDesc.Count = 1;
+		texDesc.Usage = D3D11_USAGE_DEFAULT;
+		texDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
 		texDesc.CPUAccessFlags = 0;
 		texDesc.MiscFlags = 0;
 		HRESULT hr;
@@ -110,14 +121,6 @@ namespace MyEngine
 		hr = m_device->CreateDepthStencilView(m_depthStencilBuffer, &descDSV, &m_depthStencilView);
 		if (FAILED(hr))
 			Log::Get()->Error("Error creation depth stencil view.");
-
-		m_viewport.Width = float(m_viewport.Width);
-		m_viewport.Height = float(m_viewport.Height);
-		m_viewport.MinDepth = 0.0f;
-		m_viewport.MaxDepth = 1.0f;
-		m_viewport.TopLeftX = 0;
-		m_viewport.TopLeftY = 0;
-
 	}
 
 	bool VideoDriverDX11::createDevice()
@@ -232,24 +235,21 @@ namespace MyEngine
 		return true;
 	}
 
-	void VideoDriverDX11::setRenderTargets()
+	void VideoDriverDX11::setRenderTargetBuffers()
 	{
 		m_deviceContext->OMSetRenderTargets(NUM_BUFFERS, m_renderTargetViewArray, m_depthStencilView);
 		m_deviceContext->RSSetViewports(1, &m_viewport);
 		return;
 	}
 
-	void VideoDriverDX11::setBackBufferTarget()
+	void VideoDriverDX11::setRenderTargetBackBuffer()
 	{
 		m_deviceContext->OMSetRenderTargets(1, &m_renderTargetView, m_depthStencilView);
-	}
-
-	void VideoDriverDX11::resetViewport()
-	{
 		m_deviceContext->RSSetViewports(1, &m_viewport);
+		return;
 	}
 
-	void VideoDriverDX11::clearRenderTargets()
+	void VideoDriverDX11::clearRenderTarget()
 	{
 		float colorClear[4] = { 0.0, 0.0, 0.0, 1.0 };
 		for (int i = 0; i < NUM_BUFFERS; i++)
@@ -281,7 +281,7 @@ namespace MyEngine
 			m_deviceContext->RSSetState(m_rasterizerWireState);
 	}
 
-	void VideoDriverDX11::renderOrtho()
+	void VideoDriverDX11::renderToScreen()
 	{
 		unsigned int stride = sizeof(ScreenVertexData);
 		unsigned int offset = 0;
@@ -296,15 +296,18 @@ namespace MyEngine
 		float clearColor[4] = { 0.0f, 0.125f, 0.25f, 0.0f };
 		m_deviceContext->ClearRenderTargetView(m_renderTargetView, clearColor);
 		m_deviceContext->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH, 1.0f, 0);
-	//	if (stateNow == 1)
-	//		deviceContext->RSSetState(m_rasterizerWireState);
-	//	else
-	//		deviceContext->RSSetState(m_rasterizerSolidState);
+		m_deviceContext->RSSetState(m_rasterizerSolidState);
 	}
 
 	void VideoDriverDX11::endScene()
 	{ 
 		m_swapChain->Present(0, 0); 
 	};
+
+	void VideoDriverDX11::renderShader(Light* light)
+	{
+		XMMATRIX m_worldMatrix = XMMatrixIdentity();
+		m_lightShader->render(m_deviceContext, 6, m_worldMatrix, m_worldMatrix, m_matrixOrtho, m_shaderResourceViewArray[0], m_shaderResourceViewArray[1], light);
+	}
 
 }

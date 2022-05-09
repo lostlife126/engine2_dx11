@@ -40,7 +40,7 @@ namespace MyEngine
 		wnd.hCursor = LoadCursor(0, IDC_ARROW);
 		wnd.hbrBackground = (HBRUSH)GetStockObject(BLACK_BRUSH);
 		wnd.lpszMenuName = NULL;
-		wnd.lpszClassName = L"D3D11F";
+		wnd.lpszClassName = L"Engine";
 		wnd.cbSize = sizeof(WNDCLASSEX);
 
 		if (!RegisterClassExW(&wnd))
@@ -58,7 +58,7 @@ namespace MyEngine
 		long lleft = (long)m_desc.posx;
 		long ltop = (long)m_desc.posy;
 
-		m_hwnd = CreateWindowExW(NULL, L"D3D11F", m_desc.caption.c_str(), WS_OVERLAPPEDWINDOW | WS_VISIBLE, lleft, ltop, lwidth, lheight, NULL, NULL, NULL, NULL);
+		m_hwnd = CreateWindowExW(NULL, L"Engine", m_desc.caption.c_str(), WS_OVERLAPPEDWINDOW | WS_VISIBLE, lleft, ltop, lwidth, lheight, NULL, NULL, NULL, NULL);
 
 		if (!m_hwnd)
 		{
@@ -96,6 +96,7 @@ namespace MyEngine
 	{
 		switch (nMsg)
 		{
+
 		case WM_CREATE:
 			return 0;
 		case WM_CLOSE:

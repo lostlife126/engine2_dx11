@@ -16,14 +16,12 @@ namespace MyEngine
 		void init(HWND hwnd_);
 		VideoDriverDX11* driverDX11;
 
-		Font font;
-		Text* text_fps;
-		Text* text_time;
+		//Font font;
+	//	Text* text_fps;
+	//	Text* text_time;
 
 	private:
 		
-
-
 		int m_width = 1024;
 		int m_height = 768;
 		HWND hwnd;

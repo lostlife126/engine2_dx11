@@ -23,15 +23,21 @@ namespace MyEngine
 		void update(float dt);
 		void drawAll();
 
-		void addObject(const char* pathMesh, const char* pathTexture);
+		void addObject();
 
 		CameraDX11* getCamera();
+		void loadGraph(ID3D11Device* device, const char* mesh_path, const char* tex_path);
+
+		Light* getLight();
 
 	private:
 		CameraDX11* m_camera;
 		std::vector<Light*> light;
-		std::vector<Model*> allObjects;
+		std::vector<Mesh*> mesh;
+		std::vector<ModelShader*> m_shader;
 		VideoDriverDX11* driver;
+		std::vector<Object*> object;
+
 
 		void frustrumCulling();
 	};

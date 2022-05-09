@@ -54,7 +54,7 @@ namespace MyEngine
 	void loadObjInfo(const char* path, int& nVertices, int& nTexels, int& nNormals, int& nFaces);
 
 	// класс реализующий 3d модель объекта - сетку (вершины нормали индексы и т.д.) и текстуры
-	class Model
+	class Mesh
 	{
 	public:
 
@@ -67,12 +67,8 @@ namespace MyEngine
 		std::vector<VertexData> vertices;
 		std::vector<DWORD> indices;
 
-		ModelShader* m_shader;
-		BoxAABB box;
-
 		void loadObj(const char* path)
 		{
-
 			bool invert = true;
 			std::vector<XMFLOAT3> v;
 			std::vector<XMFLOAT2> t;
@@ -217,28 +213,18 @@ namespace MyEngine
 				indices[3 * i + 1] = indt[3 * i + 1];
 				indices[3 * i + 2] = indt[3 * i + 2];
 			}
-			box.fill(v);
 			return;
 		}
 
-		Model()
+		Mesh()
 		{
-			m_World = XMMatrixIdentity();
 		}
 
-		void load(ID3D11Device* device, const char* mesh_path, const char* tex_path)
+		void load(ID3D11Device* device, const char* mesh_path)
 		{
 			loadObj(mesh_path);
-		
 			p_vBuff = Buffer::createVertexBuffer(device, sizeof(VertexData) * numVertices, &(vertices[0]), false);
 			p_iBuff = Buffer::createIndexBuffer(device, sizeof(DWORD) * numIndices, &(indices[0]), false);
-
-			m_shader = new ModelShader;
-			m_shader->addInputElement("POSITION", DXGI_FORMAT_R32G32B32_FLOAT);
-			m_shader->addInputElement("TEXCOORD", DXGI_FORMAT_R32G32_FLOAT);
-			m_shader->addInputElement("NORMAL", DXGI_FORMAT_R32G32B32_FLOAT);
-			m_shader->initShaders(device, "mesh_vs.fx", "mesh_ps.fx");
-			m_shader->loadTexture(device, "chest_albedo.png");
 		}
 
 		void release()
@@ -257,7 +243,7 @@ namespace MyEngine
 
 		}
 
-		void renderBuffers(ID3D11DeviceContext* deviceContext)
+		void render(ID3D11DeviceContext* deviceContext)
 		{
 			unsigned int stride = sizeof(VertexData);
 			unsigned int offset = 0;
@@ -268,31 +254,23 @@ namespace MyEngine
 			return;
 		}
 
-		void render(ID3D11DeviceContext* deviceContext, XMMATRIX worldMatrix, XMMATRIX viewMatrix, XMMATRIX projectionMatrix)
-		{
-			// ????
-			renderBuffers(deviceContext);
-			// пишем входящие данные в шейдер
-			m_shader->setShaderParameters(deviceContext, worldMatrix, viewMatrix, projectionMatrix);
-			//
-			m_shader->draw(deviceContext);
-			deviceContext->DrawIndexed(numIndices, 0, 0);
-		}
-
 		ID3D11Buffer* p_vBuff = nullptr;
 		ID3D11Buffer* p_iBuff = nullptr;
-
-
-		bool created = false;
-
-		XMMATRIX m_World;
-
-
 
 	private:
 
 
 	};
 
+	class Object
+	{
+	public:
+
+		int typeMesh;
+		int typeTexture;
+
+		XMFLOAT3 position;
+		XMMATRIX worldMatrix;
+	};
 
 }

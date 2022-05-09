@@ -5,7 +5,10 @@ SamplerState SampleTypePoint : register(s0);
 
 cbuffer LightBuffer
 {
-    float3 lightDirection;
+    
+	float4 lightAmb;
+	float4 lightDiff;
+	float3 lightDirection;
     float padding;
 };
 
@@ -21,22 +24,18 @@ float4 PS(PixelInputType input) : SV_TARGET
     float4 colors;
     float4 normals;
     float3 lightDir;
-    float lightIntensity;
+    float4 lightIntensity;
     float4 outputColor;
 
     colors = colorTexture.Sample(SampleTypePoint, input.tex);
-
-    // Sample the normals from the normal render texture using the point sampler at this texture coordinate location.
     normals = normalTexture.Sample(SampleTypePoint, input.tex);
 
-    // Invert the light direction for calculations.
-    lightDir = -lightDirection;
+    lightDir = lightDirection;
 
-    // Calculate the amount of light on this pixel.
-    lightIntensity = saturate(dot(normals.xyz, lightDir));
+    //lightIntensity = saturate(dot(normals.xyz, lightDir));
+	lightIntensity = (lightAmb + lightDiff * dot(normals.xyz, lightDir));
 
-    // Determine the final amount of diffuse color based on the color of the pixel combined with the light intensity.
-    outputColor = saturate(colors * lightIntensity);
+	outputColor = (colors * lightIntensity);
 
     return outputColor;
 }

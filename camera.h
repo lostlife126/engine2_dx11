@@ -13,6 +13,7 @@ namespace MyEngine
 
 		XMMATRIX m_View;
 		XMMATRIX m_Projection;
+		XMMATRIX m_baseView;
 
 		XMFLOAT4 pos;
 		XMFLOAT4 speed;
@@ -40,6 +41,8 @@ namespace MyEngine
 			aView = 0.6f;
 			m_View = XMMatrixLookAtLH(pos_, at_, up);
 			m_Projection = XMMatrixPerspectiveFovLH(aView, aspect, 0.1f, 1000.0f);
+
+			m_baseView = XMMatrixLookAtLH(pos_, at_, up);
 		}
 
 		void zoom(float mul)

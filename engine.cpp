@@ -12,7 +12,6 @@ namespace MyEngine
 			scene->update(dt);
 			drawScene();
 			m_window->runEvent();
-
 		}
 		return;
 	}
@@ -60,23 +59,22 @@ namespace MyEngine
 
 	void Engine::drawScene()
 	{
-		renderer->driverDX11->setRenderTargets();
-		renderer->driverDX11->clearRenderTargets();
+		renderer->driverDX11->setRenderTargetBuffers(); // 
+		renderer->driverDX11->clearRenderTarget();  // 
 
 		scene->drawAll();
 
+		renderer->driverDX11->setRenderTargetBackBuffer(); // 
+
 		renderer->driverDX11->beginScene();
-		
+
 		renderer->driverDX11->turnZBufferOff();
 
+		renderer->driverDX11->renderToScreen();
 
-		renderer->driverDX11->renderOrtho();
+		renderer->driverDX11->renderShader(scene->getLight());
+
 		renderer->driverDX11->turnZBufferOn();
-
-		//turnOffZ();
-		// full screen window render
-		// light shader render
-		// turnOnZ()
 
 		renderer->driverDX11->endScene();
 

@@ -47,6 +47,7 @@ namespace MyEngine
 	void InputManager::changeLock()
 	{
 		lockMouse = !lockMouse;
+		ShowCursor(!lockMouse);
 	}
 
 	void InputManager::run(const UINT& msg, WPARAM wParam, LPARAM lParam)
