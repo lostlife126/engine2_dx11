@@ -93,8 +93,6 @@ namespace MyEngine
 				scene->getCamera()->moveRight();
 			if (arg.wc == 'q')
 				manager->changeLock();
-			if (arg.wc == 'e')
-				renderer->driverDX11->changeState();
 				
 
 			return false;

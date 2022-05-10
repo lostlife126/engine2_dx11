@@ -25,13 +25,13 @@ namespace MyEngine
 
 		void addObject();
 
-		CameraDX11* getCamera();
-		void loadGraph(ID3D11Device* device, const char* mesh_path, const char* tex_path);
+		Camera* getCamera();
+		void loadGraph(ID3D11Device* device, const char* mesh_path, const char* tex_path, bool invert = true);
 
 		Light* getLight();
 
 	private:
-		CameraDX11* m_camera;
+		Camera* m_camera;
 		std::vector<Light*> light;
 		std::vector<Mesh*> mesh;
 		std::vector<ModelShader*> m_shader;

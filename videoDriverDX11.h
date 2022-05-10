@@ -54,8 +54,7 @@ namespace MyEngine
 		ID3D11DepthStencilState* m_depthStencilState;
 		ID3D11DepthStencilState* m_depthDisabledStencilState;
 
-		ID3D11RasterizerState* m_rasterizerSolidState; // состояние растеризатора с сплошной заливкой
-		ID3D11RasterizerState* m_rasterizerWireState; // состояние растеризатора с проволочной заливкой
+		ID3D11RasterizerState* m_rasterizerState; // состояние растеризатора
 
 		D3D11_VIEWPORT m_viewport; // вьюпорт
 
@@ -67,8 +66,10 @@ namespace MyEngine
 		XMMATRIX m_matrixProjection; // матрица проекции
 		XMMATRIX m_matrixOrtho; // ортоматрица
 
+		XMMATRIX m_baseWorldMatrix; // базовая матрица мира (единичная) для вывода текстуры буферов на экран
+		XMMATRIX m_baseViewMatrix; // базовая матрица вида (единичная) для вывода текстуры буферов на экран
+
 		bool createDevice();
-		bool solidState;
 
 		int m_widthScreen;
 		int m_heightScreen;
@@ -103,10 +104,8 @@ namespace MyEngine
 			m_depthStencilView = nullptr;
 			m_depthStencilState = nullptr;
 			m_depthDisabledStencilState = nullptr;
-			m_rasterizerWireState = nullptr;
-			m_rasterizerSolidState = nullptr;
+			m_rasterizerState = nullptr;
 			m_renderTargetView = nullptr;
-			solidState = true;
 		}
 
 		void setRenderTargetBuffers();
@@ -117,8 +116,6 @@ namespace MyEngine
 
 		void turnZBufferOn();
 		void turnZBufferOff();
-
-		void changeState();
 
 		void* operator new(size_t i)
 		{

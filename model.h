@@ -19,38 +19,6 @@ namespace MyEngine
 		XMFLOAT3 norm;
 	};
 
-	class BoxAABB
-	{
-	public:
-		float xl, xr, dx;
-		float yl, yr, dy;
-		float zl, zr, dz;
-
-		void setZero()
-		{
-			xl = 0.0f; xr = 0.0f; dx = 0.0f;
-			yl = 0.0f; yr = 0.0f; dy = 0.0f;
-			zl = 0.0f; zr = 0.0f; dz = 0.0f;
-		}
-
-		void fill(std::vector<XMFLOAT3>& v)
-		{
-			setZero();
-			for (int i = 0; i < v.size(); i++)
-			{
-				xl = (xl < v[i].x) ? xl : v[i].x;
-				xr = (xr > v[i].x) ? xr : v[i].x;
-				yl = (yl < v[i].y) ? yl : v[i].y;
-				yr = (yr > v[i].y) ? yr : v[i].y;
-				zl = (zl < v[i].z) ? zl : v[i].z;
-				zr = (zr > v[i].z) ? zr : v[i].z;
-			}
-			dx = xr - xl;
-			dy = yr - yl;
-			dz = zr - zl;
-		}
-	};
-
 	void loadObjInfo(const char* path, int& nVertices, int& nTexels, int& nNormals, int& nFaces);
 
 	// класс реализующий 3d модель объекта - сетку (вершины нормали индексы и т.д.) и текстуры
@@ -67,9 +35,9 @@ namespace MyEngine
 		std::vector<VertexData> vertices;
 		std::vector<DWORD> indices;
 
-		void loadObj(const char* path)
+		void loadObj(const char* path, bool invert)
 		{
-			bool invert = true;
+
 			std::vector<XMFLOAT3> v;
 			std::vector<XMFLOAT2> t;
 			std::vector<XMFLOAT3> n;
@@ -220,9 +188,9 @@ namespace MyEngine
 		{
 		}
 
-		void load(ID3D11Device* device, const char* mesh_path)
+		void load(ID3D11Device* device, const char* mesh_path, bool invert = false)
 		{
-			loadObj(mesh_path);
+			loadObj(mesh_path, invert);
 			p_vBuff = Buffer::createVertexBuffer(device, sizeof(VertexData) * numVertices, &(vertices[0]), false);
 			p_iBuff = Buffer::createIndexBuffer(device, sizeof(DWORD) * numIndices, &(indices[0]), false);
 		}
@@ -266,11 +234,37 @@ namespace MyEngine
 	{
 	public:
 
+		Object():
+			typeMesh(0),
+			typeTexture(0)
+		{
+			m_position.x = 0.0;
+			m_position.y = 0.0;
+			m_position.z = 0.0;
+			m_worldMatrix = XMMatrixTranslation(m_position.x, m_position.y, m_position.z);
+		}
+
+		Object(int typeMesh_, int typeTexture_, float x, float y, float z):
+			typeMesh(typeMesh_),
+			typeTexture(typeTexture_)
+		{
+			m_position.x = x;
+			m_position.y = y;
+			m_position.z = z;
+			m_worldMatrix = XMMatrixTranslation(m_position.x, m_position.y, m_position.z);
+		}
+
+		XMMATRIX getWorldMatrix()
+		{
+			return m_worldMatrix;
+		}
+
 		int typeMesh;
 		int typeTexture;
+	private:
 
-		XMFLOAT3 position;
-		XMMATRIX worldMatrix;
+		XMFLOAT3 m_position;
+		XMMATRIX m_worldMatrix;
 	};
 
 }

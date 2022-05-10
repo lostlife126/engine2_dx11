@@ -20,6 +20,9 @@ namespace MyEngine
 		m_viewport.TopLeftX = 0;
 		m_viewport.TopLeftY = 0;
 
+		m_baseWorldMatrix = XMMatrixIdentity();
+		m_baseViewMatrix = XMMatrixIdentity();
+
 		createBuffers();
 
 		std::vector<ScreenVertexData> vScreen(4);
@@ -227,10 +230,9 @@ namespace MyEngine
 		D3D11_RASTERIZER_DESC desc;
 		ZeroMemory(&desc, sizeof(D3D11_RASTERIZER_DESC));
 		desc.CullMode = D3D11_CULL_NONE;
-		desc.FillMode = D3D11_FILL_WIREFRAME;
-		m_device->CreateRasterizerState(&desc, &m_rasterizerWireState);
 		desc.FillMode = D3D11_FILL_SOLID;
-		m_device->CreateRasterizerState(&desc, &m_rasterizerSolidState);
+		m_device->CreateRasterizerState(&desc, &m_rasterizerState);
+		m_deviceContext->RSSetState(m_rasterizerState);
 
 		return true;
 	}
@@ -272,15 +274,6 @@ namespace MyEngine
 		return;
 	}
 
-	void VideoDriverDX11::changeState()
-	{
-		solidState = !solidState;
-		if (solidState)
-			m_deviceContext->RSSetState(m_rasterizerSolidState);
-		else
-			m_deviceContext->RSSetState(m_rasterizerWireState);
-	}
-
 	void VideoDriverDX11::renderToScreen()
 	{
 		unsigned int stride = sizeof(ScreenVertexData);
@@ -296,7 +289,7 @@ namespace MyEngine
 		float clearColor[4] = { 0.0f, 0.125f, 0.25f, 0.0f };
 		m_deviceContext->ClearRenderTargetView(m_renderTargetView, clearColor);
 		m_deviceContext->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH, 1.0f, 0);
-		m_deviceContext->RSSetState(m_rasterizerSolidState);
+		//m_deviceContext->RSSetState(m_rasterizerSolidState);
 	}
 
 	void VideoDriverDX11::endScene()
@@ -306,8 +299,7 @@ namespace MyEngine
 
 	void VideoDriverDX11::renderShader(Light* light)
 	{
-		XMMATRIX m_worldMatrix = XMMatrixIdentity();
-		m_lightShader->render(m_deviceContext, 6, m_worldMatrix, m_worldMatrix, m_matrixOrtho, m_shaderResourceViewArray[0], m_shaderResourceViewArray[1], light);
+		m_lightShader->render(m_deviceContext, 6, m_baseWorldMatrix, m_baseViewMatrix, m_matrixOrtho, m_shaderResourceViewArray[0], m_shaderResourceViewArray[1], light);
 	}
 
 }

@@ -325,7 +325,6 @@ namespace MyEngine
 			return;
 		}
 
-		
 		void render
 		(
 			ID3D11DeviceContext* deviceContext,

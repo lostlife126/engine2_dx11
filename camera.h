@@ -2,81 +2,109 @@
 //#include "basicStructs.h"
 #include <d3d11.h>
 #include <d3dx11.h>
-#include <d3dcompiler.h>
+//#include <d3dcompiler.h>
 #include <xnamath.h>
 namespace MyEngine
 {
 
-	class CameraDX11
+	double getAngle(double x, double y);
+
+	const float maxSpeed = 50.0;
+	const float acceleration = 5.0;
+
+	class Camera
 	{
 	public:
 
-		XMMATRIX m_View;
-		XMMATRIX m_Projection;
-		XMMATRIX m_baseView;
+		Camera() :
+			position(0.0, 0.0, 0.0, 0.0),
+			speed(0.0, 0.0, 0.0, 0.0),
+			direction(0.0, 0.0, 1.0, 0.0),
+			zoomNow(1.0),
+			invertY(false)
 
-		XMFLOAT4 pos;
-		XMFLOAT4 speed;
-		XMFLOAT4 dir;
-		float a_speed = 0.5f;
-		float aspect;
-		float ax;
-		float ay;
-		float aView;
-		bool invertY;
-
-		CameraDX11()
 		{
-			XMVECTOR pos_ = XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
-			XMVECTOR at_ = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
-			XMVECTOR up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
-			pos = XMFLOAT4(0.0f, 0.0f, 1.0f, 0.0f);
-			dir = XMFLOAT4(0.0f, 0.0f, -1.0f, 0.0f);
-			speed = XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f);
-			ax = 0.0f;
-			ay = 1.5f;
-
-			invertY = false;
-			aspect = 1.33333f;
-			aView = 0.6f;
-			m_View = XMMatrixLookAtLH(pos_, at_, up);
-			m_Projection = XMMatrixPerspectiveFovLH(aView, aspect, 0.1f, 1000.0f);
-
-			m_baseView = XMMatrixLookAtLH(pos_, at_, up);
+			setInit();
 		}
 
+		Camera(float x, float y, float z) :
+			position(x, y, z, 0.0),
+			speed(0.0, 0.0, 0.0, 0.0),
+			direction(0.0, 0.0, 1.0, 0.0),
+			zoomNow(1.0),
+			invertY(false)
+
+		{
+			setInit();
+		}
+
+		void moveForward()
+		{
+			speed.x += acceleration * direction.x;
+			speed.y += acceleration * direction.y;
+			speed.z += acceleration * direction.z;
+			moved = true;
+			correctSpeed();
+		}
+		void moveBack()
+		{
+			speed.x -= acceleration * direction.x;
+			speed.y -= acceleration * direction.y;
+			speed.z -= acceleration * direction.z;
+			moved = true;
+			correctSpeed();
+		}
+		void moveLeft()
+		{
+			speed.x -= acceleration * direction.z;
+			speed.z += acceleration * direction.x;
+			moved = true;
+			correctSpeed();
+		}
+		void moveRight()
+		{
+			speed.x += acceleration * direction.z;
+			speed.z -= acceleration * direction.x;
+			moved = true;
+			correctSpeed();
+		}
 		void zoom(float mul)
 		{
-			aView *= mul;
-			if (aView > 1.6f)
+			zoomNow *= mul;
+			if (zoomNow > 1.6f)
 			{
-				aView = 1.6f;
-				return;
+				zoomNow = 1.6f;
 			}
-			if (aView < 0.5f)
+			else
 			{
-				aView = 0.5f;
-				return;
+				if (zoomNow < 0.5f)
+				{
+					zoomNow = 0.5f;
+				}
 			}
+			m_Projection = XMMatrixPerspectiveFovLH(zoomNow, aspectRatio, 0.1f, 1000.0f);
+			return;
 		}
-
 		void render(float dt)
 		{
-			pos.x += speed.x * dt;
-			pos.y += speed.y * dt;
-			pos.z += speed.z * dt;
+			if (!moved)
+			{
+				speed.x *= 0.95; if (fabs(speed.x) < 0.01f) speed.x = 0.0f;
+				speed.y *= 0.95; if (fabs(speed.y) < 0.01f) speed.y = 0.0f;
+				speed.z *= 0.95; if (fabs(speed.z) < 0.01f) speed.z = 0.0f;
+			}
+			moved = false;
 
-			XMVECTOR pos_ = XMVectorSet(pos.x, pos.y, pos.z, 0.0f);
-			XMVECTOR at_ = XMVectorSet(pos.x+dir.x, pos.y+dir.y, pos.z+dir.z, 0.0f);
+			position.x += speed.x * dt;
+			position.y += speed.y * dt;
+			position.z += speed.z * dt;
+
+			XMVECTOR pos_ = XMVectorSet(position.x, position.y, position.z, 0.0f);
+			XMVECTOR at_ = XMVectorSet(position.x + direction.x, position.y + direction.y, position.z + direction.z, 0.0f);
 			XMVECTOR up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
-			speed.x *= 0.98; if (fabs(speed.x) < 0.01f) speed.x = 0.0f;
-			speed.y *= 0.98; if (fabs(speed.y) < 0.01f) speed.y = 0.0f;
-			speed.z *= 0.98; if (fabs(speed.z) < 0.01f) speed.z = 0.0f;
 
 			m_View = XMMatrixLookAtLH(pos_, at_, up);
-			m_Projection = XMMatrixPerspectiveFovLH(aView, aspect, 0.1f, 1000.0f);
 		}
-
 		void turn(float dx, float dy)
 		{
 			if (invertY)
@@ -84,55 +112,78 @@ namespace MyEngine
 				dy = -dy;
 			}
 
-			ax += dx;
+			ax -= dx;
 			ay += dy;
-			if (ax > 3.1415926f)
-				ax -= 6.2831853f;
-			if (ax < -3.1415926f)
-				ax += 6.2831853f;
+			if (ax > XM_PI)
+				ax - XM_PI;
+			if (ax < -XM_PI)
+				ax = XM_PI;
 			if (ay < 0.000001f)
 				ay = 0.000001f;
-			if (ay > 3.1415926f)
-				ay = 3.1415926f;
+			if (ay > XM_PI - 1e-6)
+				ay = XM_PI - 1e-6;
 
-			dir.x = -sinf(ay) * sinf(ax);
-			dir.y = cosf(ay);
-			dir.z = -sinf(ay) * cosf(ax);
+			direction.x = sinf(ay) * cosf(ax);
+			direction.y = cosf(ay);
+			direction.z = sinf(ay) * sinf(ax);
 		}
+		XMMATRIX getViewMatrix()
+		{
+			return m_View;
+		}
+
+		XMMATRIX getProjectionMatrix()
+		{
+			return m_Projection;
+		}
+
+	private:
+
+		XMMATRIX m_View;
+		XMMATRIX m_Projection;
+		XMMATRIX m_baseView;
+
+		XMFLOAT4 position;
+		XMFLOAT4 speed;
+		XMFLOAT4 direction;
+
+		float aspectRatio;
+		float ax;
+		float ay;
+		float zoomNow;
+		bool invertY;
+		bool moved;
 
 		void correctSpeed()
 		{
-			if (speed.x < -1.0f) speed.x = -1.0f; if (speed.x > 1.0f) speed.x = 1.0f;
-			if (speed.y < -1.0f) speed.y = -1.0f; if (speed.y > 1.0f) speed.y = 1.0f;
-			if (speed.z < -1.0f) speed.z = -1.0f; if (speed.z > 1.0f) speed.z = 1.0f;
+			if (speed.x < -maxSpeed) speed.x = -maxSpeed; if (speed.x > maxSpeed) speed.x = maxSpeed;
+			if (speed.y < -maxSpeed) speed.y = -maxSpeed; if (speed.y > maxSpeed) speed.y = maxSpeed;
+			if (speed.z < -maxSpeed) speed.z = -maxSpeed; if (speed.z > maxSpeed) speed.z = maxSpeed;
 		}
 
-		void moveForward()
+		void setInit()
 		{
-			speed.x += a_speed * dir.x;
-			speed.y += a_speed * dir.y;
-			speed.z += a_speed * dir.z;
-			correctSpeed();
-		}
+			XMVECTOR pos_ = XMVectorSet(position.x, position.y, position.z, 0.0f);
+			XMVECTOR at_ = XMVectorSet(position.x + direction.x, position.y + direction.y, position.z + +direction.z, 0.0f);
+			XMVECTOR up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+			speed = XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f);
+			ax = getAngle(direction.x, direction.z);
 
-		void moveBack()
-		{
-			speed.x -= a_speed * dir.x;
-			speed.y -= a_speed * dir.y;
-			speed.z -= a_speed * dir.z;
-			correctSpeed();
-		}
-		void moveLeft()
-		{
-			speed.x -= a_speed * dir.z;
-			speed.z += a_speed * dir.x;
-			correctSpeed();
-		}
-		void moveRight()
-		{
-			speed.x += a_speed * dir.z;
-			speed.z -= a_speed * dir.x;
-			correctSpeed();
+			ay = acosf(direction.y);
+
+			direction.x = sinf(ay) * cosf(ax);
+			direction.y = cosf(ay);
+			direction.z = sinf(ay) * sinf(ax);
+
+			invertY = false;
+			aspectRatio = 1.33333f;
+
+			m_View = XMMatrixLookAtLH(pos_, at_, up);
+			m_Projection = XMMatrixPerspectiveFovLH(zoomNow, aspectRatio, 0.1f, 1000.0f);
+
+			m_baseView = XMMatrixLookAtLH(pos_, at_, up);
+
+			moved = false;
 		}
 
 	};

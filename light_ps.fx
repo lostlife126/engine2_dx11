@@ -30,10 +30,10 @@ float4 PS(PixelInputType input) : SV_TARGET
     colors = colorTexture.Sample(SampleTypePoint, input.tex);
     normals = normalTexture.Sample(SampleTypePoint, input.tex);
 
-    lightDir = lightDirection;
+    lightDir = -lightDirection;
 
     //lightIntensity = saturate(dot(normals.xyz, lightDir));
-	lightIntensity = (lightAmb + lightDiff * dot(normals.xyz, lightDir));
+	lightIntensity = saturate(lightAmb + lightDiff * dot(normals.xyz, lightDir));
 
 	outputColor = (colors * lightIntensity);
 

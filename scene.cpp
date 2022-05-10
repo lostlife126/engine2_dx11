@@ -2,7 +2,7 @@
 namespace MyEngine
 {
 
-	CameraDX11* Scene::getCamera()
+	Camera* Scene::getCamera()
 	{
 		return m_camera;
 	}
@@ -23,40 +23,38 @@ namespace MyEngine
 	void Scene::init(VideoDriverDX11* driver_)
 	{
 		driver = driver_;
-		m_camera = new CameraDX11;
-		loadGraph(driver->getDevice(),"chest_mesh.obj", "chest_albedo2.png");
+		m_camera = new Camera(0.0, 2.0, -2.0);
+		loadGraph(driver->getDevice(), "skybox.obj", "skybox.png", true);
+		loadGraph(driver->getDevice(), "floor.obj", "floor.bmp");
+		loadGraph(driver->getDevice(),"chest_mesh.obj", "chest_albedo.png");
+		loadGraph(driver->getDevice(), "cube.obj", "cube.bmp");
+		loadGraph(driver->getDevice(), "firehydrant_mesh.obj", "firehydrant_albedo.png");
+
 		addObject();
-		light.push_back(new Light);
+		light.push_back(new Light(1.0, 1.0, 0.0));
 		return;
 	}
 
-	void Scene::loadGraph(ID3D11Device* device, const char* mesh_path, const char* tex_path)
+	void Scene::loadGraph(ID3D11Device* device, const char* mesh_path, const char* tex_path, bool invert)
 	{
 		mesh.push_back(new Mesh);
-		mesh.back()->load(driver->getDevice(), mesh_path);
+		mesh.back()->load(driver->getDevice(), mesh_path, invert);
 
 		m_shader.push_back(new ModelShader);
-		m_shader[0]->addInputElement("POSITION", DXGI_FORMAT_R32G32B32_FLOAT);
-		m_shader[0]->addInputElement("TEXCOORD", DXGI_FORMAT_R32G32_FLOAT);
-		m_shader[0]->addInputElement("NORMAL", DXGI_FORMAT_R32G32B32_FLOAT);
-		m_shader[0]->initShaders(device, "mesh_vs.fx", "mesh_ps.fx");
-		m_shader[0]->loadTexture(device, "chest_albedo.png");
+		m_shader.back()->addInputElement("POSITION", DXGI_FORMAT_R32G32B32_FLOAT);
+		m_shader.back()->addInputElement("TEXCOORD", DXGI_FORMAT_R32G32_FLOAT);
+		m_shader.back()->addInputElement("NORMAL", DXGI_FORMAT_R32G32B32_FLOAT);
+		m_shader.back()->initShaders(device, "mesh_vs.fx", "mesh_ps.fx");
+		m_shader.back()->loadTexture(device, tex_path);
 	}
 
 	void Scene::addObject()
 	{
-		object.push_back(new Object);
-		object[0]->typeMesh = 0;
-		object[0]->typeTexture = 0;
-		object[0]->position = XMFLOAT3(1.0, 0.0, 0.0);
-		object[0]->worldMatrix = XMMatrixTranslation(object[0]->position.x, object[0]->position.y, object[0]->position.z);
-
-		object.push_back(new Object);
-		object[1]->typeMesh = 0;
-		object[1]->typeTexture = 0;
-		object[1]->position = XMFLOAT3(-1.0, 0.0, 0.0);
-		object[1]->worldMatrix = XMMatrixTranslation(object[1]->position.x, object[1]->position.y, object[1]->position.z);
-
+		object.push_back(new Object(0, 0, 0.0, 0.0, 0.0));
+		object.push_back(new Object(1, 1, 0.0, 0.0, 0.0));
+		object.push_back(new Object(2, 2, -1.0, 0.5, 0.0));
+		object.push_back(new Object(3, 3, 1.0, 0.5, 0.0));
+		object.push_back(new Object(4, 4, 1.0, 0.5, 1.0));
 	}
 
 	void Scene::drawAll()
@@ -64,7 +62,7 @@ namespace MyEngine
 		for (auto obj : object)
 		{
 			mesh[obj->typeMesh]->render(driver->getDeviceContext());
-			m_shader[obj->typeTexture]->render(driver->getDeviceContext(), mesh[obj->typeMesh]->numIndices, obj->worldMatrix, m_camera->m_View, m_camera->m_Projection);
+			m_shader[obj->typeTexture]->render(driver->getDeviceContext(), mesh[obj->typeMesh]->numIndices, obj->getWorldMatrix(), m_camera->getViewMatrix(), m_camera->getProjectionMatrix());
 		}
 	}
 

@@ -12,7 +12,7 @@
 
 namespace MyEngine
 {
-
+	/*
 	struct VertexFont
 	{
 		XMFLOAT3 pos;
@@ -50,7 +50,7 @@ namespace MyEngine
 		unsigned short m_width_screen = 640;
 		unsigned short m_height_screen = 480;
 		std::map<int, CharDesc> m_charDesc;
-		Shader* m_shader;
+		ModelShader* m_shader;
 
 		ID3D11Buffer* m_constantBuffer;
 		ID3D11Buffer* m_pixelBuffer;
@@ -149,7 +149,7 @@ namespace MyEngine
 			m_height_screen = hei_screen;
 			parse("font.fnt");
 
-			m_shader = new Shader;
+			m_shader = new ModelShader;
 			m_shader->loadTexture(device, "font_0.png");
 
 			m_shader->addInputElement("POSITION", DXGI_FORMAT_R32G32B32_FLOAT);
@@ -207,7 +207,7 @@ namespace MyEngine
 		void draw(ID3D11DeviceContext* deviceContext, unsigned int ind, float r, float g, float b, float x, float y)
 		{
 			setShaderParameters(deviceContext, r, g, b, x, y);
-			m_shader->draw(deviceContext);
+			m_shader->render(deviceContext);
 			deviceContext->DrawIndexed(ind, 0, 0);
 		}
 
@@ -316,5 +316,6 @@ namespace MyEngine
 		bool m_dynamic;
 
 	};
+	*/
 
 }
