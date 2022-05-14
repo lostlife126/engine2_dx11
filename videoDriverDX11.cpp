@@ -2,6 +2,7 @@
 
 #include <d3dcompiler.h>
 #include <xnamath.h>
+#include "log.h"
 namespace MyEngine
 {
 	void VideoDriverDX11::init(HWND hwnd_)
@@ -52,6 +53,45 @@ namespace MyEngine
 		m_lightShader->addInputElement("TEXCOORD", DXGI_FORMAT_R32G32_FLOAT);
 		m_lightShader->initShaders(m_device, "light_vs.fx", "light_ps.fx");
 		m_lightShader->setSampleState(m_device);
+
+		fontFPS = new Font(m_device, m_deviceContext);
+		fontFPS->init(m_widthScreen, m_heightScreen, 10);
+		textFPS = new Text(fontFPS);
+		textFPS->init("fps = ", 12, true);
+		fontControl = new Font(m_device, m_deviceContext);
+		fontControl->init(m_widthScreen, m_heightScreen, 7);
+		textControl = new Text(fontControl);
+		textControl->init("w - forward, s - back, a - left, d - right, q - lock mouse, esc - exit", 72, false);
+
+		D3D11_BLEND_DESC blendStateDesc;
+		ZeroMemory(&blendStateDesc, sizeof(D3D11_BLEND_DESC));
+
+		// Create an alpha enabled blend state description.
+		blendStateDesc.RenderTarget[0].BlendEnable = TRUE;
+		blendStateDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_ONE;
+		blendStateDesc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
+		blendStateDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+		blendStateDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
+		blendStateDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
+		blendStateDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+		blendStateDesc.RenderTarget[0].RenderTargetWriteMask = 0x0f;
+
+		// Create the blend state using the description.
+		HRESULT result = m_device->CreateBlendState(&blendStateDesc, &m_alphaEnableBlendingState);
+		if (FAILED(result))
+		{
+			return;
+		}
+
+		// Modify the description to create an alpha disabled blend state description.
+		blendStateDesc.RenderTarget[0].BlendEnable = FALSE;
+
+		// Create the blend state using the description.
+		result = m_device->CreateBlendState(&blendStateDesc, &m_alphaDisableBlendingState);
+		if (FAILED(result))
+		{
+			return;
+		}
 	}
 
 	void VideoDriverDX11::createBuffers()
@@ -289,7 +329,6 @@ namespace MyEngine
 		float clearColor[4] = { 0.0f, 0.125f, 0.25f, 0.0f };
 		m_deviceContext->ClearRenderTargetView(m_renderTargetView, clearColor);
 		m_deviceContext->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH, 1.0f, 0);
-		//m_deviceContext->RSSetState(m_rasterizerSolidState);
 	}
 
 	void VideoDriverDX11::endScene()
@@ -300,6 +339,25 @@ namespace MyEngine
 	void VideoDriverDX11::renderShader(Light* light)
 	{
 		m_lightShader->render(m_deviceContext, 6, m_baseWorldMatrix, m_baseViewMatrix, m_matrixOrtho, m_shaderResourceViewArray[0], m_shaderResourceViewArray[1], light);
+	}
+
+	void VideoDriverDX11::renderText(Text* text, XMFLOAT4 color, XMFLOAT2 pos)
+	{
+		turnOnAlphaBlending();
+		text->render(color, pos);
+		turnOffAlphaBlending();
+	}
+
+	void VideoDriverDX11::turnOnAlphaBlending()
+	{
+		float blendFactor[4] = { 0.0, 0.0, 0.0, 0.0 };
+		m_deviceContext->OMSetBlendState(m_alphaEnableBlendingState, blendFactor, 0xffffffff);
+	}
+
+	void VideoDriverDX11::turnOffAlphaBlending()
+	{
+		float blendFactor[4] = { 0.0, 0.0, 0.0, 0.0 };
+		m_deviceContext->OMSetBlendState(m_alphaDisableBlendingState, blendFactor, 0xffffffff);
 	}
 
 }

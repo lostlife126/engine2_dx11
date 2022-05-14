@@ -46,8 +46,17 @@ namespace MyEngine
 
 	void InputManager::changeLock()
 	{
-		lockMouse = !lockMouse;
-		ShowCursor(!lockMouse);
+		POINT Position;
+		GetCursorPos(&Position);	// получаем текущую позицию курсора
+
+		Position.x -= m_windowrect.left;
+		Position.y -= m_windowrect.top;
+		if (Position.x > 0 && Position.x < 640 && Position.y>0 && Position.y < 480)
+		{
+			lockMouse = !lockMouse;
+			ShowCursor(!lockMouse);
+		}
+		return;
 	}
 
 	void InputManager::run(const UINT& msg, WPARAM wParam, LPARAM lParam)
@@ -153,9 +162,6 @@ namespace MyEngine
 
 	void InputManager::m_mousewheel(short Value)
 	{
-		//	if (m_MouseWheel == Value)
-		//		return;
-
 		m_MouseWheel = Value;
 
 		for (auto it = m_Listener.begin(); it != m_Listener.end(); ++it)
@@ -188,5 +194,17 @@ namespace MyEngine
 		}
 	}
 
-	//------------------------------------------------------------------
+
+	bool InputListener::MousePressed(const MouseEventClick& arg) { return false; }
+	// кнопка отпущена
+	bool InputListener::MouseReleased(const MouseEventClick& arg) { return false; }
+	// вращение колесика
+	bool InputListener::MouseWheel(const MouseEventWheel& arg) { return false; }
+	// движение мыши
+	bool InputListener::MouseMove(const MouseEventMove& arg, bool lockedMouse){	return false; }
+	// кнопка нажата
+	bool InputListener::KeyPressed(const KeyEvent& arg) { return false;	}
+	// кнопка отпущена
+	bool InputListener::KeyReleased(const KeyEvent& arg) { return false; }
+
 }

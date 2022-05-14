@@ -1,239 +1,62 @@
 #pragma once
 #include "basicStructs.h"
-#include"log.h"
+
 
 #include <d3d11.h>
 #include <d3dx11.h>
-#include <d3dcompiler.h>
 #include <xnamath.h>
 #include "buffer.h"
 #include "shader.h"
 
 namespace MyEngine
 {
-
+	// структура точки с координатой, текстурной координатой и нормалью
 	struct VertexData
 	{
 		XMFLOAT3  pos;
 		XMFLOAT2  tex;
 		XMFLOAT3 norm;
 	};
-
+	// загрузить из obj файла число точек, текселей, нормалей и граней
 	void loadObjInfo(const char* path, int& nVertices, int& nTexels, int& nNormals, int& nFaces);
 
-	// класс реализующий 3d модель объекта - сетку (вершины нормали индексы и т.д.) и текстуры
+	// класс реализующий 3d модель объекта - сетку (вершины нормали индексы и т.д.)
 	class Mesh
 	{
 	public:
 
-		int numVertices;
-		int numIndices;
-		int numFaces;
+		int numVertices; // число вершин
+		int numIndices; // число индексов
+		int numFaces; // число граней
 
-		std::string caption;
+		std::string caption; // название сетки
 
-		std::vector<VertexData> vertices;
-		std::vector<DWORD> indices;
-
-		void loadObj(const char* path, bool invert)
-		{
-
-			std::vector<XMFLOAT3> v;
-			std::vector<XMFLOAT2> t;
-			std::vector<XMFLOAT3> n;
-			
-			std::vector<DWORD> indv;
-			std::vector<DWORD> indt;
-			std::vector<DWORD> indn;
-
-			int num_v = 0;
-			int num_n = 0;
-			int num_t = 0;
-			int num_f = 0;
-
-			loadObjInfo(path, num_v, num_t, num_n, num_f);
-			numVertices = num_t;
-			numFaces = num_f;
-			numIndices = num_f * 3;
-
-			vertices.resize(num_t);
-			indices.resize(numIndices);
-
-			v.reserve(num_v);
-			n.reserve(num_n);
-			t.reserve(num_t);
-			indv.reserve(numIndices);
-			indn.reserve(numIndices);
-			indt.reserve(numIndices);
-
-			std::ifstream file;
-			file.open(path);
-			if (!file.good())
-			{
-				Log::Get()->Error("Error opening file: ", path);
-				return;
-			}
-
-			std::string line, key, x, y, z;
-			char delim = '/';
-			while (!file.eof())
-			{
-				std::getline(file, line);
-				std::istringstream iss(line);
-				key = "";
-				iss >> key;
-				if (key == "v") // vertex
-				{
-					XMFLOAT3 temp;
-					iss >> temp.x >> temp.y >> temp.z;
-					if (invert)
-					{
-						temp.z = -temp.z;
-					}
-					v.push_back(temp);
-					continue;
-				}
-				if (key == "vt") // texture
-				{
-					XMFLOAT2 temp;
-					iss >> temp.x >> temp.y;
-					if (invert)
-					{
-						temp.y = 1.0f - temp.y;
-					}
-					t.push_back(temp);
-					continue;
-				}
-				if (key == "vn") // normals
-				{
-					XMFLOAT3 temp;
-					iss >> temp.x >> temp.y >> temp.z;
-					if (invert)
-					{
-						temp.z = -temp.z;
-					}
-					n.push_back(temp);
-					continue;
-				}
-				if (key == "f") // indices of face
-				{
-					iss >> x >> y >> z;
-					std::vector<int> splitX;
-					std::vector<int> splitY;
-					std::vector<int> splitZ;
-					if (invert)
-					{
-						splitStr(z, delim, splitX);
-						splitStr(y, delim, splitY);
-						splitStr(x, delim, splitZ);
-					}
-					else
-					{
-						splitStr(x, delim, splitX);
-						splitStr(y, delim, splitY);
-						splitStr(z, delim, splitZ);
-					}
-
-					indv.push_back(splitX[0] - 1);
-					indv.push_back(splitY[0] - 1);
-					indv.push_back(splitZ[0] - 1);
-
-					indt.push_back(splitX[1] - 1);
-					indt.push_back(splitY[1] - 1);
-					indt.push_back(splitZ[1] - 1);
-
-					indn.push_back(splitX[2] - 1);
-					indn.push_back(splitY[2] - 1);
-					indn.push_back(splitZ[2] - 1);
-
-					continue;
-				}
-				if (key.c_str()[0] == '#') // comment
-				{
-					continue;
-				}
-				if (key == "o") // caption
-				{
-					iss >> caption;
-					continue;
-				}
-				if (key == "mtllib") // 
-				{
-					continue;
-				}
-			}
-			file.close();
-			for (int i = 0; i < numFaces; i++)
-			{
-				vertices[indt[i * 3    ]].pos = v[indv[i * 3    ]];
-				vertices[indt[i * 3 + 1]].pos = v[indv[i * 3 + 1]];
-				vertices[indt[i * 3 + 2]].pos = v[indv[i * 3 + 2]];
-
-				vertices[indt[i * 3    ]].tex = t[indt[i * 3    ]];
-				vertices[indt[i * 3 + 1]].tex = t[indt[i * 3 + 1]];
-				vertices[indt[i * 3 + 2]].tex = t[indt[i * 3 + 2]];
-
-				vertices[indt[i * 3    ]].norm = n[indn[i * 3    ]];
-				vertices[indt[i * 3 + 1]].norm = n[indn[i * 3 + 1]];
-				vertices[indt[i * 3 + 2]].norm = n[indn[i * 3 + 2]];
-				
-				indices[3 * i    ] = indt[3 * i    ];
-				indices[3 * i + 1] = indt[3 * i + 1];
-				indices[3 * i + 2] = indt[3 * i + 2];
-			}
-			return;
-		}
-
+		std::vector<VertexData> vertices; // массив с вертексами
+		std::vector<DWORD> indices; // массив с индексами
+		// кнструктор по умолчанию
 		Mesh()
 		{
 		}
+		// загрузить сетку из файла и поместить в буферы
+		void load(ID3D11Device* device, const char* mesh_path, bool invert = false);
+		// освободить память
+		void release();
+		// отрисовать
+		void render(ID3D11DeviceContext* deviceContext);
 
-		void load(ID3D11Device* device, const char* mesh_path, bool invert = false)
-		{
-			loadObj(mesh_path, invert);
-			p_vBuff = Buffer::createVertexBuffer(device, sizeof(VertexData) * numVertices, &(vertices[0]), false);
-			p_iBuff = Buffer::createIndexBuffer(device, sizeof(DWORD) * numIndices, &(indices[0]), false);
-		}
+		ID3D11Buffer* p_vBuff = nullptr; // буфер вершин
+		ID3D11Buffer* p_iBuff = nullptr;// буфер индексов
 
-		void release()
-		{
-			if (p_vBuff != nullptr)
-			{
-				p_vBuff->Release();
-				p_vBuff = nullptr;
-			}
-
-			if (p_iBuff != nullptr)
-			{
-				p_iBuff->Release();
-				p_iBuff = nullptr;
-			}
-
-		}
-
-		void render(ID3D11DeviceContext* deviceContext)
-		{
-			unsigned int stride = sizeof(VertexData);
-			unsigned int offset = 0;
-
-			deviceContext->IASetVertexBuffers(0, 1, &p_vBuff, &stride, &offset);
-			deviceContext->IASetIndexBuffer(p_iBuff, DXGI_FORMAT_R32_UINT, 0);
-			deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-			return;
-		}
-
-		ID3D11Buffer* p_vBuff = nullptr;
-		ID3D11Buffer* p_iBuff = nullptr;
-
-	private:
-
-
+	protected:
+		// загрузка obj файла и его парсинг
+		void loadObj(const char* path, bool invert);
 	};
 
+	// объект реализующий объекты на сцене
 	class Object
 	{
 	public:
-
+		// конструктор по умолчанию (объект в координатах 0,0,0)
 		Object():
 			typeMesh(0),
 			typeTexture(0)
@@ -243,7 +66,7 @@ namespace MyEngine
 			m_position.z = 0.0;
 			m_worldMatrix = XMMatrixTranslation(m_position.x, m_position.y, m_position.z);
 		}
-
+		// конструктор с определенной сеткой и шкуркой в определенной координате xyz
 		Object(int typeMesh_, int typeTexture_, float x, float y, float z):
 			typeMesh(typeMesh_),
 			typeTexture(typeTexture_)
@@ -253,18 +76,18 @@ namespace MyEngine
 			m_position.z = z;
 			m_worldMatrix = XMMatrixTranslation(m_position.x, m_position.y, m_position.z);
 		}
-
+		// получить мировую матрицу объекта
 		XMMATRIX getWorldMatrix()
 		{
 			return m_worldMatrix;
 		}
 
-		int typeMesh;
-		int typeTexture;
+		int typeMesh; // тип сетки (из массива)
+		int typeTexture;//  тип текстуры (из массива)
 	private:
 
-		XMFLOAT3 m_position;
-		XMMATRIX m_worldMatrix;
+		XMFLOAT3 m_position; // текущее положение
+		XMMATRIX m_worldMatrix; // мировая матрица объекта
 	};
 
 }

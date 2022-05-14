@@ -8,7 +8,7 @@
 #include "sstream"
 
 namespace MyEngine
-{
+{// тут ничего интересного
 	class Renderer
 	{
 	public:

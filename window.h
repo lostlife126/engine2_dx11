@@ -1,20 +1,16 @@
 #pragma once
 
-
 #include <clocale>
-#include <ctime>
-
 #include <string>
-#include <list>
 #define NOMINMAX
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
+
 #include"inputManager.h"
-//class InputManager;
 
 namespace MyEngine
 {
-
+	// структура свойств окна
 	struct DescWindow
 	{
 		DescWindow() :
@@ -26,19 +22,22 @@ namespace MyEngine
 			resizing(true)
 		{}
 
-		int posx;
-		int posy;
-		std::wstring caption;	///< заголовок окна
-		int width;				///< ширина клиентской части окна
-		int height;				///< высота клиентской части окна
-		bool resizing;
+		int posx; // положение х верхнего левого края
+		int posy; // положение у верхнего левого края
+		std::wstring caption;	//< заголовок окна
+		int width;				//< ширина клиентской части окна
+		int height;				//< высота клиентской части окна
+		bool resizing; // 
 	};
 
+	// класс инкапсулирующий окно в windows
 	class Window
 	{
 	public:
+		// конструктор по умолчанию
 		Window();
 
+		// получение окна (в одном экземпляре)
 		static Window* get() { return m_wndthis; }
 
 		// Создать окно
@@ -49,13 +48,17 @@ namespace MyEngine
 
 		// Закрыть окно.
 		void close();
-
+		// задать менеджер управления
 		void setInputManager(InputManager* input_manager);
-
+		// получить hwnd
 		HWND getHWND() const { return m_hwnd; }
+		// получить левый край
 		int getLeft() const { return m_desc.posx; }
+		// получить верхний край
 		int getTop() const { return m_desc.posy; }
+		// получить ширину
 		int getWidth() const { return m_desc.width; }
+		// получить высоту
 		int getHeight() const { return m_desc.height; }
 		// Вернуть заголовок окна
 		const std::wstring& getCaption() const { return m_desc.caption; }
@@ -81,16 +84,16 @@ namespace MyEngine
 		static Window* m_wndthis;
 
 		DescWindow m_desc;	// описание окна
-		InputManager* inputManager;
+		InputManager* inputManager; // менеджер управления
 		HWND m_hwnd;		// дескриптор окна	
 		bool m_isexit;		// флаг сообщающий о событии выхода	
 		bool m_active;		// окно активно?
-		bool m_minimized;
-		bool m_maximized;
+		bool m_minimized; // свернуто
+		bool m_maximized; // развернуто
 		bool m_isresize;	// если окно изменило размер
 	};
 
-	// обработка событий
+	// обработка событий WndProc
 	static LRESULT CALLBACK StaticWndProc(HWND hwnd, UINT nMsg, WPARAM wParam, LPARAM lParam);
 
 }

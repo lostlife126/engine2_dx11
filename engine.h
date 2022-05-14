@@ -7,66 +7,73 @@
 #include "renderer.h"
 #include <d3d11.h>
 #include <d3dx11.h>
-#include "font.h"
 #include <omp.h>
 
 namespace MyEngine
 {
-
+	// класс таймера для расчета фпс и дельты по времени
 	class FPSCounter
 	{
 	public:
-
+		// конструктор по умолчанию
 		FPSCounter()
 		{
 			nulling();
 		}
-
+		// зануляем все поля
 		void nulling()
 		{
 			dt = 0.0;
-			time = 0.0;
+			timeTotal = 0.0;
 			lastFrame = omp_get_wtime();
 		}
-
+		// замерить текущий фрейм и дать прошедшее время
 		float frame()
 		{
-			double timeNow = omp_get_wtime();
+			double timeNow = omp_get_wtime(); // используем библиотеку omp.h
 			dt = (timeNow - lastFrame);
 			lastFrame = timeNow;
-			time += dt;
+			timeTotal += dt; // и считаем текущее общее время
 			return dt;
 		}
-		double lastFrame;
-		double dt;
-		double time;
-	private:
 
+	private:
+		double lastFrame; // время последнего замера
+		double dt; // дельта времени с последнего замера (время кадра)
+		double timeTotal; // общее время прошедшее со времени старта
 	};
 
-	class Engine
+	// класс движка. главный здесь везде. именно в нем содержатся рендерер, менеджер управления, окна и прочие штуки
+	class Engine : public InputListener // класс наследник наблюдателя чтобы получать команды от клавы (на выход)
 	{
 	public:
-
+		// конструктор и деструктор по умолчанию
 		Engine();
 		~Engine();
-
-		InputManager* inputManager;
-		Scene* scene;
-		Renderer* renderer;
-		Window* m_window;
-		DescWindow desc;
-		FPSCounter fpsCounter;
-
-
-		bool isRun = false;
-		bool isInitialized = false;
-		Log log;
-
+		// запускаем ход движка
 		void run();
-		void start();
+		// инициализируем движок
 		void init();
+		// вырубаем движок
+		void shutdown();
+		// нажата ли кнопка (нам будет нужна только кнопка esc)
+		bool KeyPressed(const KeyEvent& arg) override;
 
+	protected:
+
+		InputManager* inputManager; // менеджер управления 
+		Scene* scene;   // сцена для моделирования 3д
+		Renderer* renderer; // отрисовщик
+		Window* m_window; // класс окна
+		DescWindow desc; // описание окна (зачем оно тут?)
+		FPSCounter fpsCounter; // таймер и счетчик фпс
+		double dt; // дельта времени с последнего шага
+		double timeFPS; // время прошедшее с последнего изменения строки с фпс (для обновления раз в 0.25 сек)
+		bool isRun = false; // запущен ли главный цикл движка?
+		bool isInitialized = false; // инициализирован ли движок
+		Log log; // логер
+		// отрисовать сцену
 		void drawScene();
+
 	};
 }

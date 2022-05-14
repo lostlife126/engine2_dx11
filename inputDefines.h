@@ -4,8 +4,9 @@
 
 namespace MyEngine
 {
+	// структуры для менеджера управления
 	//------------------------------------------------------------------
-
+	// мышиные коды
 	enum eMouseKeyCodes
 	{
 		MOUSE_LEFT = 0,
@@ -14,7 +15,7 @@ namespace MyEngine
 
 		MOUSE_MAX
 	};
-
+	// клавиатурные коды
 	enum eKeyCodes
 	{
 		KEY_LBUTTON = 0x01, // Left mouse button
@@ -171,7 +172,7 @@ namespace MyEngine
 
 		KEY_MAX = 0x100
 	};
-
+	// мышиное событие
 	struct MouseEvent
 	{
 		MouseEvent(int nx, int ny) : x(nx), y(ny) {}
@@ -187,7 +188,7 @@ namespace MyEngine
 		MouseEventClick(eMouseKeyCodes b, int nx, int ny) : MouseEvent(nx, ny), btn(b) {}
 		const eMouseKeyCodes btn;	// Клавиша
 	};
-
+	// движение мыши
 	struct MouseEventMove : public MouseEvent
 	{
 		MouseEventMove(int nx, int ny, int dx_, int dy_) : MouseEvent(nx, ny), dx(dx_), dy(dy_)  {}

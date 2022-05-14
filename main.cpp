@@ -8,10 +8,10 @@ int main(int argc, char** argv)
 {
 	MyEngine::Engine engine;
 
-	engine.start();
+	engine.init();
+	engine.run();
 
-
-	system("pause");
+	//system("pause");
 
 	return 0;
 }

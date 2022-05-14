@@ -2,11 +2,12 @@
 
 #include <d3d11.h>
 #include <d3dx11.h>
-#include <d3dcompiler.h>
-#include <xnamath.h>
+//#include <d3dcompiler.h>
+//#include <xnamath.h>
 
 namespace MyEngine
 {
+	// класс для создания буферов вершин, индексов и константных буферов
 	class Buffer
 	{
 	public:

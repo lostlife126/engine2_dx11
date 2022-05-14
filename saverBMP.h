@@ -6,7 +6,7 @@ class LoaderMRM
 {
 public:
 
-
+	// тут ничего интересного
 
 	void load(std::string path)
 	{

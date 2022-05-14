@@ -3,6 +3,18 @@
 namespace MyEngine
 {
 
+	double getAngle(double x, double y)
+	{
+		double res;
+		if (fabs(x) > 1e-10)
+			res = atanf(y / fabs(x));
+		else
+			res = M_PI_2;
+		if (x < 0.0) // угол в левой половине (2 3 четверти)
+			res = M_PI - res;
+		return res;
+	}
+
 	void splitStr(std::string& str, char delim, std::vector<int>& splitString)
 	{
 		std::stringstream ss(str);
@@ -16,51 +28,4 @@ namespace MyEngine
 		}
 		return;
 	}
-
-	//float edge(Vect3f& a, Vect3f& b, Vect3f& c)
-	//{
-	//	return (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x);
-		//return (c.x - a.x) * (b.y - a.y) - (c.y - a.y) * (b.x - a.x);
-	//}
-	/*
-	float min(float a, float b)
-	{
-		return (a < b) ? a : b;
-	}
-
-	float max(float a, float b)
-	{
-		return (a > b) ? a : b;
-	}
-
-	float min(float a, float b, float c)
-	{
-		return min(min(a, b), c);
-	}
-
-	float max(float a, float b, float c)
-	{
-		return max(max(a, b), c);
-	}
-
-	int min(int a, int b)
-	{
-		return (a < b) ? a : b;
-	}
-
-	int max(int a, int b)
-	{
-		return (a > b) ? a : b;
-	}
-
-	int min(int a, int b, int c)
-	{
-		return min(min(a, b), c);
-	}
-
-	int max(int a, int b, int c)
-	{
-		return max(max(a, b), c);
-	}
-	*/
 }

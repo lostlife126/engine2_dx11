@@ -1,50 +1,43 @@
 #pragma once
 
-//#include <d3d11.h>
-//#include <d3dx11.h>
-//#include <d3dcompiler.h>
-#include <xnamath.h>
-//#include<d3dx10math.h>
-
-class Light
+#include "basicStructs.h"
+namespace MyEngine
 {
-public:
-
-	float a;
-	XMFLOAT3 pos;
-	XMFLOAT3 lightDir;
-	XMFLOAT4 lightAmbient;
-	XMFLOAT4 lightDiffuse;
-
-	Light()
+	// класс который хранит источник света
+	class Light
 	{
-		a = 0.0;
-		pos = XMFLOAT3(cosf(a), 0.0f, sinf(a));
-		lightDir = XMFLOAT3(-cosf(a), 0.0f, -sinf(a));
-		lightAmbient = XMFLOAT4(0.3f, 0.3f, 0.3f, 0.0f);
-		lightDiffuse = XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
-	}
+	public:
 
-	Light(float x, float y, float z)
-	{
-		if (fabs(x) < 1e-6)
+		float a; // текущий угол положения источника света
+		XMFLOAT3 pos;// текущая координата источника
+		XMFLOAT3 lightDir; // направление света
+		XMFLOAT4 lightAmbient; // составляющая среды
+		XMFLOAT4 lightDiffuse; // диффузная составляющая
+		// конструктор по умолчанию создает свет в точке 1,0,0 и направлен в 0,0,0
+		Light()
 		{
-			a = XM_PI;
+			a = 0.0;
+			pos = XMFLOAT3(cosf(a), 0.0f, sinf(a));
+			lightDir = XMFLOAT3(-cosf(a), 0.0f, -sinf(a));
+			lightAmbient = XMFLOAT4(0.3f, 0.3f, 0.3f, 0.0f);
+			lightDiffuse = XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
 		}
-		else
+		// создать свет в точке xyz
+		Light(float x, float y, float z)
 		{
-			a = atanf(z / x);
+			a = getAngle(x, z);
+			pos = XMFLOAT3(cosf(a), y, sinf(a));
+			lightDir = XMFLOAT3(-cosf(a), 0.0f, -sinf(a));
+			lightAmbient = XMFLOAT4(0.3f, 0.3f, 0.3f, 0.0f);
+			lightDiffuse = XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
 		}
-		pos = XMFLOAT3(cosf(a), y, sinf(a));
-		lightDir = XMFLOAT3(-cosf(a), 0.0f, -sinf(a));
-		lightAmbient = XMFLOAT4(0.3f, 0.3f, 0.3f, 0.0f);
-		lightDiffuse = XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
-	}
+		// обновить положение и направление света
+		void update(float dt)
+		{
+			a += dt;
+			pos = XMFLOAT3(5.0 * cosf(a), pos.y, 5.0 * sinf(a));
+			lightDir = XMFLOAT3(-cosf(a), 0.0f, -sinf(a));
+		}
+	};
 
-	void update(float dt)
-	{
-		a += dt;
-		pos = XMFLOAT3(5.0*cosf(a), pos.y, 5.0 * sinf(a));
-		lightDir = XMFLOAT3(-cosf(a), 0.0f, -sinf(a));
-	}
-};
+}

@@ -5,7 +5,6 @@
 #include "camera.h"
 #include "model.h"
 #include "light.h"
-
 #include "videoDriverDX11.h"
 
 namespace MyEngine
