@@ -1,4 +1,5 @@
 #include "camera.h"
+#include "basicStructs.h"
 
 namespace MyEngine
 {
@@ -153,7 +154,7 @@ namespace MyEngine
 		XMVECTOR at_ = XMVectorSet(position.x + direction.x, position.y + direction.y, position.z + +direction.z, 0.0f);
 		XMVECTOR up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
 		speed = XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f);
-	//	ax = getAngle(direction.x, direction.z);
+		ax = getAngle(direction.x, direction.z);
 
 		ay = acosf(direction.y);
 

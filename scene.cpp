@@ -10,7 +10,7 @@ namespace MyEngine
 	void Scene::update(float dt)
 	{
 		m_camera->render(dt);
-		frustrumCulling();
+		frustrum.constructPlanes(100.0, m_camera);
 		light[0]->update(dt);
 		return;
 	}
@@ -50,19 +50,36 @@ namespace MyEngine
 
 	void Scene::addObject()
 	{
-		object.push_back(new Object(0, 0, 0.0, 0.0, 0.0)); // skybox
+		skybox = new Object(0, 0, 0.0, 0.0, 0.0);
 		object.push_back(new Object(1, 1, 0.0, 0.0, 0.0)); // floor
 		object.push_back(new Object(2, 2, -1.0, 0.25, 0.0)); // chest
 		object.push_back(new Object(3, 3, 1.0, 0.5, 0.0)); // cube
 		object.push_back(new Object(4, 4, 1.0, 0.0, 1.0)); // hydrant
+		object[0]->setBox(mesh[1]);
+		object[1]->setBox(mesh[2]);
+		object[2]->setBox(mesh[3]);
+		object[3]->setBox(mesh[4]);
+		for (int i = 0; i < 50; i++)
+		{
+			double x = ((rand() % 20000) - 10000) / 1000.0;
+			double y = ((rand() % 20000)) / 2000.0;
+			double z = ((rand() % 20000) - 10000) / 1000.0;
+			object.push_back(new Object(4, 4, x, y, z)); // hydrant
+			object.back()->setBox(mesh[4]);
+		}
 	}
 
 	void Scene::drawAll()
 	{
-		for (auto obj : object)
+		mesh[skybox->typeMesh]->render(driver->getDeviceContext());
+		m_shader[skybox->typeTexture]->render(driver->getDeviceContext(), mesh[skybox->typeMesh]->numIndices, skybox->getWorldMatrix(), m_camera->getViewMatrix(), m_camera->getProjectionMatrix());
+
+		frustrumCulling();
+		for (auto iter = visible_objects.begin(); iter != visible_objects.end();)
 		{
-			mesh[obj->typeMesh]->render(driver->getDeviceContext());
-			m_shader[obj->typeTexture]->render(driver->getDeviceContext(), mesh[obj->typeMesh]->numIndices, obj->getWorldMatrix(), m_camera->getViewMatrix(), m_camera->getProjectionMatrix());
+			mesh[(*iter)->typeMesh]->render(driver->getDeviceContext());
+			m_shader[(*iter)->typeTexture]->render(driver->getDeviceContext(), mesh[(*iter)->typeMesh]->numIndices, (*iter)->getWorldMatrix(), m_camera->getViewMatrix(), m_camera->getProjectionMatrix());
+			iter = visible_objects.erase(iter);
 		}
 	}
 
@@ -70,7 +87,8 @@ namespace MyEngine
 	{
 		for (int i = 0; i < object.size(); i++)
 		{
-		//	visibleObjects.push(allObjects[i]);
+			if(frustrum.isAABBIn(object[i]->box, m_camera, object[i]->getWorldMatrix()))
+				visible_objects.push_back(object[i]);
 		}
 		return;
 	}

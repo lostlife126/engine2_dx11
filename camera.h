@@ -28,6 +28,16 @@ namespace MyEngine
 		{
 			setInit();
 		}
+
+		void* operator new(size_t i)
+		{
+			return _aligned_malloc(i, 16);
+		}
+		// удаляем тоже выровненные
+		void operator delete(void* p)
+		{
+			_aligned_free(p);
+		}
 		
 		// если нажата кнопка (здесь управление wasd)
 		bool KeyPressed(const KeyEvent& arg) override;
