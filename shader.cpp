@@ -24,18 +24,6 @@ namespace MyEngine
 		return;
 	}
 
-	// загружаем текстуру
-	void Shader::loadTexture(ID3D11Device* device, const char* filename)
-	{
-		HRESULT hr = D3DX11CreateShaderResourceViewFromFileA(device, filename, NULL, NULL, &m_texture, NULL);
-		if (FAILED(hr))
-			Log::Get()->Error("Can't create texture from file.");
-		else
-			Log::Get()->Debug("Created texture from file.");
-
-		setSampleState(device);
-	}
-
 	// создание состояния сэмплера (для выборки текстур)
 	void Shader::setSampleState(ID3D11Device* device)
 	{
@@ -78,7 +66,8 @@ namespace MyEngine
 		hr = D3DX11CompileFromFileA(filename, NULL, NULL, entryPoint, shaderModel, flagShaders, 0, NULL, ppBlobOut, &pErrorBlob, NULL);
 		if (FAILED(hr) && pErrorBlob != NULL)
 		{
-			Log::Get()->Error("Error compiling shader:", (char*)pErrorBlob->GetBufferPointer());
+			Log::Get()->Error("Error compiling shader: ");
+				Log::Get()->Error((char*)pErrorBlob->GetBufferPointer());
 			pErrorBlob->Release(); pErrorBlob = nullptr;
 		}
 
@@ -131,7 +120,26 @@ namespace MyEngine
 
 	}
 
+	// загружаем текстуру
+	void ModelShader::loadTextures(ID3D11Device* device, const char* caption)
+	{
+		std::string filename;
+		filename = caption;
+		filename += "_albedo.png";
+		HRESULT hr = D3DX11CreateShaderResourceViewFromFileA(device, filename.c_str(), NULL, NULL, &m_texture[0], NULL);
+		filename = caption;
+		filename += "_normal.png";
+		hr = D3DX11CreateShaderResourceViewFromFileA(device, filename.c_str(), NULL, NULL, &m_texture[1], NULL);
+		filename = caption;
+		filename += "_ao.png";
+		hr = D3DX11CreateShaderResourceViewFromFileA(device, filename.c_str(), NULL, NULL, &m_texture[2], NULL);
+		if (FAILED(hr))
+			Log::Get()->Error("Can't create texture from file.");
+		else
+			Log::Get()->Debug("Created texture from file.");
 
+		setSampleState(device);
+	}
 
 
 	bool ModelShader::setShaderParameters(ID3D11DeviceContext* deviceContext, XMMATRIX worldMatrix, XMMATRIX viewMatrix, XMMATRIX projectionMatrix)
@@ -152,7 +160,7 @@ namespace MyEngine
 		p_data->m_Projection = projectionMatrix;
 		deviceContext->Unmap(m_matrixBuffer, 0);
 		deviceContext->VSSetConstantBuffers(bufferNum, 1, &m_matrixBuffer);
-		deviceContext->PSSetShaderResources(0, 1, &m_texture);
+		deviceContext->PSSetShaderResources(0, 1, &m_texture[0]);
 		return true;
 	}
 
@@ -168,7 +176,7 @@ namespace MyEngine
 		deviceContext->VSSetShader(m_vShader, NULL, 0);
 		deviceContext->PSSetShader(m_pShader, NULL, 0);
 		if (m_texture)
-			deviceContext->PSSetShaderResources(0, 1, &m_texture);//////// надо ли это тут????
+			deviceContext->PSSetShaderResources(0, 1, &m_texture[0]);//////// надо ли это тут????
 		if (m_sampleState)
 			deviceContext->PSSetSamplers(0, 1, &m_sampleState);
 		deviceContext->DrawIndexed(numIndices, 0, 0);
@@ -183,6 +191,21 @@ namespace MyEngine
 		m_matrixBuffer = Buffer::createConstantBuffer(device, sizeof(MatrixBufferType), true);
 
 		return;
+	}
+
+	// загружаем текстуру
+	void TextShader::loadTextures(ID3D11Device* device, const char* caption)
+	{
+		std::string filename;
+		filename = caption;
+		filename += "_font.png";
+		HRESULT hr = D3DX11CreateShaderResourceViewFromFileA(device, caption, NULL, NULL, &m_texture, NULL);
+		if (FAILED(hr))
+			Log::Get()->Error("Can't create texture from file.");
+		else
+			Log::Get()->Debug("Created texture from file.");
+
+		setSampleState(device);
 	}
 
 
@@ -286,6 +309,20 @@ namespace MyEngine
 		return;
 	}
 
+	// загружаем текстуру
+	void LightShader::loadTextures(ID3D11Device* device, const char* caption)
+	{
+		std::string filename;
+		filename = caption;
+		filename += "_font.png";
+		HRESULT hr = D3DX11CreateShaderResourceViewFromFileA(device, caption, NULL, NULL, &m_texture, NULL);
+		if (FAILED(hr))
+			Log::Get()->Error("Can't create texture from file.");
+		else
+			Log::Get()->Debug("Created texture from file.");
+
+		setSampleState(device);
+	}
 
 	// инициализация вершинного и пиксельного шейдеров
 	void LightShader::initShaders(ID3D11Device* device, const char* vShaderFile, const char* pShaderFile)

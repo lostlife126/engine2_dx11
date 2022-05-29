@@ -131,7 +131,7 @@ namespace MyEngine
 		void addObject();
 
 		Camera* getCamera();
-		void loadGraph(ID3D11Device* device, const char* mesh_path, const char* tex_path, bool invert = true);
+		void loadGraph(ID3D11Device* device, const char* caption, bool invert = false);
 
 		Light* getLight();
 		Frustrum frustrum;

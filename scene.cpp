@@ -24,28 +24,30 @@ namespace MyEngine
 	{
 		driver = driver_;
 		m_camera = new Camera(0.0, 2.0, -2.0);
-		loadGraph(driver->getDevice(), "skybox.obj", "skybox.png", true);
-		loadGraph(driver->getDevice(), "floor.obj", "floor.bmp");
-		loadGraph(driver->getDevice(),"chest_mesh.obj", "chest_albedo.png");
-		loadGraph(driver->getDevice(), "cube.obj", "cube.bmp");
-		loadGraph(driver->getDevice(), "firehydrant_mesh.obj", "firehydrant_albedo.png");
+		loadGraph(driver->getDevice(), "skybox");
+		loadGraph(driver->getDevice(), "floor");
+		loadGraph(driver->getDevice(),"chest", true);
+		loadGraph(driver->getDevice(), "cube");
+		loadGraph(driver->getDevice(), "firehydrant", true);
 
 		addObject();
 		light.push_back(new Light(1.0, 1.0, 0.0));
 		return;
 	}
 
-	void Scene::loadGraph(ID3D11Device* device, const char* mesh_path, const char* tex_path, bool invert)
+	void Scene::loadGraph(ID3D11Device* device, const char* caption, bool invert)
 	{
 		mesh.push_back(new Mesh);
-		mesh.back()->load(driver->getDevice(), mesh_path, invert);
+		mesh.back()->load(driver->getDevice(), caption, invert);
 
 		m_shader.push_back(new ModelShader);
 		m_shader.back()->addInputElement("POSITION", DXGI_FORMAT_R32G32B32_FLOAT);
 		m_shader.back()->addInputElement("TEXCOORD", DXGI_FORMAT_R32G32_FLOAT);
 		m_shader.back()->addInputElement("NORMAL", DXGI_FORMAT_R32G32B32_FLOAT);
+		m_shader.back()->addInputElement("TANGENT", DXGI_FORMAT_R32G32B32_FLOAT);
+		m_shader.back()->addInputElement("BINORMAL", DXGI_FORMAT_R32G32B32_FLOAT);
 		m_shader.back()->initShaders(device, "mesh_vs.fx", "mesh_ps.fx");
-		m_shader.back()->loadTexture(device, tex_path);
+		m_shader.back()->loadTextures(device, caption);
 	}
 
 	void Scene::addObject()

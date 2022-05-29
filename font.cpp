@@ -99,7 +99,7 @@ namespace MyEngine
 		parse("font.fnt");
 
 		m_shader = new TextShader;
-		m_shader->loadTexture(device, filenameTex.c_str());
+		m_shader->loadTextures(device, filenameTex.c_str());
 
 		m_shader->addInputElement("POSITION", DXGI_FORMAT_R32G32B32_FLOAT);
 		m_shader->addInputElement("TEXCOORD", DXGI_FORMAT_R32G32_FLOAT);

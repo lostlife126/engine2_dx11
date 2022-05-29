@@ -3,6 +3,11 @@
 namespace MyEngine
 {
 
+	double sqr(double x)
+	{
+		return x * x;
+	}
+
 	double getAngle(double x, double y)
 	{
 		double res;

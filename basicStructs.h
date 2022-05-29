@@ -11,6 +11,8 @@ namespace MyEngine
 {
 	// общие статические структуры 
 
+	double sqr(double x);
+
 	// вычисление угла между x и y через тангенс (от -pi до +pi)
 	double getAngle(double x, double y);
 

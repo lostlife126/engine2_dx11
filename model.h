@@ -16,6 +16,8 @@ namespace MyEngine
 		XMFLOAT3  pos;
 		XMFLOAT2  tex;
 		XMFLOAT3 norm;
+		XMFLOAT3 tang;
+		XMFLOAT3 binorm;
 	};
 	// загрузить из obj файла число точек, текселей, нормалей и граней
 	void loadObjInfo(const char* path, int& nVertices, int& nTexels, int& nNormals, int& nFaces);
@@ -50,6 +52,8 @@ namespace MyEngine
 	protected:
 		// загрузка obj файла и его парсинг
 		void loadObj(const char* path, bool invert);
+
+		void calcNormals();
 	};
 
 	// объект реализующий объекты на сцене

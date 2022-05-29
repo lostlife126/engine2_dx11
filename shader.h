@@ -50,7 +50,7 @@ namespace MyEngine
 		void addInputElement(const char* name, DXGI_FORMAT format);
 
 		// загружаем текстуру
-		void loadTexture(ID3D11Device* device, const char* filename);
+		virtual void loadTextures(ID3D11Device* device, const char* filename) = 0;
 
 		// создание состояния сэмплера (для выборки текстур)
 		void setSampleState(ID3D11Device* device);
@@ -64,7 +64,7 @@ namespace MyEngine
 		ID3D11SamplerState* m_sampleState = nullptr; // сэмплер
 
 		D3D11_INPUT_ELEMENT_DESC* m_layout_format = nullptr;
-		ID3D11ShaderResourceView* m_texture = nullptr;
+
 
 		ID3D11Buffer* m_matrixBuffer = nullptr; // константный буфер матрицы
 
@@ -90,12 +90,16 @@ namespace MyEngine
 	{
 	public:
 
+		void loadTextures(ID3D11Device* device, const char* filename) override;
+
 		bool setShaderParameters(ID3D11DeviceContext* deviceContext, XMMATRIX worldMatrix, XMMATRIX viewMatrix, XMMATRIX projectionMatrix);
 
 		void render(ID3D11DeviceContext* deviceContext, int numIndices, XMMATRIX worldMatrix, XMMATRIX viewMatrix, XMMATRIX projectionMatrix);
 
 		// инициализация вершинного и пиксельного шейдеров и создание буфера матриц
 		void initShaders(ID3D11Device* device, const char* vShaderFile, const char* pShaderFile);
+
+		ID3D11ShaderResourceView* m_texture[5]; // diffuse, normal, ao, metal, rough
 
 	};
 
@@ -107,12 +111,16 @@ namespace MyEngine
 		ID3D11Buffer* m_constantBuffer = nullptr;
 		ID3D11Buffer* m_pixelBuffer = nullptr;
 
+		void loadTextures(ID3D11Device* device, const char* filename) override;
+
 		bool setShaderParameters(ID3D11DeviceContext* deviceContext, XMFLOAT4 color, XMFLOAT2 pos, XMMATRIX m_orthoMatrix);
 
 		void render(ID3D11DeviceContext* deviceContext, int numIndices, XMFLOAT4 color, XMFLOAT2 pos, XMMATRIX projectionMatrix);
 
 			// инициализация вершинного и пиксельного шейдеров и создание буфера матриц
 		void initShaders(ID3D11Device* device, const char* vShaderFile, const char* pShaderFile);
+
+		ID3D11ShaderResourceView* m_texture; // font
 
 	};
 	
@@ -139,6 +147,7 @@ namespace MyEngine
 
 		void createConstantBuffer(ID3D11Device* device);
 
+		void loadTextures(ID3D11Device* device, const char* filename) override;
 
 		// инициализация вершинного и пиксельного шейдеров
 		void initShaders(ID3D11Device* device, const char* vShaderFile, const char* pShaderFile);
@@ -154,6 +163,8 @@ namespace MyEngine
 			ID3D11ShaderResourceView* textureNorm,
 			Light* light
 		);
+
+		ID3D11ShaderResourceView* m_texture; // font
 		
 	};
 	

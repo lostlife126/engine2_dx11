@@ -1,5 +1,6 @@
 #include "model.h"
 #include"log.h"
+#include <xnamath.h>
 
 namespace MyEngine
 {
@@ -49,7 +50,7 @@ namespace MyEngine
 		return;
 	}
 
-	void Mesh::loadObj(const char* path, bool invert)
+	void Mesh::loadObj(const char* captionFile, bool invert)
 	{
 
 		std::vector<XMFLOAT3> v;
@@ -64,13 +65,14 @@ namespace MyEngine
 		int num_n = 0;
 		int num_t = 0;
 		int num_f = 0;
-
-		loadObjInfo(path, num_v, num_t, num_n, num_f);
-		numVertices = num_t;
+		std::string filename = captionFile;
+		filename += "_mesh.obj";
+		loadObjInfo(filename.c_str(), num_v, num_t, num_n, num_f);
+		numVertices = num_f * 3; // num_t
 		numFaces = num_f;
 		numIndices = num_f * 3;
 
-		vertices.resize(num_t);
+		vertices.resize(numVertices);
 		indices.resize(numIndices);
 
 		v.reserve(num_v);
@@ -81,10 +83,10 @@ namespace MyEngine
 		indt.reserve(numIndices);
 
 		std::ifstream file;
-		file.open(path);
+		file.open(filename);
 		if (!file.good())
 		{
-			Log::Get()->Error("Error opening file: ", path);
+			Log::Get()->Error("Error opening file: ", filename);
 			return;
 		}
 
@@ -101,9 +103,7 @@ namespace MyEngine
 				XMFLOAT3 temp;
 				iss >> temp.x >> temp.y >> temp.z;
 				if (invert)
-				{
 					temp.z = -temp.z;
-				}
 				v.push_back(temp);
 				continue;
 			}
@@ -112,9 +112,7 @@ namespace MyEngine
 				XMFLOAT2 temp;
 				iss >> temp.x >> temp.y;
 				if (invert)
-				{
 					temp.y = 1.0f - temp.y;
-				}
 				t.push_back(temp);
 				continue;
 			}
@@ -123,9 +121,7 @@ namespace MyEngine
 				XMFLOAT3 temp;
 				iss >> temp.x >> temp.y >> temp.z;
 				if (invert)
-				{
 					temp.z = -temp.z;
-				}
 				n.push_back(temp);
 				continue;
 			}
@@ -171,36 +167,105 @@ namespace MyEngine
 				iss >> caption;
 				continue;
 			}
-			if (key == "mtllib") // 
+			if (key == "mtllib") // описание материалов
 			{
 				continue;
 			}
 		}
 		file.close();
 		for (int i = 0; i < numFaces; i++)
-		{
-			vertices[indt[i * 3]].pos = v[indv[i * 3]];
-			vertices[indt[i * 3 + 1]].pos = v[indv[i * 3 + 1]];
-			vertices[indt[i * 3 + 2]].pos = v[indv[i * 3 + 2]];
+		{	
+			vertices[i * 3].pos     = v[indv[i * 3]];
+			vertices[i * 3 + 1].pos = v[indv[i * 3 + 1]];
+			vertices[i * 3 + 2].pos = v[indv[i * 3 + 2]];
 
-			vertices[indt[i * 3]].tex = t[indt[i * 3]];
-			vertices[indt[i * 3 + 1]].tex = t[indt[i * 3 + 1]];
-			vertices[indt[i * 3 + 2]].tex = t[indt[i * 3 + 2]];
+			vertices[i * 3].tex     = t[indt[i * 3]];
+			vertices[i * 3 + 1].tex = t[indt[i * 3 + 1]];
+			vertices[i * 3 + 2].tex = t[indt[i * 3 + 2]];
 
-			vertices[indt[i * 3]].norm = n[indn[i * 3]];
-			vertices[indt[i * 3 + 1]].norm = n[indn[i * 3 + 1]];
-			vertices[indt[i * 3 + 2]].norm = n[indn[i * 3 + 2]];
+			vertices[i * 3].norm     = n[indn[i * 3]];
+			vertices[i * 3 + 1].norm = n[indn[i * 3 + 1]];
+			vertices[i * 3 + 2].norm = n[indn[i * 3 + 2]];
 
-			indices[3 * i] = indt[3 * i];
-			indices[3 * i + 1] = indt[3 * i + 1];
-			indices[3 * i + 2] = indt[3 * i + 2];
+			indices[3 * i] = 3 * i;
+			indices[3 * i + 1] = 3 * i + 1;
+			indices[3 * i + 2] = 3 * i + 2;
 		}
+		calcNormals();
+
 		return;
 	}
 
-	void Mesh::load(ID3D11Device* device, const char* mesh_path, bool invert)
+	void Mesh::calcNormals()
 	{
-		loadObj(mesh_path, invert);
+		for (int i = 0; i < numFaces; i++)
+		{
+			float v1[3];
+			float v2[3];
+			float tu[2];
+			float tv[2];
+
+			v1[0] = vertices[indices[3 * i + 1]].pos.x - vertices[indices[3 * i]].pos.x;
+			v1[1] = vertices[indices[3 * i + 1]].pos.y - vertices[indices[3 * i]].pos.y;
+			v1[2] = vertices[indices[3 * i + 1]].pos.z - vertices[indices[3 * i]].pos.z;
+
+			v2[0] = vertices[indices[3 * i + 2]].pos.x - vertices[indices[3 * i]].pos.x;
+			v2[1] = vertices[indices[3 * i + 2]].pos.y - vertices[indices[3 * i]].pos.y;
+			v2[2] = vertices[indices[3 * i + 2]].pos.z - vertices[indices[3 * i]].pos.z;
+
+			tu[0] = vertices[indices[3 * i + 1]].tex.x - vertices[indices[3 * i]].tex.x;
+			tv[0] = vertices[indices[3 * i + 1]].tex.y - vertices[indices[3 * i]].tex.y;
+
+			tu[1] = vertices[indices[3 * i + 2]].tex.x - vertices[indices[3 * i]].tex.x;
+			tv[1] = vertices[indices[3 * i + 2]].tex.y - vertices[indices[3 * i]].tex.y;
+
+			double den = 1.0f / (tu[0] * tv[1] - tu[1] * tv[0]);
+
+			vertices[indices[3 * i]].tang.x = (tv[1] * v1[0] - tv[0] * v2[0]) * den;
+			vertices[indices[3 * i]].tang.y = (tv[1] * v1[1] - tv[0] * v2[1]) * den;
+			vertices[indices[3 * i]].tang.z = (tv[1] * v1[2] - tv[0] * v2[2]) * den;
+
+			vertices[indices[3 * i]].binorm.x = (tu[0] * v2[0] - tu[1] * v1[0]) * den;
+			vertices[indices[3 * i]].binorm.y = (tu[0] * v2[1] - tu[1] * v1[1]) * den;
+			vertices[indices[3 * i]].binorm.z = (tu[0] * v2[2] - tu[1] * v1[2]) * den;
+
+			double len_r = 1.0 / sqrt(sqr(vertices[indices[3 * i]].tang.x)
+				+ sqr(vertices[indices[3 * i]].tang.y)
+				+ sqr(vertices[indices[3 * i]].tang.z));
+			vertices[indices[3 * i]].tang.x *= len_r;
+			vertices[indices[3 * i]].tang.y *= len_r;
+			vertices[indices[3 * i]].tang.z *= len_r;
+
+			len_r = 1.0 / sqrt(sqr(vertices[indices[3 * i]].binorm.x)
+				+ sqr(vertices[indices[3 * i]].binorm.y)
+				+ sqr(vertices[indices[3 * i]].binorm.z));
+			vertices[indices[3 * i]].binorm.x *= len_r;
+			vertices[indices[3 * i]].binorm.y *= len_r;
+			vertices[indices[3 * i]].binorm.z *= len_r;
+
+			vertices[indices[3 * i]].norm.x = vertices[indices[3 * i]].tang.y * vertices[indices[3 * i]].binorm.z - vertices[indices[3 * i]].tang.z * vertices[indices[3 * i]].binorm.y;
+			vertices[indices[3 * i]].norm.y = vertices[indices[3 * i]].tang.z * vertices[indices[3 * i]].binorm.x - vertices[indices[3 * i]].tang.x * vertices[indices[3 * i]].binorm.z;
+			vertices[indices[3 * i]].norm.z = vertices[indices[3 * i]].tang.x * vertices[indices[3 * i]].binorm.y - vertices[indices[3 * i]].tang.y * vertices[indices[3 * i]].binorm.x;
+
+			len_r = 1.0 / sqrt(sqr(vertices[indices[3 * i]].norm.x)
+				+ sqr(vertices[indices[3 * i]].norm.y)
+				+ sqr(vertices[indices[3 * i]].norm.z));
+
+			vertices[indices[3 * i]].norm.x *= len_r;
+			vertices[indices[3 * i]].norm.y *= len_r;
+			vertices[indices[3 * i]].norm.z *= len_r;
+
+			vertices[indices[3 * i + 2]].tang   = vertices[indices[3 * i + 1]].tang   = vertices[indices[3 * i]].tang;
+
+			vertices[indices[3 * i + 2]].binorm = vertices[indices[3 * i + 1]].binorm = vertices[indices[3 * i]].binorm;
+
+			vertices[indices[3 * i + 2]].norm   = vertices[indices[3 * i + 1]].norm   = vertices[indices[3 * i]].norm;
+		}
+	}
+
+	void Mesh::load(ID3D11Device* device, const char* caption, bool invert)
+	{
+		loadObj(caption, invert);
 		p_vBuff = Buffer::createVertexBuffer(device, sizeof(VertexData) * numVertices, &(vertices[0]), false);
 		p_iBuff = Buffer::createIndexBuffer(device, sizeof(DWORD) * numIndices, &(indices[0]), false);
 	}
