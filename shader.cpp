@@ -66,8 +66,7 @@ namespace MyEngine
 		hr = D3DX11CompileFromFileA(filename, NULL, NULL, entryPoint, shaderModel, flagShaders, 0, NULL, ppBlobOut, &pErrorBlob, NULL);
 		if (FAILED(hr) && pErrorBlob != NULL)
 		{
-			Log::Get()->Error("Error compiling shader: ");
-				Log::Get()->Error((char*)pErrorBlob->GetBufferPointer());
+			Log::Get()->Error("%s %s","Error compiling shader:", (char*)pErrorBlob->GetBufferPointer());
 			pErrorBlob->Release(); pErrorBlob = nullptr;
 		}
 
@@ -84,7 +83,7 @@ namespace MyEngine
 		ID3D10Blob* vShaderBuff; // буфер для него
 		compileShaderFromFile(vShaderFile, entryPoint, "vs_4_0", &vShaderBuff); // компилим вершинный файл 
 		if (vShaderBuff == nullptr)
-			Log::Get()->Error("Error reading file vertex shader.");
+			Log::Get()->Error("%s %s", "Error reading file vertex shader:", vShaderFile);
 		// создаем шейдер
 		hr = device->CreateVertexShader(vShaderBuff->GetBufferPointer(), vShaderBuff->GetBufferSize(), NULL, &m_vShader);
 		if (FAILED(hr))
@@ -127,16 +126,24 @@ namespace MyEngine
 		filename = caption;
 		filename += "_albedo.png";
 		HRESULT hr = D3DX11CreateShaderResourceViewFromFileA(device, filename.c_str(), NULL, NULL, &m_texture[0], NULL);
+		if (FAILED(hr))
+			Log::Get()->Error("%s %s", "Can't create texture from file:", filename.c_str());
+		else
+			Log::Get()->Debug("%s %s", "Created texture from file: ", filename.c_str());
 		filename = caption;
 		filename += "_normal.png";
 		hr = D3DX11CreateShaderResourceViewFromFileA(device, filename.c_str(), NULL, NULL, &m_texture[1], NULL);
+		if (FAILED(hr))
+			Log::Get()->Error("%s %s", "Can't create texture from file:", filename.c_str());
+		else
+			Log::Get()->Debug("%s %s", "Created texture from file:", filename.c_str());
 		filename = caption;
 		filename += "_ao.png";
 		hr = D3DX11CreateShaderResourceViewFromFileA(device, filename.c_str(), NULL, NULL, &m_texture[2], NULL);
 		if (FAILED(hr))
-			Log::Get()->Error("Can't create texture from file.");
+			Log::Get()->Error("%s %s", "Can't create texture from file:", filename.c_str());
 		else
-			Log::Get()->Debug("Created texture from file.");
+			Log::Get()->Debug("%s %s", "Created texture from file:", filename.c_str());
 
 		setSampleState(device);
 	}
@@ -201,7 +208,7 @@ namespace MyEngine
 		filename += "_font.png";
 		HRESULT hr = D3DX11CreateShaderResourceViewFromFileA(device, caption, NULL, NULL, &m_texture, NULL);
 		if (FAILED(hr))
-			Log::Get()->Error("Can't create texture from file.");
+			Log::Get()->Error("%s %s","Can't create texture from file:", filename);
 		else
 			Log::Get()->Debug("Created texture from file.");
 

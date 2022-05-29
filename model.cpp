@@ -205,61 +205,62 @@ namespace MyEngine
 			float tu[2];
 			float tv[2];
 
-			v1[0] = vertices[indices[3 * i + 1]].pos.x - vertices[indices[3 * i]].pos.x;
-			v1[1] = vertices[indices[3 * i + 1]].pos.y - vertices[indices[3 * i]].pos.y;
-			v1[2] = vertices[indices[3 * i + 1]].pos.z - vertices[indices[3 * i]].pos.z;
+			auto& p1 = vertices[indices[3 * i]];
+			auto& p2 = vertices[indices[3 * i + 1]];
+			auto& p3 = vertices[indices[3 * i + 2]];
 
-			v2[0] = vertices[indices[3 * i + 2]].pos.x - vertices[indices[3 * i]].pos.x;
-			v2[1] = vertices[indices[3 * i + 2]].pos.y - vertices[indices[3 * i]].pos.y;
-			v2[2] = vertices[indices[3 * i + 2]].pos.z - vertices[indices[3 * i]].pos.z;
+			v1[0] = p2.pos.x - p1.pos.x;
+			v1[1] = p2.pos.y - p1.pos.y;
+			v1[2] = p2.pos.z - p1.pos.z;
 
-			tu[0] = vertices[indices[3 * i + 1]].tex.x - vertices[indices[3 * i]].tex.x;
-			tv[0] = vertices[indices[3 * i + 1]].tex.y - vertices[indices[3 * i]].tex.y;
+			v2[0] = p3.pos.x - p1.pos.x;
+			v2[1] = p3.pos.y - p1.pos.y;
+			v2[2] = p3.pos.z - p1.pos.z;
 
-			tu[1] = vertices[indices[3 * i + 2]].tex.x - vertices[indices[3 * i]].tex.x;
-			tv[1] = vertices[indices[3 * i + 2]].tex.y - vertices[indices[3 * i]].tex.y;
+			tu[0] = p2.tex.x - p1.tex.x;
+			tv[0] = p2.tex.y - p1.tex.y;
+
+			tu[1] = p3.tex.x - p1.tex.x;
+			tv[1] = p3.tex.y - p1.tex.y;
 
 			double den = 1.0f / (tu[0] * tv[1] - tu[1] * tv[0]);
 
-			vertices[indices[3 * i]].tang.x = (tv[1] * v1[0] - tv[0] * v2[0]) * den;
-			vertices[indices[3 * i]].tang.y = (tv[1] * v1[1] - tv[0] * v2[1]) * den;
-			vertices[indices[3 * i]].tang.z = (tv[1] * v1[2] - tv[0] * v2[2]) * den;
+			p1.tang.x = (tv[1] * v1[0] - tv[0] * v2[0]) * den;
+			p1.tang.y = (tv[1] * v1[1] - tv[0] * v2[1]) * den;
+			p1.tang.z = (tv[1] * v1[2] - tv[0] * v2[2]) * den;
 
-			vertices[indices[3 * i]].binorm.x = (tu[0] * v2[0] - tu[1] * v1[0]) * den;
-			vertices[indices[3 * i]].binorm.y = (tu[0] * v2[1] - tu[1] * v1[1]) * den;
-			vertices[indices[3 * i]].binorm.z = (tu[0] * v2[2] - tu[1] * v1[2]) * den;
+			p1.binorm.x = (tu[0] * v2[0] - tu[1] * v1[0]) * den;
+			p1.binorm.y = (tu[0] * v2[1] - tu[1] * v1[1]) * den;
+			p1.binorm.z = (tu[0] * v2[2] - tu[1] * v1[2]) * den;
 
-			double len_r = 1.0 / sqrt(sqr(vertices[indices[3 * i]].tang.x)
-				+ sqr(vertices[indices[3 * i]].tang.y)
-				+ sqr(vertices[indices[3 * i]].tang.z));
-			vertices[indices[3 * i]].tang.x *= len_r;
-			vertices[indices[3 * i]].tang.y *= len_r;
-			vertices[indices[3 * i]].tang.z *= len_r;
+			double len_r = 1.0 / sqrt(sqr(p1.tang.x) + sqr(p1.tang.y) + sqr(p1.tang.z));
+			p1.tang.x *= len_r;
+			p1.tang.y *= len_r;
+			p1.tang.z *= len_r;
 
-			len_r = 1.0 / sqrt(sqr(vertices[indices[3 * i]].binorm.x)
-				+ sqr(vertices[indices[3 * i]].binorm.y)
-				+ sqr(vertices[indices[3 * i]].binorm.z));
-			vertices[indices[3 * i]].binorm.x *= len_r;
-			vertices[indices[3 * i]].binorm.y *= len_r;
-			vertices[indices[3 * i]].binorm.z *= len_r;
+			len_r = 1.0 / sqrt(sqr(p1.binorm.x)	+ sqr(p1.binorm.y) + sqr(p1.binorm.z));
+			p1.binorm.x *= len_r;
+			p1.binorm.y *= len_r;
+			p1.binorm.z *= len_r;
 
-			vertices[indices[3 * i]].norm.x = vertices[indices[3 * i]].tang.y * vertices[indices[3 * i]].binorm.z - vertices[indices[3 * i]].tang.z * vertices[indices[3 * i]].binorm.y;
-			vertices[indices[3 * i]].norm.y = vertices[indices[3 * i]].tang.z * vertices[indices[3 * i]].binorm.x - vertices[indices[3 * i]].tang.x * vertices[indices[3 * i]].binorm.z;
-			vertices[indices[3 * i]].norm.z = vertices[indices[3 * i]].tang.x * vertices[indices[3 * i]].binorm.y - vertices[indices[3 * i]].tang.y * vertices[indices[3 * i]].binorm.x;
+			p1.norm.x = p1.tang.y * p1.binorm.z - p1.tang.z * p1.binorm.y;
+			p1.norm.y = p1.tang.z * p1.binorm.x - p1.tang.x * p1.binorm.z;
+			p1.norm.z = p1.tang.x * p1.binorm.y - p1.tang.y * p1.binorm.x;
 
-			len_r = 1.0 / sqrt(sqr(vertices[indices[3 * i]].norm.x)
-				+ sqr(vertices[indices[3 * i]].norm.y)
-				+ sqr(vertices[indices[3 * i]].norm.z));
+			len_r = 1.0 / sqrt(sqr(p1.norm.x) + sqr(p1.norm.y) + sqr(p1.norm.z));
 
-			vertices[indices[3 * i]].norm.x *= len_r;
-			vertices[indices[3 * i]].norm.y *= len_r;
-			vertices[indices[3 * i]].norm.z *= len_r;
+			p1.norm.x *= len_r;
+			p1.norm.y *= len_r;
+			p1.norm.z *= len_r;
 
-			vertices[indices[3 * i + 2]].tang   = vertices[indices[3 * i + 1]].tang   = vertices[indices[3 * i]].tang;
+			p3.tang = p2.tang = p1.tang;
 
-			vertices[indices[3 * i + 2]].binorm = vertices[indices[3 * i + 1]].binorm = vertices[indices[3 * i]].binorm;
+			p3.binorm = p2.binorm = p1.binorm;
 
-			vertices[indices[3 * i + 2]].norm   = vertices[indices[3 * i + 1]].norm   = vertices[indices[3 * i]].norm;
+			double dot = p1.norm.x * p2.norm.x + p1.norm.y * p2.norm.y + p1.norm.z * p2.norm.z;
+			if (dot < 0.0)
+				dot = dot;
+			p3.norm = p2.norm = p1.norm;
 		}
 	}
 
