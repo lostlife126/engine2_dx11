@@ -50,6 +50,76 @@ namespace MyEngine
 		return;
 	}
 
+	void Mesh::createRectan(int nCellsX, int nCellsY)
+	{
+		int nCells = nCellsX * nCellsY;
+		numVertices = 6 * nCells;
+		numFaces = 2 * nCells;
+		numIndices = 6 * nCells;
+
+		vertices.resize(numVertices);
+		indices.resize(numIndices);
+		XMFLOAT2 pos(-nCellsX * 0.5, -nCellsY * 0.5);
+		int ind = 0;
+		double y = pos.y;
+		for (int j = 0; j < nCellsY; j++)
+		{
+			double x = pos.x;
+			for (int i = 0; i < nCellsX; i++)
+			{ // по часовой стрелке!!!!!!!!!!!
+				vertices[ind].pos.x = x;
+				vertices[ind].pos.y = 0.0;
+				vertices[ind].pos.z = y;
+				vertices[ind].tex.x = 0.0;
+				vertices[ind].tex.y = 0.0;
+				indices[ind] = ind;
+				ind++;
+
+				vertices[ind].pos.x = x + 1.0;
+				vertices[ind].pos.y = 0.0;
+				vertices[ind].pos.z = y;
+				vertices[ind].tex.x = 1.0;
+				vertices[ind].tex.y = 0.0;
+				indices[ind] = ind;
+				ind++;
+
+				vertices[ind].pos.x = x;
+				vertices[ind].pos.y = 0.0;
+				vertices[ind].pos.z = y + 1.0;
+				vertices[ind].tex.x = 0.0;
+				vertices[ind].tex.y = 1.0;
+				indices[ind] = ind;
+				ind++;
+
+				vertices[ind].pos.x = x + 1.0;
+				vertices[ind].pos.y = 0.0;
+				vertices[ind].pos.z = y;
+				vertices[ind].tex.x = 1.0;
+				vertices[ind].tex.y = 0.0;
+				indices[ind] = ind;
+				ind++;
+
+				vertices[ind].pos.x = x + 1.0;
+				vertices[ind].pos.y = 0.0;
+				vertices[ind].pos.z = y + 1.0;
+				vertices[ind].tex.x = 1.0;
+				vertices[ind].tex.y = 1.0;
+				indices[ind] = ind;
+				ind++;
+
+				vertices[ind].pos.x = x;
+				vertices[ind].pos.y = 0.0;
+				vertices[ind].pos.z = y + 1.0;
+				vertices[ind].tex.x = 0.0;
+				vertices[ind].tex.y = 1.0;
+				indices[ind] = ind;
+				ind++;
+				x += 1.0;
+			}
+			y += 1.0;
+		}
+	}
+
 	void Mesh::loadObj(const char* captionFile, bool invert)
 	{
 
@@ -267,6 +337,13 @@ namespace MyEngine
 	void Mesh::load(ID3D11Device* device, const char* caption, bool invert)
 	{
 		loadObj(caption, invert);
+		p_vBuff = Buffer::createVertexBuffer(device, sizeof(VertexData) * numVertices, &(vertices[0]), false);
+		p_iBuff = Buffer::createIndexBuffer(device, sizeof(DWORD) * numIndices, &(indices[0]), false);
+	}
+
+	void Mesh::load(ID3D11Device* device, int nCellsX, int nCellsY)
+	{
+		createRectan(nCellsX, nCellsY);
 		p_vBuff = Buffer::createVertexBuffer(device, sizeof(VertexData) * numVertices, &(vertices[0]), false);
 		p_iBuff = Buffer::createIndexBuffer(device, sizeof(DWORD) * numIndices, &(indices[0]), false);
 	}

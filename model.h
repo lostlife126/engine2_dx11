@@ -41,10 +41,14 @@ namespace MyEngine
 		}
 		// загрузить сетку из файла и поместить в буферы
 		void load(ID3D11Device* device, const char* mesh_path, bool invert = false);
+
+		void load(ID3D11Device* device, int nCellsX, int nCellsY);
 		// освободить память
 		void release();
 		// отрисовать
 		void render(ID3D11DeviceContext* deviceContext);
+
+		void createRectan(int nCellsX, int nCellsY);
 
 		ID3D11Buffer* p_vBuff = nullptr; // буфер вершин
 		ID3D11Buffer* p_iBuff = nullptr;// буфер индексов

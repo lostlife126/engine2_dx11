@@ -24,6 +24,9 @@ namespace MyEngine
 	{
 		driver = driver_;
 		m_camera = new Camera(0.0, 2.0, -2.0);
+		//region.setRegion("map.bmp");
+		region.init(driver->getDevice(), 10, 10);
+		region.typeTexture = 1;
 		loadGraph(driver->getDevice(), "skybox");
 		loadGraph(driver->getDevice(), "floor");
 		loadGraph(driver->getDevice(),"chest", true);
@@ -53,21 +56,21 @@ namespace MyEngine
 	void Scene::addObject()
 	{
 		skybox = new Object(0, 0, 0.0, 0.0, 0.0);
-		object.push_back(new Object(1, 1, 0.0, 0.0, 0.0)); // floor
+	//	object.push_back(new Object(5, 1, 0.0, 0.0, 0.0)); // floor
 		object.push_back(new Object(2, 2, -1.0, 0.25, 0.0)); // chest
 		object.push_back(new Object(3, 3, 1.0, 0.5, 0.0)); // cube
 		object.push_back(new Object(4, 4, 1.0, 0.0, 1.0)); // hydrant
-		object[0]->setBox(mesh[1]);
-		object[1]->setBox(mesh[2]);
-		object[2]->setBox(mesh[3]);
-		object[3]->setBox(mesh[4]);
+	//	object[0]->setBox(mesh[5]);
+		object[0]->setBox(mesh[2]);
+		object[1]->setBox(mesh[3]);
+		object[2]->setBox(mesh[4]);
 		for (int i = 0; i < 50; i++)
 		{
 			double x = ((rand() % 20000) - 10000) / 1000.0;
 			double y = ((rand() % 20000)) / 2000.0;
 			double z = ((rand() % 20000) - 10000) / 1000.0;
 			object.push_back(new Object(4, 4, x, y, z)); // hydrant
-			object.back()->setBox(mesh[4]);
+			object.back()->setBox(mesh[3]);
 		}
 	}
 
@@ -75,6 +78,9 @@ namespace MyEngine
 	{
 		mesh[skybox->typeMesh]->render(driver->getDeviceContext());
 		m_shader[skybox->typeTexture]->render(driver->getDeviceContext(), mesh[skybox->typeMesh]->numIndices, skybox->getWorldMatrix(), m_camera->getViewMatrix(), m_camera->getProjectionMatrix());
+
+		region.mesh->render(driver->getDeviceContext());
+		m_shader[region.typeTexture]->render(driver->getDeviceContext(), region.mesh->numIndices, skybox->getWorldMatrix(), m_camera->getViewMatrix(), m_camera->getProjectionMatrix());
 
 		frustrumCulling();
 		for (auto iter = visible_objects.begin(); iter != visible_objects.end();)
