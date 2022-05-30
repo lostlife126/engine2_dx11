@@ -23,7 +23,7 @@ namespace MyEngine
 		Region()
 		{}
 
-		void setRegion(const char* filename)
+		void readFile(const char* filename)
 		{
 			FILE* file;
 			BITMAPFILEHEADER bmpFileHeader;
@@ -55,7 +55,7 @@ namespace MyEngine
 				for (int i = 0; i < nCellsX; i++)
 				{
 					cells[posCell].pos.x = x + 0.5;
-					cells[posCell].pos.y = bitmapBuffer[offset] / 16.0;
+					cells[posCell].pos.y = bitmapBuffer[offset] / 100.0;
 					cells[posCell].pos.z = y + 0.5;
 					posCell++;
 					x += 1.0;
@@ -69,8 +69,19 @@ namespace MyEngine
 
 		void init(ID3D11Device* device, int nCellsX, int nCellsY)
 		{
+			readFile("map.bmp");
 			mesh = new Mesh;
-			mesh->load(device, nCellsX, nCellsY);
+			mesh->createRectan(nCellsX, nCellsY);
+			for (int i = 0; i < cells.size(); i++)
+			{
+				mesh->vertices[6 * i].pos.y = cells[i].pos.y;
+				mesh->vertices[6 * i + 1].pos.y = cells[i].pos.y;
+				mesh->vertices[6 * i + 2].pos.y = cells[i].pos.y;
+				mesh->vertices[6 * i + 3].pos.y = cells[i].pos.y;
+				mesh->vertices[6 * i + 4].pos.y = cells[i].pos.y;
+				mesh->vertices[6 * i + 5].pos.y = cells[i].pos.y;
+			}
+			mesh->createBuffers(device);
 		}
 		
 		int typeTexture;

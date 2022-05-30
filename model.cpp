@@ -341,12 +341,13 @@ namespace MyEngine
 		p_iBuff = Buffer::createIndexBuffer(device, sizeof(DWORD) * numIndices, &(indices[0]), false);
 	}
 
-	void Mesh::load(ID3D11Device* device, int nCellsX, int nCellsY)
+	void Mesh::createBuffers(ID3D11Device* device)
 	{
-		createRectan(nCellsX, nCellsY);
 		p_vBuff = Buffer::createVertexBuffer(device, sizeof(VertexData) * numVertices, &(vertices[0]), false);
 		p_iBuff = Buffer::createIndexBuffer(device, sizeof(DWORD) * numIndices, &(indices[0]), false);
 	}
+
+
 
 	void Mesh::release()
 	{
