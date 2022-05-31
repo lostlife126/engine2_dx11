@@ -32,32 +32,32 @@ namespace MyEngine
 			fopen_s(&file, filename, "rb");
 			fread(&bmpFileHeader, sizeof(BITMAPFILEHEADER), 1, file);
 			fread(&bmpInfoHeader, sizeof(BITMAPINFOHEADER), 1, file);
-			nCellsX = bmpInfoHeader.biWidth;
-			nCellsY = bmpInfoHeader.biHeight;
+			nNodesX = bmpInfoHeader.biWidth;
+			nNodesY = bmpInfoHeader.biHeight;
 
 			unsigned char* bitmapBuffer = new unsigned char[bmpInfoHeader.biSizeImage];
 			fseek(file, bmpFileHeader.bfOffBits, SEEK_SET);
 			fread(bitmapBuffer, 1, bmpInfoHeader.biSizeImage, file);
 			fclose(file);
 
-			size.x = nCellsX;
-			size.y = nCellsY;
-			pos.x = -0.5f * size.x;
-			pos.y = -0.5f * size.y;
-			cells.resize(nCellsX * nCellsY);
+			size.x = nNodesX;
+			size.y = nNodesY;
+			pos.x = -(nNodesX - 1) * 0.5;
+			pos.y = -(nNodesY - 1) * 0.5;
+			nodes.resize(nNodesX * nNodesY);
 
 			int offset = 0;
-			int posCell = 0;
+			int posNode = 0;
 			double y = pos.y;
-			for (int j = 0; j < nCellsY; j++)
+			for (int j = 0; j < nNodesY; j++)
 			{
 				double x = pos.x;
-				for (int i = 0; i < nCellsX; i++)
+				for (int i = 0; i < nNodesX; i++)
 				{
-					cells[posCell].pos.x = x + 0.5;
-					cells[posCell].pos.y = bitmapBuffer[offset] / 100.0;
-					cells[posCell].pos.z = y + 0.5;
-					posCell++;
+					nodes[posNode].pos.x = x;
+					nodes[posNode].pos.y = bitmapBuffer[offset] / 25.5;
+					nodes[posNode].pos.z = y;
+					posNode++;
 					x += 1.0;
 					offset += 3;
 				}
@@ -71,16 +71,13 @@ namespace MyEngine
 		{
 			readFile("map.bmp");
 			mesh = new Mesh;
-			mesh->createRectan(nCellsX, nCellsY);
-			for (int i = 0; i < cells.size(); i++)
+			std::vector<XMFLOAT3> vec;
+			vec.resize(nodes.size());
+			for (int i = 0; i < nodes.size(); i++)
 			{
-				mesh->vertices[6 * i].pos.y = cells[i].pos.y;
-				mesh->vertices[6 * i + 1].pos.y = cells[i].pos.y;
-				mesh->vertices[6 * i + 2].pos.y = cells[i].pos.y;
-				mesh->vertices[6 * i + 3].pos.y = cells[i].pos.y;
-				mesh->vertices[6 * i + 4].pos.y = cells[i].pos.y;
-				mesh->vertices[6 * i + 5].pos.y = cells[i].pos.y;
+				vec[i] = nodes[i].pos;
 			}
+			mesh->createRectan(nNodesX, nNodesY, vec);
 			mesh->createBuffers(device);
 		}
 		
@@ -88,9 +85,9 @@ namespace MyEngine
 		Mesh* mesh;
 	protected:
 		
-		std::vector<Terrain> cells;
-		int nCellsX;
-		int nCellsY;
+		std::vector<Terrain> nodes;
+		int nNodesX;
+		int nNodesY;
 		XMFLOAT2 size;
 		XMFLOAT2 pos;
 	};

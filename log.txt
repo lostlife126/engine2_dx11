@@ -1,86 +1,86 @@
-Log created: 05/30/22 22:10:08.
+Log created: 05/31/22 22:57:33.
 ---------------------------------------
 
-22:10:08::60: *DEBUG: Create Window
-22:10:08::135: *DEBUG: InputManager init
-22:10:09::375: *DEBUG: Vertex buffer was created.
-22:10:09::376: *DEBUG: Index buffer was created.
-22:10:09::382: *DEBUG: Created vertex shader.
-22:10:09::382: *DEBUG: Created vertex layout.
-22:10:09::387: *DEBUG: Created pixel shader.
-22:10:09::388: *DEBUG: Constant buffer was created.
-22:10:09::390: *DEBUG: Constant buffer was created.
-22:10:09::390: *DEBUG: Created sampler state.
-22:10:09::423: *DEBUG: Created texture from file.
-22:10:09::423: *DEBUG: Created sampler state.
-22:10:09::428: *DEBUG: Created vertex shader.
-22:10:09::428: *DEBUG: Created vertex layout.
-22:10:09::431: *DEBUG: Created pixel shader.
-22:10:09::433: *DEBUG: Constant buffer was created.
-22:10:09::433: *DEBUG: Constant buffer was created.
-22:10:09::433: *DEBUG: Vertex buffer was created.
-22:10:09::433: *DEBUG: Index buffer was created.
-22:10:09::461: *DEBUG: Created texture from file.
-22:10:09::461: *DEBUG: Created sampler state.
-22:10:09::464: *DEBUG: Created vertex shader.
-22:10:09::464: *DEBUG: Created vertex layout.
-22:10:09::466: *DEBUG: Created pixel shader.
-22:10:09::466: *DEBUG: Constant buffer was created.
-22:10:09::466: *DEBUG: Constant buffer was created.
-22:10:09::467: *DEBUG: Vertex buffer was created.
-22:10:09::467: *DEBUG: Index buffer was created.
-22:10:09::477: *DEBUG: Vertex buffer was created.
-22:10:09::478: *DEBUG: Index buffer was created.
-22:10:09::480: *DEBUG: Vertex buffer was created.
-22:10:09::481: *DEBUG: Index buffer was created.
-22:10:09::487: *DEBUG: Created vertex shader.
-22:10:09::487: *DEBUG: Created vertex layout.
-22:10:09::494: *DEBUG: Created pixel shader.
-22:10:09::495: *DEBUG: Constant buffer was created.
-22:10:09::577: *DEBUG: Created texture from file:  skybox_albedo.png
-22:10:09::583: *ERROR: Can't create texture from file: skybox_normal.png
-22:10:09::590: *ERROR: Can't create texture from file: skybox_ao.png
-22:10:09::592: *DEBUG: Created sampler state.
-22:10:09::593: *DEBUG: Vertex buffer was created.
-22:10:09::594: *DEBUG: Index buffer was created.
-22:10:09::599: *DEBUG: Created vertex shader.
-22:10:09::599: *DEBUG: Created vertex layout.
-22:10:09::607: *DEBUG: Created pixel shader.
-22:10:09::607: *DEBUG: Constant buffer was created.
-22:10:09::609: *DEBUG: Created texture from file:  floor_albedo.png
-22:10:09::610: *ERROR: Can't create texture from file: floor_normal.png
-22:10:09::610: *ERROR: Can't create texture from file: floor_ao.png
-22:10:09::610: *DEBUG: Created sampler state.
-22:10:09::818: *DEBUG: Vertex buffer was created.
-22:10:09::818: *DEBUG: Index buffer was created.
-22:10:09::824: *DEBUG: Created vertex shader.
-22:10:09::824: *DEBUG: Created vertex layout.
-22:10:09::831: *DEBUG: Created pixel shader.
-22:10:09::831: *DEBUG: Constant buffer was created.
-22:10:09::1002: *DEBUG: Created texture from file:  chest_albedo.png
-22:10:09::1134: *DEBUG: Created texture from file: chest_normal.png
-22:10:09::1239: *DEBUG: Created texture from file: chest_ao.png
-22:10:09::1239: *DEBUG: Created sampler state.
-22:10:09::1242: *DEBUG: Vertex buffer was created.
-22:10:09::1243: *DEBUG: Index buffer was created.
-22:10:09::1248: *DEBUG: Created vertex shader.
-22:10:09::1248: *DEBUG: Created vertex layout.
-22:10:09::1255: *DEBUG: Created pixel shader.
-22:10:09::1255: *DEBUG: Constant buffer was created.
-22:10:09::1258: *DEBUG: Created texture from file:  cube_albedo.png
-22:10:09::1259: *ERROR: Can't create texture from file: cube_normal.png
-22:10:09::1259: *ERROR: Can't create texture from file: cube_ao.png
-22:10:09::1260: *DEBUG: Created sampler state.
-22:10:13::4692: *DEBUG: Vertex buffer was created.
-22:10:13::4693: *DEBUG: Index buffer was created.
-22:10:13::4699: *DEBUG: Created vertex shader.
-22:10:13::4699: *DEBUG: Created vertex layout.
-22:10:13::4705: *DEBUG: Created pixel shader.
-22:10:13::4705: *DEBUG: Constant buffer was created.
-22:10:13::4866: *DEBUG: Created texture from file:  firehydrant_albedo.png
-22:10:13::4866: *ERROR: Can't create texture from file: firehydrant_normal.png
-22:10:13::4868: *ERROR: Can't create texture from file: firehydrant_ao.png
-22:10:13::4868: *DEBUG: Created sampler state.
+22:57:33::156: *DEBUG: Create Window
+22:57:33::214: *DEBUG: InputManager init
+22:57:33::349: *DEBUG: Vertex buffer was created.
+22:57:33::349: *DEBUG: Index buffer was created.
+22:57:33::356: *DEBUG: Created vertex shader.
+22:57:33::356: *DEBUG: Created vertex layout.
+22:57:33::361: *DEBUG: Created pixel shader.
+22:57:33::361: *DEBUG: Constant buffer was created.
+22:57:33::361: *DEBUG: Constant buffer was created.
+22:57:33::361: *DEBUG: Created sampler state.
+22:57:33::393: *DEBUG: Created texture from file.
+22:57:33::393: *DEBUG: Created sampler state.
+22:57:33::396: *DEBUG: Created vertex shader.
+22:57:33::396: *DEBUG: Created vertex layout.
+22:57:33::399: *DEBUG: Created pixel shader.
+22:57:33::400: *DEBUG: Constant buffer was created.
+22:57:33::400: *DEBUG: Constant buffer was created.
+22:57:33::401: *DEBUG: Vertex buffer was created.
+22:57:33::401: *DEBUG: Index buffer was created.
+22:57:33::427: *DEBUG: Created texture from file.
+22:57:33::427: *DEBUG: Created sampler state.
+22:57:33::430: *DEBUG: Created vertex shader.
+22:57:33::430: *DEBUG: Created vertex layout.
+22:57:33::432: *DEBUG: Created pixel shader.
+22:57:33::433: *DEBUG: Constant buffer was created.
+22:57:33::433: *DEBUG: Constant buffer was created.
+22:57:33::433: *DEBUG: Vertex buffer was created.
+22:57:33::433: *DEBUG: Index buffer was created.
+22:57:33::445: *DEBUG: Vertex buffer was created.
+22:57:33::448: *DEBUG: Index buffer was created.
+22:57:33::449: *DEBUG: Vertex buffer was created.
+22:57:33::453: *DEBUG: Index buffer was created.
+22:57:33::459: *DEBUG: Created vertex shader.
+22:57:33::460: *DEBUG: Created vertex layout.
+22:57:33::471: *DEBUG: Created pixel shader.
+22:57:33::471: *DEBUG: Constant buffer was created.
+22:57:33::558: *DEBUG: Created texture from file:  skybox_albedo.png
+22:57:33::558: *ERROR: Can't create texture from file: skybox_normal.png
+22:57:33::560: *ERROR: Can't create texture from file: skybox_ao.png
+22:57:33::561: *DEBUG: Created sampler state.
+22:57:33::562: *DEBUG: Vertex buffer was created.
+22:57:33::563: *DEBUG: Index buffer was created.
+22:57:33::568: *DEBUG: Created vertex shader.
+22:57:33::568: *DEBUG: Created vertex layout.
+22:57:33::575: *DEBUG: Created pixel shader.
+22:57:33::575: *DEBUG: Constant buffer was created.
+22:57:33::579: *DEBUG: Created texture from file:  floor_albedo.png
+22:57:33::580: *ERROR: Can't create texture from file: floor_normal.png
+22:57:33::581: *ERROR: Can't create texture from file: floor_ao.png
+22:57:33::581: *DEBUG: Created sampler state.
+22:57:34::796: *DEBUG: Vertex buffer was created.
+22:57:34::796: *DEBUG: Index buffer was created.
+22:57:34::802: *DEBUG: Created vertex shader.
+22:57:34::802: *DEBUG: Created vertex layout.
+22:57:34::808: *DEBUG: Created pixel shader.
+22:57:34::808: *DEBUG: Constant buffer was created.
+22:57:34::972: *DEBUG: Created texture from file:  chest_albedo.png
+22:57:34::1107: *DEBUG: Created texture from file: chest_normal.png
+22:57:34::1216: *DEBUG: Created texture from file: chest_ao.png
+22:57:34::1220: *DEBUG: Created sampler state.
+22:57:34::1223: *DEBUG: Vertex buffer was created.
+22:57:34::1223: *DEBUG: Index buffer was created.
+22:57:34::1229: *DEBUG: Created vertex shader.
+22:57:34::1230: *DEBUG: Created vertex layout.
+22:57:34::1236: *DEBUG: Created pixel shader.
+22:57:34::1237: *DEBUG: Constant buffer was created.
+22:57:34::1240: *DEBUG: Created texture from file:  cube_albedo.png
+22:57:34::1240: *ERROR: Can't create texture from file: cube_normal.png
+22:57:34::1241: *ERROR: Can't create texture from file: cube_ao.png
+22:57:34::1241: *DEBUG: Created sampler state.
+22:57:38::4773: *DEBUG: Vertex buffer was created.
+22:57:38::4773: *DEBUG: Index buffer was created.
+22:57:38::4780: *DEBUG: Created vertex shader.
+22:57:38::4780: *DEBUG: Created vertex layout.
+22:57:38::4787: *DEBUG: Created pixel shader.
+22:57:38::4787: *DEBUG: Constant buffer was created.
+22:57:38::4944: *DEBUG: Created texture from file:  firehydrant_albedo.png
+22:57:38::4944: *ERROR: Can't create texture from file: firehydrant_normal.png
+22:57:38::4945: *ERROR: Can't create texture from file: firehydrant_ao.png
+22:57:38::4945: *DEBUG: Created sampler state.
 
 ---------------------------------------
-End log: 05/30/22 22:13:17.
+End log: 05/31/22 22:58:12.

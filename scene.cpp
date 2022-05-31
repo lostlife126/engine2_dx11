@@ -57,9 +57,9 @@ namespace MyEngine
 	{
 		skybox = new Object(0, 0, 0.0, 0.0, 0.0);
 	//	object.push_back(new Object(5, 1, 0.0, 0.0, 0.0)); // floor
-		object.push_back(new Object(2, 2, -1.0, 0.25, 0.0)); // chest
-		object.push_back(new Object(3, 3, 1.0, 0.5, 0.0)); // cube
-		object.push_back(new Object(4, 4, 1.0, 0.0, 1.0)); // hydrant
+		object.push_back(new Object(2, 2, -10.0, 0.25, 0.0)); // chest
+		object.push_back(new Object(3, 3, 10.0, 0.5, 0.0)); // cube
+		object.push_back(new Object(4, 4, 10.0, 0.0, 1.0)); // hydrant
 	//	object[0]->setBox(mesh[5]);
 		object[0]->setBox(mesh[2]);
 		object[1]->setBox(mesh[3]);

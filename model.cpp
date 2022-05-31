@@ -50,73 +50,73 @@ namespace MyEngine
 		return;
 	}
 
-	void Mesh::createRectan(int nCellsX, int nCellsY)
+	void Mesh::createRectan(int nNodesX, int nNodesY, std::vector<XMFLOAT3>& posNode)
 	{
-		int nCells = nCellsX * nCellsY;
-		numVertices = 6 * nCells;
-		numFaces = 2 * nCells;
-		numIndices = 6 * nCells;
+		int nNodes = nNodesX * nNodesY;
+		int nCells = (nNodesX - 1) * (nNodesY - 1);
+		numFaces = nCells * 2;
+		numVertices = numFaces * 3;
+		numIndices = numVertices;
 
 		vertices.resize(numVertices);
 		indices.resize(numIndices);
-		XMFLOAT2 pos(-nCellsX * 0.5, -nCellsY * 0.5);
 		int ind = 0;
-		double y = pos.y;
-		for (int j = 0; j < nCellsY; j++)
+		for (int j = 0; j < nNodesY  - 1; j++)
 		{
-			double x = pos.x;
-			for (int i = 0; i < nCellsX; i++)
+			for (int i = 0; i < nNodesX - 1; i++)
 			{ // по часовой стрелке!!!!!!!!!!!
-				vertices[ind].pos.x = x;
-				vertices[ind].pos.y = 0.0;
-				vertices[ind].pos.z = y;
+				int indNodeLB = i + j * nNodesX;
+				int indNodeRB = i + 1 + j * nNodesX;
+				int indNodeLT = i + (j + 1) * nNodesX;
+				int indNodeRT = i + 1 + (j + 1) * nNodesX;
+				vertices[ind].pos.x = posNode[indNodeLB].x;
+				vertices[ind].pos.y = posNode[indNodeLB].y;
+				vertices[ind].pos.z = posNode[indNodeLB].z;
 				vertices[ind].tex.x = 0.0;
 				vertices[ind].tex.y = 0.0;
 				indices[ind] = ind;
 				ind++;
 
-				vertices[ind].pos.x = x + 1.0;
-				vertices[ind].pos.y = 0.0;
-				vertices[ind].pos.z = y;
+				vertices[ind].pos.x = posNode[indNodeRB].x;
+				vertices[ind].pos.y = posNode[indNodeRB].y;
+				vertices[ind].pos.z = posNode[indNodeRB].z;
 				vertices[ind].tex.x = 1.0;
 				vertices[ind].tex.y = 0.0;
 				indices[ind] = ind;
 				ind++;
 
-				vertices[ind].pos.x = x;
-				vertices[ind].pos.y = 0.0;
-				vertices[ind].pos.z = y + 1.0;
+				vertices[ind].pos.x = posNode[indNodeLT].x;
+				vertices[ind].pos.y = posNode[indNodeLT].y;
+				vertices[ind].pos.z = posNode[indNodeLT].z;
 				vertices[ind].tex.x = 0.0;
 				vertices[ind].tex.y = 1.0;
 				indices[ind] = ind;
 				ind++;
 
-				vertices[ind].pos.x = x + 1.0;
-				vertices[ind].pos.y = 0.0;
-				vertices[ind].pos.z = y;
+				vertices[ind].pos.x = posNode[indNodeRB].x;
+				vertices[ind].pos.y = posNode[indNodeRB].y;
+				vertices[ind].pos.z = posNode[indNodeRB].z;
 				vertices[ind].tex.x = 1.0;
 				vertices[ind].tex.y = 0.0;
 				indices[ind] = ind;
 				ind++;
 
-				vertices[ind].pos.x = x + 1.0;
-				vertices[ind].pos.y = 0.0;
-				vertices[ind].pos.z = y + 1.0;
+				vertices[ind].pos.x = posNode[indNodeRT].x;
+				vertices[ind].pos.y = posNode[indNodeRT].y;
+				vertices[ind].pos.z = posNode[indNodeRT].z;
 				vertices[ind].tex.x = 1.0;
 				vertices[ind].tex.y = 1.0;
 				indices[ind] = ind;
 				ind++;
 
-				vertices[ind].pos.x = x;
-				vertices[ind].pos.y = 0.0;
-				vertices[ind].pos.z = y + 1.0;
+				vertices[ind].pos.x = posNode[indNodeLT].x;
+				vertices[ind].pos.y = posNode[indNodeLT].y;
+				vertices[ind].pos.z = posNode[indNodeLT].z;
 				vertices[ind].tex.x = 0.0;
 				vertices[ind].tex.y = 1.0;
 				indices[ind] = ind;
 				ind++;
-				x += 1.0;
 			}
-			y += 1.0;
 		}
 	}
 
