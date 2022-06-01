@@ -13,6 +13,8 @@ namespace MyEngine
 
 	double sqr(double x);
 
+	float getRand();
+
 	// вычисление угла между x и y через тангенс (от -pi до +pi)
 	double getAngle(double x, double y);
 

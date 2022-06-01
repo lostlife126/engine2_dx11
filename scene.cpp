@@ -25,7 +25,7 @@ namespace MyEngine
 		driver = driver_;
 		m_camera = new Camera(0.0, 2.0, -2.0);
 		//region.setRegion("map.bmp");
-		region.init(driver->getDevice(), 100, 100);
+		region.init(driver->getDevice());
 		region.typeTexture = 1;
 		loadGraph(driver->getDevice(), "skybox");
 		loadGraph(driver->getDevice(), "floor");

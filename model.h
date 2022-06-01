@@ -10,6 +10,42 @@
 
 namespace MyEngine
 {
+	// hei это высота
+	// temp - температура
+	// humid - осадки
+	class Terrain
+	{
+	public:
+		float temp = 0.0; // шкала от -32 до 32 шаг 64 / 256 = 0.25;       temp  = 0.25 * char
+		float hei = 0.0;  // шкала от -2048 до 2048 шаг 4096 / 256 = 16.0; hei   = 16.0 * char
+		float humid = 1000.0; // логарифмическая шкала от 62.5 до 16000:      humid = 1000.0 * exp (char / 32.0 * log(2.0)) 
+		int get()
+		{
+			int tempI = int(temp * 4.0) + 128;
+			int heiI = int(hei / 16.0) + 128;
+			int humidI = int(log(humid / 1000.0) / log(2.0) * 32.0) + 128;
+			if (humidI > 255)
+				tempI = tempI;
+			return (humidI * 256 + heiI) * 256 + tempI;
+		}
+
+		void set(int p)
+		{
+			temp = (p % 256 - 128) * 0.25;
+			p << 8;
+			hei = (p % 256 - 128) * 16.0;
+			p << 8;
+			humid = 1000.0 * exp(p / 32.0 * log(2.0));
+		}
+
+		void set(float temp_, float hei_, float humid_)
+		{
+			temp = (temp_ - 128.0) * 0.25;
+			hei = (hei_ - 128.0) * 16.0;
+			humid = 1000.0 * exp((humid_ - 128.0) / 32.0 * log(2.0));
+		}
+	};
+
 	// структура точки с координатой, текстурной координатой и нормалью
 	struct VertexData
 	{
@@ -48,7 +84,7 @@ namespace MyEngine
 		// отрисовать
 		void render(ID3D11DeviceContext* deviceContext);
 
-		void createRectan(int nCellsX, int nCellsY, std::vector<XMFLOAT3>& posNode);
+		void createRectan(std::vector<float>& hei, std::vector<int>& types, int nNodesX, int nNodesY);
 
 		ID3D11Buffer* p_vBuff = nullptr; // буфер вершин
 		ID3D11Buffer* p_iBuff = nullptr;// буфер индексов

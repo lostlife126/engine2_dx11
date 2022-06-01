@@ -10,11 +10,52 @@
 namespace MyEngine
 {
 
-	class Terrain
+
+	class Perline
 	{
 	public:
-		XMFLOAT3 pos;
-		int type;
+
+		int width;
+		int height;
+		std::vector<float> data;
+
+		Perline(int sizeX, int sizeY):
+			width(sizeX),
+			height(sizeY)
+		{
+			data.resize(width * height);
+		}
+
+		void create(float amp, float k)
+		{
+			int nNodesX = k + 1.9999999;
+			int nNodesY = k + 1.9999999;
+			std::vector<float> rNodes(nNodesX * nNodesY);
+			for (int i = 0; i < rNodes.size(); i++)
+			{
+				rNodes[i] = getRand();
+			}
+
+			for (int j = 0; j < height; j++)
+			{
+				for (int i = 0; i < width; i++)
+				{
+					int left = (i * k) / width;
+					int right = left + 1;
+					int bottom = (j * k) / height;
+					int top = bottom + 1;
+					int nodeLB = left + nNodesX * bottom;
+					int nodeRB = right + nNodesX * bottom;
+					int nodeLT = left + nNodesX * top;
+					int nodeRT = right + nNodesX * top;
+					float dx = (i * k) / width - left;
+					float dy = (j * k) / height - bottom;
+					data[i + width * j] = rNodes[nodeLB] * (1.0 - dx) * (1.0 - dy) + rNodes[nodeRB] * dx * (1.0 - dy) + rNodes[nodeLT] * (1.0 - dx) * dy + rNodes[nodeRT] * dx * dy;
+				}
+			}
+
+		}
+
 	};
 
 	class Region
@@ -40,44 +81,135 @@ namespace MyEngine
 			fread(bitmapBuffer, 1, bmpInfoHeader.biSizeImage, file);
 			fclose(file);
 
-			size.x = nNodesX;
-			size.y = nNodesY;
-			pos.x = -(nNodesX - 1) * 0.5;
-			pos.y = -(nNodesY - 1) * 0.5;
 			nodes.resize(nNodesX * nNodesY);
 
 			int offset = 0;
 			int posNode = 0;
-			double y = pos.y;
 			for (int j = 0; j < nNodesY; j++)
 			{
 				double x = pos.x;
 				for (int i = 0; i < nNodesX; i++)
 				{
-					nodes[posNode].pos.x = x;
-					nodes[posNode].pos.y = bitmapBuffer[offset] / 25.5;
-					nodes[posNode].pos.z = y;
+					nodes[posNode].hei = bitmapBuffer[offset] / 25.5;
 					posNode++;
-					x += 1.0;
 					offset += 3;
 				}
-				y += 1.0;
 			}
 			delete[] bitmapBuffer;
 
 		}
 
-		void init(ID3D11Device* device, int nCellsX, int nCellsY)
+		void createMap()
+		{
+
+		}
+
+		void saveToBMP(const char* filename)
+		{
+			int kp = nNodesX * 3 % 4;
+			if (kp != 0) kp = 4 - kp;
+			int sizeStr = 3 * nNodesX + kp; // с выравниванием на 4 байта
+
+
+			BITMAPFILEHEADER bmpFileHeader;
+			bmpFileHeader.bfType = 19778;
+			bmpFileHeader.bfSize = 54 + sizeStr * nNodesY;
+			bmpFileHeader.bfOffBits = 54;
+			bmpFileHeader.bfReserved1 = 0;
+			bmpFileHeader.bfReserved2 = 0;
+
+			BITMAPINFOHEADER bmpInfoHeader;
+			bmpInfoHeader.biSize = 40;
+			bmpInfoHeader.biWidth = nNodesX;
+			bmpInfoHeader.biHeight = nNodesY;
+			bmpInfoHeader.biPlanes = 1;
+			bmpInfoHeader.biBitCount = 24;
+			bmpInfoHeader.biCompression = 0;
+			bmpInfoHeader.biSizeImage = sizeStr * nNodesY;
+			bmpInfoHeader.biXPelsPerMeter = 0;
+			bmpInfoHeader.biYPelsPerMeter = 0;
+			bmpInfoHeader.biClrUsed = 0;
+			bmpInfoHeader.biClrImportant = 0;
+
+			std::vector<char> buffer(sizeStr);
+
+			FILE* file;
+			fopen_s(&file, filename, "wb");
+
+			fwrite(&bmpFileHeader, sizeof(BITMAPFILEHEADER), 1, file);
+			fwrite(&bmpInfoHeader, sizeof(BITMAPINFOHEADER), 1, file);
+			for (int j = 0; j < nNodesY; j++)
+			{
+				int pos = 0;
+				for (int i = 0; i < nNodesX; i++)
+				{
+					int pix = nodes[i + nNodesX * j].get();
+					memcpy(&buffer[pos], &pix, 3);
+					pos += 3;
+				}
+				for (int i = 0; i < kp; i++)
+				{
+					buffer[pos] = 0;
+					pos++;
+				}
+				fwrite(&(buffer[0]), 1, sizeStr, file);
+			}
+			fclose(file);
+
+
+		}
+
+		void init(ID3D11Device* device)
 		{
 			readFile("map.bmp");
-			mesh = new Mesh;
-			std::vector<XMFLOAT3> vec;
-			vec.resize(nodes.size());
+
+			Perline pTemp(100, 100);
+			pTemp.create(1.0, 2.0);
+
+			Perline pHei(100, 100);
+			pHei.create(1.0, 20.0);
+
+			Perline pHum(100, 100);
+			pHum.create(1.0, 2.0);
+
 			for (int i = 0; i < nodes.size(); i++)
 			{
-				vec[i] = nodes[i].pos;
+				nodes[i].set(pTemp.data[i] * 255.0, pHei.data[i] * 255.0, pHum.data[i] * 255.0);
 			}
-			mesh->createRectan(nNodesX, nNodesY, vec);
+
+			saveToBMP("map1.bmp");
+
+			nCellsX = nNodesX - 1;
+			nCellsY = nNodesY - 1;
+			mesh = new Mesh;
+			std::vector<float> heis(nNodesX * nNodesY);
+			std::vector<int> cellTypes((nNodesX - 1) * (nNodesY - 1));
+			for (int i = 0; i < heis.size(); i++)
+			{
+				heis[i] = nodes[i].hei;
+			}
+			int ind = 0;
+			for (int j = 0; j < nCellsY; j++)
+			{
+				for (int i = 0; i < nCellsX; i++)
+				{
+					int nLB = i + nNodesX * j;
+					int nRB = i + 1 + nNodesX * j;
+					int nLT = i + nNodesX * (j + 1);
+					int nRT = i + 1 + nNodesX * (j + 1);
+					cellTypes[ind] = 3;
+					if (nodes[nLB].hei < 0.0 || nodes[nRB].hei < 0.0 || nodes[nLT].hei < 0.0 || nodes[nRT].hei < 0.0)
+						cellTypes[ind] = 2;
+					if(nodes[nLB].hei<0.0 && nodes[nRB].hei < 0.0 && nodes[nLT].hei < 0.0 && nodes[nRT].hei < 0.0)
+						cellTypes[ind] = 1;
+					if (nodes[nLB].hei > 1000.0 || nodes[nRB].hei > 1000.0 || nodes[nLT].hei > 1000.0 || nodes[nRT].hei > 1000.0)
+						cellTypes[ind] = 0;
+					//cellTypes[ind] = (rand() % 4);
+					ind++;
+				}
+			}
+
+			mesh->createRectan(heis, cellTypes, nCellsX + 1, nCellsY + 1);
 			mesh->createBuffers(device);
 		}
 		
@@ -88,6 +220,8 @@ namespace MyEngine
 		std::vector<Terrain> nodes;
 		int nNodesX;
 		int nNodesY;
+		int nCellsX;
+		int nCellsY;
 		XMFLOAT2 size;
 		XMFLOAT2 pos;
 	};

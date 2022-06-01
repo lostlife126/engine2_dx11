@@ -8,6 +8,11 @@ namespace MyEngine
 		return x * x;
 	}
 
+	float getRand()
+	{
+		return (rand() % 32768) / 32768.0;
+	}
+
 	double getAngle(double x, double y)
 	{
 		double res;

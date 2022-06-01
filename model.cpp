@@ -5,6 +5,14 @@
 namespace MyEngine
 {
 
+	XMFLOAT2 texType[4] =
+	{
+		XMFLOAT2(0.0, 0.0), // rocks
+		XMFLOAT2(0.5, 0.0), // water
+		XMFLOAT2(0.0, 0.5), // sand
+		XMFLOAT2(0.5, 0.5) // grass
+	};
+
 	void loadObjInfo(const char* path, int& nVertices, int& nTexels, int& nNormals, int& nFaces)
 	{
 		nVertices = 0;
@@ -50,9 +58,9 @@ namespace MyEngine
 		return;
 	}
 
-	void Mesh::createRectan(int nNodesX, int nNodesY, std::vector<XMFLOAT3>& posNode)
+	void Mesh::createRectan(std::vector<float>& hei, std::vector<int>& types, int nNodesX, int nNodesY)
 	{
-		int nNodes = nNodesX * nNodesY;
+	//	int nNodes = nNodesX * nNodesY;
 		int nCells = (nNodesX - 1) * (nNodesY - 1);
 		numFaces = nCells * 2;
 		numVertices = numFaces * 3;
@@ -60,63 +68,72 @@ namespace MyEngine
 
 		vertices.resize(numVertices);
 		indices.resize(numIndices);
-		int ind = 0;
+		int indVer = 0;
+		int indCell = 0;
+		float sizeTex = 0.5;
+		float coefHei = 0.001; // коэффициент для нормировки высоты - макс высота - 2.048 метра
+		XMFLOAT2 pos(-nNodesX * 0.5, -nNodesY * 0.5);
 		for (int j = 0; j < nNodesY  - 1; j++)
 		{
+			pos.x = -nNodesX * 0.5;
 			for (int i = 0; i < nNodesX - 1; i++)
 			{ // по часовой стрелке!!!!!!!!!!!
 				int indNodeLB = i + j * nNodesX;
 				int indNodeRB = i + 1 + j * nNodesX;
 				int indNodeLT = i + (j + 1) * nNodesX;
 				int indNodeRT = i + 1 + (j + 1) * nNodesX;
-				vertices[ind].pos.x = posNode[indNodeLB].x;
-				vertices[ind].pos.y = posNode[indNodeLB].y;
-				vertices[ind].pos.z = posNode[indNodeLB].z;
-				vertices[ind].tex.x = 0.0;
-				vertices[ind].tex.y = 0.0;
-				indices[ind] = ind;
-				ind++;
 
-				vertices[ind].pos.x = posNode[indNodeRB].x;
-				vertices[ind].pos.y = posNode[indNodeRB].y;
-				vertices[ind].pos.z = posNode[indNodeRB].z;
-				vertices[ind].tex.x = 1.0;
-				vertices[ind].tex.y = 0.0;
-				indices[ind] = ind;
-				ind++;
+				vertices[indVer].pos.x = pos.x;
+				vertices[indVer].pos.y = hei[indNodeLB] * coefHei;
+				vertices[indVer].pos.z = pos.y;
+				vertices[indVer].tex = texType[types[indCell]];
+				indices[indVer] = indVer;
+				indVer++;
 
-				vertices[ind].pos.x = posNode[indNodeLT].x;
-				vertices[ind].pos.y = posNode[indNodeLT].y;
-				vertices[ind].pos.z = posNode[indNodeLT].z;
-				vertices[ind].tex.x = 0.0;
-				vertices[ind].tex.y = 1.0;
-				indices[ind] = ind;
-				ind++;
+				vertices[indVer].pos.x = pos.x + 1.0;
+				vertices[indVer].pos.y = hei[indNodeRB] *coefHei;
+				vertices[indVer].pos.z = pos.y;
+				vertices[indVer].tex = texType[types[indCell]];
+				vertices[indVer].tex.x += sizeTex;
+				indices[indVer] = indVer;
+				indVer++;
 
-				vertices[ind].pos.x = posNode[indNodeRB].x;
-				vertices[ind].pos.y = posNode[indNodeRB].y;
-				vertices[ind].pos.z = posNode[indNodeRB].z;
-				vertices[ind].tex.x = 1.0;
-				vertices[ind].tex.y = 0.0;
-				indices[ind] = ind;
-				ind++;
+				vertices[indVer].pos.x = pos.x;
+				vertices[indVer].pos.y = hei[indNodeLT] * coefHei;;
+				vertices[indVer].pos.z = pos.y + 1.0;
+				vertices[indVer].tex = texType[types[indCell]];
+				vertices[indVer].tex.y += sizeTex;
+				indices[indVer] = indVer;
+				indVer++;
 
-				vertices[ind].pos.x = posNode[indNodeRT].x;
-				vertices[ind].pos.y = posNode[indNodeRT].y;
-				vertices[ind].pos.z = posNode[indNodeRT].z;
-				vertices[ind].tex.x = 1.0;
-				vertices[ind].tex.y = 1.0;
-				indices[ind] = ind;
-				ind++;
+				vertices[indVer].pos.x = pos.x + 1.0;
+				vertices[indVer].pos.y = hei[indNodeRB] * coefHei;;
+				vertices[indVer].pos.z = pos.y;
+				vertices[indVer].tex = texType[types[indCell]];
+				vertices[indVer].tex.x += sizeTex;
+				indices[indVer] = indVer;
+				indVer++;
 
-				vertices[ind].pos.x = posNode[indNodeLT].x;
-				vertices[ind].pos.y = posNode[indNodeLT].y;
-				vertices[ind].pos.z = posNode[indNodeLT].z;
-				vertices[ind].tex.x = 0.0;
-				vertices[ind].tex.y = 1.0;
-				indices[ind] = ind;
-				ind++;
+				vertices[indVer].pos.x = pos.x + 1.0;
+				vertices[indVer].pos.y = hei[indNodeRT] * coefHei;;
+				vertices[indVer].pos.z = pos.y + 1.0;
+				vertices[indVer].tex = texType[types[indCell]];
+				vertices[indVer].tex.x += sizeTex;
+				vertices[indVer].tex.y += sizeTex;
+				indices[indVer] = indVer;
+				indVer++;
+
+				vertices[indVer].pos.x = pos.x;
+				vertices[indVer].pos.y = hei[indNodeLT] * coefHei;;
+				vertices[indVer].pos.z = pos.y + 1.0;
+				vertices[indVer].tex = texType[types[indCell]];
+				vertices[indVer].tex.y += sizeTex;
+				indices[indVer] = indVer;
+				indVer++;
+				pos.x += 1.0;
+				indCell++;
 			}
+			pos.y += 1.0;
 		}
 	}
 
