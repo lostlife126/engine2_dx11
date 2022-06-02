@@ -8,6 +8,16 @@ namespace MyEngine
 		return x * x;
 	}
 
+	double myMin(double a, double b)
+	{
+		return (a > b)?b:a;
+	}
+
+	double myMax(double a, double b)
+	{
+		return (a > b) ? a : b;
+	}
+
 	float getRand()
 	{
 		return (rand() % 32768) / 32768.0;

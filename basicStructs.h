@@ -13,6 +13,10 @@ namespace MyEngine
 
 	double sqr(double x);
 
+	double myMin(double a, double b);
+
+	double myMax(double a, double b);
+
 	float getRand();
 
 	// вычисление угла между x и y через тангенс (от -pi до +pi)

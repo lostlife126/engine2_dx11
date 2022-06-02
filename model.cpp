@@ -7,10 +7,10 @@ namespace MyEngine
 
 	XMFLOAT2 texType[4] =
 	{
-		XMFLOAT2(0.0, 0.0), // rocks
-		XMFLOAT2(0.5, 0.0), // water
-		XMFLOAT2(0.0, 0.5), // sand
-		XMFLOAT2(0.5, 0.5) // grass
+		XMFLOAT2(0.5, 0.0), // rocks
+		XMFLOAT2(1.0, 0.0), // water
+		XMFLOAT2(0.5, 0.5), // sand
+		XMFLOAT2(1.0, 0.5) // grass
 	};
 
 	void loadObjInfo(const char* path, int& nVertices, int& nTexels, int& nNormals, int& nFaces)
@@ -71,7 +71,7 @@ namespace MyEngine
 		int indVer = 0;
 		int indCell = 0;
 		float sizeTex = 0.5;
-		float coefHei = 0.001; // коэффициент для нормировки высоты - макс высота - 2.048 метра
+		float coefHei = 0.002; // коэффициент для нормировки высоты - макс высота - 2.048 метра
 		XMFLOAT2 pos(-nNodesX * 0.5, -nNodesY * 0.5);
 		for (int j = 0; j < nNodesY  - 1; j++)
 		{
@@ -94,7 +94,7 @@ namespace MyEngine
 				vertices[indVer].pos.y = hei[indNodeRB] *coefHei;
 				vertices[indVer].pos.z = pos.y;
 				vertices[indVer].tex = texType[types[indCell]];
-				vertices[indVer].tex.x += sizeTex;
+				vertices[indVer].tex.x -= sizeTex;
 				indices[indVer] = indVer;
 				indVer++;
 
@@ -110,7 +110,7 @@ namespace MyEngine
 				vertices[indVer].pos.y = hei[indNodeRB] * coefHei;;
 				vertices[indVer].pos.z = pos.y;
 				vertices[indVer].tex = texType[types[indCell]];
-				vertices[indVer].tex.x += sizeTex;
+				vertices[indVer].tex.x -= sizeTex;
 				indices[indVer] = indVer;
 				indVer++;
 
@@ -118,7 +118,7 @@ namespace MyEngine
 				vertices[indVer].pos.y = hei[indNodeRT] * coefHei;;
 				vertices[indVer].pos.z = pos.y + 1.0;
 				vertices[indVer].tex = texType[types[indCell]];
-				vertices[indVer].tex.x += sizeTex;
+				vertices[indVer].tex.x -= sizeTex;
 				vertices[indVer].tex.y += sizeTex;
 				indices[indVer] = indVer;
 				indVer++;
@@ -135,6 +135,7 @@ namespace MyEngine
 			}
 			pos.y += 1.0;
 		}
+		calcNormals();
 	}
 
 	void Mesh::loadObj(const char* captionFile, bool invert)
@@ -287,38 +288,38 @@ namespace MyEngine
 	{
 		for (int i = 0; i < numFaces; i++)
 		{
-			float v1[3];
-			float v2[3];
-			float tu[2];
-			float tv[2];
+			XMFLOAT3 v1;
+			XMFLOAT3 v2;
+			XMFLOAT2 t1;
+			XMFLOAT2 t2;
 
 			auto& p1 = vertices[indices[3 * i]];
 			auto& p2 = vertices[indices[3 * i + 1]];
 			auto& p3 = vertices[indices[3 * i + 2]];
 
-			v1[0] = p2.pos.x - p1.pos.x;
-			v1[1] = p2.pos.y - p1.pos.y;
-			v1[2] = p2.pos.z - p1.pos.z;
+			v1.x = p2.pos.x - p1.pos.x;
+			v1.y = p2.pos.y - p1.pos.y;
+			v1.z = p2.pos.z - p1.pos.z;
 
-			v2[0] = p3.pos.x - p1.pos.x;
-			v2[1] = p3.pos.y - p1.pos.y;
-			v2[2] = p3.pos.z - p1.pos.z;
+			v2.x = p3.pos.x - p1.pos.x;
+			v2.y = p3.pos.y - p1.pos.y;
+			v2.z = p3.pos.z - p1.pos.z;
 
-			tu[0] = p2.tex.x - p1.tex.x;
-			tv[0] = p2.tex.y - p1.tex.y;
+			t1.x = p2.tex.x - p1.tex.x;
+			t1.y = p2.tex.y - p1.tex.y;
 
-			tu[1] = p3.tex.x - p1.tex.x;
-			tv[1] = p3.tex.y - p1.tex.y;
+			t2.x = p3.tex.x - p1.tex.x;
+			t2.y = p3.tex.y - p1.tex.y;
 
-			double den = 1.0f / (tu[0] * tv[1] - tu[1] * tv[0]);
+			double den = 1.0f / (t1.x * t2.y - t2.x * t1.y);
 
-			p1.tang.x = (tv[1] * v1[0] - tv[0] * v2[0]) * den;
-			p1.tang.y = (tv[1] * v1[1] - tv[0] * v2[1]) * den;
-			p1.tang.z = (tv[1] * v1[2] - tv[0] * v2[2]) * den;
+			p1.tang.x = (t2.y * v1.x - t1.y * v2.x) * den;
+			p1.tang.y = (t2.y * v1.y - t1.y * v2.y) * den;
+			p1.tang.z = (t2.y * v1.z - t1.y * v2.z) * den;
 
-			p1.binorm.x = (tu[0] * v2[0] - tu[1] * v1[0]) * den;
-			p1.binorm.y = (tu[0] * v2[1] - tu[1] * v1[1]) * den;
-			p1.binorm.z = (tu[0] * v2[2] - tu[1] * v1[2]) * den;
+			p1.binorm.x = (t1.x * v2.x - t2.x * v1.x) * den;
+			p1.binorm.y = (t1.x * v2.y - t2.x * v1.y) * den;
+			p1.binorm.z = (t1.x * v2.z - t2.x * v1.z) * den;
 
 			double len_r = 1.0 / sqrt(sqr(p1.tang.x) + sqr(p1.tang.y) + sqr(p1.tang.z));
 			p1.tang.x *= len_r;

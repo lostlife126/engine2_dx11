@@ -11,7 +11,7 @@ namespace MyEngine
 {
 
 
-	class Perline
+	class NodeField
 	{
 	public:
 
@@ -19,14 +19,72 @@ namespace MyEngine
 		int height;
 		std::vector<float> data;
 
-		Perline(int sizeX, int sizeY):
+		NodeField(int sizeX, int sizeY):
 			width(sizeX),
 			height(sizeY)
 		{
 			data.resize(width * height);
+			nulling();
 		}
 
-		void create(float amp, float k)
+		void nulling()
+		{
+			for (int i = 0; i < data.size(); i++)
+			{
+				data[i] = 0.0;
+			}
+		}
+
+		void setChains()
+		{
+			for (int i = 0; i < data.size(); i++)
+			{
+				data[i] = 1.0 - 2.0 * fabs(data[i] - 0.5);
+			}
+		}
+
+		void normalize()
+		{
+			float minD = 1e10;
+			float maxD = -1e10;
+			for (int i = 0; i < data.size(); i++)
+			{
+				minD = (minD < data[i]) ? minD : data[i];
+				maxD = (maxD > data[i]) ? maxD : data[i];
+			}
+			float rangeD_r = 1.0f / (maxD - minD);
+			for (int i = 0; i < data.size(); i++)
+			{
+				data[i] = (data[i] - minD) * rangeD_r;
+			}
+		}
+
+		void setExpBorder(float lambda)
+		{
+			for (int i = 0; i < data.size(); i++)
+			{
+				int x = i % width;
+				float lenBorder = myMin(x, width - x);
+				int y = i / width;
+				lenBorder = myMax(1.0, myMin(myMin(lenBorder, y), height - y));
+				data[i] = data[i] * (1.0 - exp(-lambda * lenBorder));
+			}
+		}
+
+		void setValue(float x)
+		{
+			for (int i = 0; i < data.size(); i++)
+			{
+				data[i] = x;
+			}
+		}
+
+		void addGradient(float amp, XMFLOAT2 dir)
+		{
+
+		}
+
+		void addNoise(float amp, float k)
 		{
 			int nNodesX = k + 1.9999999;
 			int nNodesY = k + 1.9999999;
@@ -50,7 +108,7 @@ namespace MyEngine
 					int nodeRT = right + nNodesX * top;
 					float dx = (i * k) / width - left;
 					float dy = (j * k) / height - bottom;
-					data[i + width * j] = rNodes[nodeLB] * (1.0 - dx) * (1.0 - dy) + rNodes[nodeRB] * dx * (1.0 - dy) + rNodes[nodeLT] * (1.0 - dx) * dy + rNodes[nodeRT] * dx * dy;
+					data[i + width * j] += rNodes[nodeLB] * (1.0 - dx) * (1.0 - dy) + rNodes[nodeRB] * dx * (1.0 - dy) + rNodes[nodeLT] * (1.0 - dx) * dy + rNodes[nodeRT] * dx * dy;
 				}
 			}
 
@@ -163,14 +221,20 @@ namespace MyEngine
 		{
 			readFile("map.bmp");
 
-			Perline pTemp(100, 100);
-			pTemp.create(1.0, 2.0);
+			NodeField pTemp(100, 100);
+			pTemp.addNoise(1.0, 2.0);
 
-			Perline pHei(100, 100);
-			pHei.create(1.0, 20.0);
+			NodeField pHei(100, 100);
+			pHei.addNoise(1.0, 5.0);
+			pHei.setChains();
+			pHei.addNoise(0.3, 10.0);
+			pHei.addNoise(0.12, 20.0);
+			pHei.addNoise(0.05, 50.0);
+			pHei.normalize();
+			pHei.setExpBorder(0.1);
 
-			Perline pHum(100, 100);
-			pHum.create(1.0, 2.0);
+			NodeField pHum(100, 100);
+			pHum.addNoise(1.0, 2.0);
 
 			for (int i = 0; i < nodes.size(); i++)
 			{
