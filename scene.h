@@ -43,7 +43,7 @@ namespace MyEngine
 			}
 		}
 
-		void normalize()
+		void normalize(float amp = 1.0f)
 		{
 			float minD = 1e10;
 			float maxD = -1e10;
@@ -52,7 +52,7 @@ namespace MyEngine
 				minD = (minD < data[i]) ? minD : data[i];
 				maxD = (maxD > data[i]) ? maxD : data[i];
 			}
-			float rangeD_r = 1.0f / (maxD - minD);
+			float rangeD_r = amp / (maxD - minD);
 			for (int i = 0; i < data.size(); i++)
 			{
 				data[i] = (data[i] - minD) * rangeD_r;
@@ -159,7 +159,7 @@ namespace MyEngine
 
 		void createMap()
 		{
-
+			
 		}
 
 		void saveToBMP(const char* filename)

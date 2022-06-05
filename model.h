@@ -76,6 +76,11 @@ namespace MyEngine
 		{
 		}
 
+		~Mesh()
+		{
+			release();
+		}
+
 		void createBuffers(ID3D11Device* device);
 		// загрузить сетку из файла и поместить в буферы
 		void load(ID3D11Device* device, const char* mesh_path, bool invert = false);
