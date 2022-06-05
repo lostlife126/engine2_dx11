@@ -32,8 +32,8 @@ PixelOutputType PS(PixelInputType input) : SV_TARGET
 	bumpNormal = normalize(bumpNormal);
 	
     output.color = textureColor;
-	output.normal = float4(input.normal, 1.0f);
-	//output.normal = float4(bumpNormal, 1.0);
+	//output.normal = float4(input.normal, 1.0f);
+	output.normal = float4(bumpNormal, 1.0);
 	//output.normal = bumpMap;
 
     return output;

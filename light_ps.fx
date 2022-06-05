@@ -36,6 +36,6 @@ float4 PS(PixelInputType input) : SV_TARGET
 	lightIntensity = saturate(lightAmb + lightDiff * saturate(dot(normals.xyz, lightDir)));
 
 	outputColor = colors * lightIntensity;
-    //  outputColor = normals;
+     // outputColor = normals;
     return outputColor;
 }

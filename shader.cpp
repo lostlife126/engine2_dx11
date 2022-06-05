@@ -168,6 +168,9 @@ namespace MyEngine
 		deviceContext->Unmap(m_matrixBuffer, 0);
 		deviceContext->VSSetConstantBuffers(bufferNum, 1, &m_matrixBuffer);
 		deviceContext->PSSetShaderResources(0, 1, &m_texture[0]);
+		if(m_texture[1]!=NULL)
+			deviceContext->PSSetShaderResources(1, 1, &m_texture[1]);
+
 		return true;
 	}
 
@@ -182,8 +185,8 @@ namespace MyEngine
 		deviceContext->IASetInputLayout(m_layout);
 		deviceContext->VSSetShader(m_vShader, NULL, 0);
 		deviceContext->PSSetShader(m_pShader, NULL, 0);
-		if (m_texture)
-			deviceContext->PSSetShaderResources(0, 1, &m_texture[0]);//////// надо ли это тут????
+	//	if (m_texture)
+	//		deviceContext->PSSetShaderResources(0, 1, &m_texture[0]);//////// надо ли это тут????
 		if (m_sampleState)
 			deviceContext->PSSetSamplers(0, 1, &m_sampleState);
 		deviceContext->DrawIndexed(numIndices, 0, 0);

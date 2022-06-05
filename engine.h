@@ -18,6 +18,8 @@ namespace MyEngine
 		// конструктор по умолчанию
 		FPSCounter()
 		{
+			QueryPerformanceFrequency((LARGE_INTEGER*)&freq);
+			QueryPerformanceCounter((LARGE_INTEGER*)&currentTime);
 			nulling();
 		}
 		// зануляем все поля
@@ -25,22 +27,24 @@ namespace MyEngine
 		{
 			dt = 0.0;
 			timeTotal = 0.0;
-			lastFrame = omp_get_wtime();
+			QueryPerformanceCounter((LARGE_INTEGER*)&lastFrame);
 		}
 		// замерить текущий фрейм и дать прошедшее время
 		float frame()
 		{
-			double timeNow = omp_get_wtime(); // используем библиотеку omp.h
-			dt = (timeNow - lastFrame);
-			lastFrame = timeNow;
+			QueryPerformanceCounter((LARGE_INTEGER*)&currentTime);
+			dt = float(currentTime - lastFrame) / freq;
+			lastFrame = currentTime;
 			timeTotal += dt; // и считаем текущее общее время
 			return dt;
 		}
 
 	private:
-		double lastFrame; // время последнего замера
+		INT64 lastFrame; // время последнего замера
 		double dt; // дельта времени с последнего замера (время кадра)
 		double timeTotal; // общее время прошедшее со времени старта
+		INT64 freq; // частота циклов
+		INT64 currentTime;
 	};
 
 	// класс движка. главный здесь везде. именно в нем содержатся рендерер, менеджер управления, окна и прочие штуки
