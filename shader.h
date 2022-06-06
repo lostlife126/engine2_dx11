@@ -20,12 +20,19 @@ namespace MyEngine
 		XMMATRIX m_Projection;
 	};
 
+	struct CameraBufferType
+	{
+		XMFLOAT3 position;
+		float padding;
+	};
+
 	struct LightBufferType
 	{
-		XMFLOAT4 ambient;
-		XMFLOAT4 diffuse;
+		XMFLOAT4 ambientColor;
+		XMFLOAT4 diffuseColor;
+		XMFLOAT4 specularColor;
 		XMFLOAT3 direction;
-		float padding;
+		float specularPower;
 	};
 
 	struct ConstantBuffer
@@ -131,6 +138,7 @@ namespace MyEngine
 	public:
 
 		ID3D11Buffer* m_lightBuffer;
+		ID3D11Buffer* m_cameraBuffer;
 
 		void setShaderParameters
 		(
@@ -138,11 +146,9 @@ namespace MyEngine
 			XMMATRIX worldMatrix,
 			XMMATRIX viewMatrix,
 			XMMATRIX projectionMatrix,
-			ID3D11ShaderResourceView* textureDiff,
-			ID3D11ShaderResourceView* textureNorm,
-			XMFLOAT3 lightDir,
-			XMFLOAT4 lightAmbient,
-			XMFLOAT4 lightDiffuse
+			ID3D11ShaderResourceView* texture[],
+			Light* light,
+			XMFLOAT3 cameraDir
 		);
 
 		void createConstantBuffer(ID3D11Device* device);
@@ -159,9 +165,9 @@ namespace MyEngine
 			XMMATRIX worldMatrix,
 			XMMATRIX viewMatrix,
 			XMMATRIX projectionMatrix,
-			ID3D11ShaderResourceView* textureDiff,
-			ID3D11ShaderResourceView* textureNorm,
-			Light* light
+			ID3D11ShaderResourceView* texture[],
+			Light* light,
+			XMFLOAT3 cameraDir
 		);
 
 		ID3D11ShaderResourceView* m_texture; // font

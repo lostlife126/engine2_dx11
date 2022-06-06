@@ -89,8 +89,9 @@ namespace MyEngine
 	public:
 		Text* textFPS; // текст: fps = ...
 		Text* textControl; // текст подсказки по управлению
+		Text* textTimeDay; // текст подсказки по управлению
 		// рендеринг шейдера освещения
-		void renderShader(Light* light);
+		void renderShader(Light* light, Camera* camera);
 		// вывод текста на экран
 		void renderText(Text* text, XMFLOAT4 color, XMFLOAT2 pos);
 		// создание буферов???

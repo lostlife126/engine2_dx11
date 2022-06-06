@@ -64,7 +64,12 @@ namespace MyEngine
 		// получить проекционную матрицу
 		XMMATRIX getProjectionMatrix();
 
-	private:
+		XMFLOAT3 getDirection()
+		{
+			return XMFLOAT3(direction.x, direction.y, direction.z);
+		}
+
+	protected:
 
 		XMMATRIX m_View;// видовая матрица
 		XMMATRIX m_Projection; // проекционная матрица

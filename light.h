@@ -10,34 +10,35 @@ namespace MyEngine
 
 		float a; // текущий угол положени€ источника света
 		XMFLOAT3 pos;// текуща€ координата источника
-		XMFLOAT3 lightDir; // направление света
-		XMFLOAT4 lightAmbient; // составл€юща€ среды
-		XMFLOAT4 lightDiffuse; // диффузна€ составл€юща€
-		XMFLOAT4 lightSpect; // диффузна€ составл€юща€
+		XMFLOAT3 direction; // направление света
+		XMFLOAT4 ambientColor; // составл€юща€ среды
+		XMFLOAT4 diffuseColor; // диффузна€ составл€юща€
+		XMFLOAT4 specularColor; // диффузна€ составл€юща€
+		float specularPower = 100.0;
 		// конструктор по умолчанию создает свет в точке 1,0,0 и направлен в 0,0,0
 		Light()
 		{
 			a = 0.0;
 			pos = XMFLOAT3(cosf(a), 0.0f, sinf(a));
-			lightDir = XMFLOAT3(-cosf(a), 0.0f, -sinf(a));
-			lightAmbient = XMFLOAT4(0.1f, 0.1f, 0.1f, 0.1f);
-			lightDiffuse = XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
-			lightSpect = XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
+			direction = XMFLOAT3(-cosf(a), 0.0f, -sinf(a));
+			ambientColor = XMFLOAT4(0.1f, 0.1f, 0.1f, 0.1f);
+			diffuseColor = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
+			specularColor = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 		}
 		// создать свет в точке xyz
 		Light(float x, float y, float z)
 		{
 			a = getAngle(x, z);
 			pos = XMFLOAT3(cosf(a), y, sinf(a));
-			lightDir = XMFLOAT3(-cosf(a), 0.0f, -sinf(a));
-			lightAmbient = XMFLOAT4(0.1f, 0.1f, 0.1f, 1.0f);
-			lightDiffuse = XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
-			lightSpect = XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
+			direction = XMFLOAT3(-cosf(a), 0.0f, -sinf(a));
+			ambientColor = XMFLOAT4(0.1f, 0.1f, 0.1f, 1.0f);
+			diffuseColor = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
+			specularColor = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 		}
 		// обновить положение и направление света
 		void update(float dt)
 		{
-			a += 0.1 * dt;
+			a += M_PI / 12.0 * dt;
 			float redFrac = 1.0f;
 			float otherFrac = 1.0f;	
 			if (a > M_PI * 2.0)
@@ -70,10 +71,10 @@ namespace MyEngine
 				}
 			}
 
-			lightDiffuse = XMFLOAT4(redFrac, otherFrac, otherFrac, 1.0f);
+			diffuseColor = XMFLOAT4(redFrac, otherFrac, otherFrac, 1.0f);
 
 			pos = XMFLOAT3(50.0 * cosf(a), 50.0 * sinf(a), 0.0);
-			lightDir = XMFLOAT3(-cosf(a), -sinf(a), 0.0f);
+			direction = XMFLOAT3(-cosf(a), -sinf(a), 0.0f);
 		}
 	};
 

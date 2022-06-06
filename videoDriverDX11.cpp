@@ -62,6 +62,8 @@ namespace MyEngine
 		fontControl->init(m_widthScreen, m_heightScreen, 7);
 		textControl = new Text(fontControl);
 		textControl->init("w - forward, s - back, a - left, d - right, q - lock mouse, esc - exit", 72, false);
+		textTimeDay = new Text(fontControl);
+		textTimeDay->init("time: ", 12, true);
 
 		D3D11_BLEND_DESC blendStateDesc;
 		ZeroMemory(&blendStateDesc, sizeof(D3D11_BLEND_DESC));
@@ -336,9 +338,9 @@ namespace MyEngine
 		m_swapChain->Present(0, 0); 
 	};
 
-	void VideoDriverDX11::renderShader(Light* light)
+	void VideoDriverDX11::renderShader(Light* light, Camera* camera)
 	{
-		m_lightShader->render(m_deviceContext, 6, m_baseWorldMatrix, m_baseViewMatrix, m_matrixOrtho, m_shaderResourceViewArray[0], m_shaderResourceViewArray[1], light);
+		m_lightShader->render(m_deviceContext, 6, m_baseWorldMatrix, m_baseViewMatrix, m_matrixOrtho, m_shaderResourceViewArray, light, camera->getDirection());
 	}
 
 	void VideoDriverDX11::renderText(Text* text, XMFLOAT4 color, XMFLOAT2 pos)

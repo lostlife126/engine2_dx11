@@ -79,5 +79,7 @@ namespace MyEngine
 		// отрисовать сцену
 		void drawScene();
 
+		float timeDay = 6.0f; // время суток
+
 	};
 }

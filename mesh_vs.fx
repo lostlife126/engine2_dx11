@@ -27,6 +27,7 @@ struct PixelInputType
 PixelInputType VS(VertexInputType input)
 {
     PixelInputType output;
+	float4 worldPos;
     
     input.position.w = 1.0f;
 
@@ -44,6 +45,6 @@ PixelInputType VS(VertexInputType input)
 	
 	output.tangent = mul(input.tangent, (float3x3)worldMatrix);
     output.tangent = normalize(output.tangent);
-
+	
 	return output;
 }
