@@ -410,6 +410,8 @@ namespace MyEngine
 
 		void addObject();
 
+		void renderFog();
+
 		Camera* getCamera();
 		void loadGraph(ID3D11Device* device, const char* caption, bool invert = false);
 
@@ -427,6 +429,7 @@ namespace MyEngine
 		std::vector<Object*> object;
 		std::list<Object*> visible_objects;
 		Region region;
+		FogShader* fogShader;
 
 		void frustrumCulling();
 	};

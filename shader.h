@@ -67,13 +67,8 @@ namespace MyEngine
 		ID3D11VertexShader* m_vShader = nullptr; // вершинный шейдер
 		ID3D11PixelShader* m_pShader = nullptr; // пиксельный шейдер
 		ID3D11InputLayout* m_layout = nullptr; // формат данных шейдера
-
 		ID3D11SamplerState* m_sampleState = nullptr; // сэмплер
-
-		D3D11_INPUT_ELEMENT_DESC* m_layout_format = nullptr;
-
-
-		ID3D11Buffer* m_matrixBuffer = nullptr; // константный буфер матрицы
+		D3D11_INPUT_ELEMENT_DESC* m_layout_format = nullptr; //  массив входных элементов
 
 		const int maxLayout = 8;
 		int numLayout = 0;
@@ -88,7 +83,7 @@ namespace MyEngine
 		// загрузка и инициализация вершинного шейдера и формата входных данных
 		void initVertexShaders(ID3D11Device* device, const char* vShaderFile, const char* entryPoint);
 		
-		// загрузка и инициализация пиксельного шейдера
+		// загрузка и инициализация пиксельного шейдера и формата входных данных
 		void initPixelShaders(ID3D11Device* device, const char* pShaderFile, const char* entryPoint);
 
 };
@@ -99,7 +94,7 @@ namespace MyEngine
 
 		void loadTextures(ID3D11Device* device, const char* filename) override;
 
-		bool setShaderParameters(ID3D11DeviceContext* deviceContext, XMMATRIX worldMatrix, XMMATRIX viewMatrix, XMMATRIX projectionMatrix);
+		void setShaderParameters(ID3D11DeviceContext* deviceContext, XMMATRIX worldMatrix, XMMATRIX viewMatrix, XMMATRIX projectionMatrix);
 
 		void render(ID3D11DeviceContext* deviceContext, int numIndices, XMMATRIX worldMatrix, XMMATRIX viewMatrix, XMMATRIX projectionMatrix);
 
@@ -107,9 +102,8 @@ namespace MyEngine
 		void initShaders(ID3D11Device* device, const char* vShaderFile, const char* pShaderFile);
 
 		ID3D11ShaderResourceView* m_texture[5]; // diffuse, normal, ao, metal, rough
-
+		ID3D11Buffer* m_matrixBuffer = nullptr; // константный буфер матрицы
 	};
-
 	
 	class TextShader : public Shader
 	{
@@ -120,7 +114,7 @@ namespace MyEngine
 
 		void loadTextures(ID3D11Device* device, const char* filename) override;
 
-		bool setShaderParameters(ID3D11DeviceContext* deviceContext, XMFLOAT4 color, XMFLOAT2 pos, XMMATRIX m_orthoMatrix);
+		void setShaderParameters(ID3D11DeviceContext* deviceContext, XMFLOAT4 color, XMFLOAT2 pos, XMMATRIX m_orthoMatrix);
 
 		void render(ID3D11DeviceContext* deviceContext, int numIndices, XMFLOAT4 color, XMFLOAT2 pos, XMMATRIX projectionMatrix);
 
@@ -131,12 +125,10 @@ namespace MyEngine
 
 	};
 	
-
-	
 	class LightShader : public Shader
 	{
 	public:
-
+		ID3D11Buffer* m_matrixBuffer = nullptr; // константный буфер матрицы
 		ID3D11Buffer* m_lightBuffer;
 		ID3D11Buffer* m_cameraBuffer;
 
@@ -153,7 +145,8 @@ namespace MyEngine
 
 		void createConstantBuffer(ID3D11Device* device);
 
-		void loadTextures(ID3D11Device* device, const char* filename) override;
+		void loadTextures(ID3D11Device* device, const char* filename) override
+		{}
 
 		// инициализация вершинного и пиксельного шейдеров
 		void initShaders(ID3D11Device* device, const char* vShaderFile, const char* pShaderFile);
@@ -169,10 +162,24 @@ namespace MyEngine
 			Light* light,
 			XMFLOAT3 cameraDir
 		);
-
-		ID3D11ShaderResourceView* m_texture; // font
 		
 	};
 	
+	class FogShader : public Shader
+	{
+	public:
+
+		void loadTextures(ID3D11Device* device, const char* filename) override
+		{}
+
+		void setShaderParameters(ID3D11DeviceContext* deviceContext, XMMATRIX viewMatrix);
+
+		void render(ID3D11DeviceContext* deviceContext, XMMATRIX viewMatrix);
+
+		// инициализация вершинного и пиксельного шейдеров и создание буфера матриц
+		void initShaders(ID3D11Device* device, const char* vShaderFile, const char* pShaderFile);
+
+		ID3D11Buffer* m_matrixBuffer = nullptr; // константный буфер матрицы
+	};
 
 }

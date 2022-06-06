@@ -24,7 +24,6 @@ namespace MyEngine
 		return;
 	}
 
-	// создание состояния сэмплера (для выборки текстур)
 	void Shader::setSampleState(ID3D11Device* device)
 	{
 		D3D11_SAMPLER_DESC sd;
@@ -49,11 +48,6 @@ namespace MyEngine
 			Log::Get()->Debug("Created sampler state.");
 	}
 
-	// метод для загрузки шейдера из файла в ID3DBlob
-	// filename - имя файла из которого грузим
-	// entryPoint - точка в файле с которой начинается шейдер
-	// shaderModel - версия шейдера
-	// ppBlobOut - буфер куда кладем загруженный шейдер
 	void Shader::compileShaderFromFile(const char* filename, LPCSTR entryPoint, LPCSTR shaderModel, ID3DBlob** ppBlobOut)
 	{
 		HRESULT hr = S_OK;
@@ -73,7 +67,6 @@ namespace MyEngine
 		return;
 	}
 
-	// загрузка и инициализация вершинного шейдера и формата входных данных
 	void Shader::initVertexShaders(ID3D11Device* device, const char* vShaderFile, const char* entryPoint)
 	{
 		HRESULT hr;
@@ -81,17 +74,17 @@ namespace MyEngine
 
 		// вершинный шейдер
 		ID3D10Blob* vShaderBuff; // буфер для него
-		compileShaderFromFile(vShaderFile, entryPoint, "vs_4_0", &vShaderBuff); // компилим вершинный файл 
+		compileShaderFromFile(vShaderFile, entryPoint, "vs_4_0", &vShaderBuff); // компилим файл вершинного шейдера
 		if (vShaderBuff == nullptr)
 			Log::Get()->Error("%s %s", "Error reading file vertex shader:", vShaderFile);
 		// создаем шейдер
-		hr = device->CreateVertexShader(vShaderBuff->GetBufferPointer(), vShaderBuff->GetBufferSize(), NULL, &m_vShader);
+		hr = device->CreateVertexShader(vShaderBuff->GetBufferPointer(), vShaderBuff->GetBufferSize(), NULL, &m_vShader); // создаем вершинный шейдер
 		if (FAILED(hr))
 			Log::Get()->Error("Error creating vertex shader.");
 		else
 			Log::Get()->Debug("Created vertex shader.");
 
-		hr = device->CreateInputLayout(m_layout_format, numLayout, vShaderBuff->GetBufferPointer(), vShaderBuff->GetBufferSize(), &m_layout);
+		hr = device->CreateInputLayout(m_layout_format, numLayout, vShaderBuff->GetBufferPointer(), vShaderBuff->GetBufferSize(), &m_layout); // подаем типы выходных данных
 		if (FAILED(hr))
 			Log::Get()->Error("Error creating vertex layout.");
 		else
@@ -100,7 +93,6 @@ namespace MyEngine
 		vShaderBuff->Release(); vShaderBuff = nullptr;
 	}
 
-	// загрузка и инициализация пиксельного шейдера
 	void Shader::initPixelShaders(ID3D11Device* device, const char* pShaderFile, const char* entryPoint)
 	{
 		HRESULT hr;
@@ -119,7 +111,6 @@ namespace MyEngine
 
 	}
 
-	// загружаем текстуру
 	void ModelShader::loadTextures(ID3D11Device* device, const char* caption)
 	{
 		std::string filename;
@@ -148,8 +139,7 @@ namespace MyEngine
 		setSampleState(device);
 	}
 
-
-	bool ModelShader::setShaderParameters(ID3D11DeviceContext* deviceContext, XMMATRIX worldMatrix, XMMATRIX viewMatrix, XMMATRIX projectionMatrix)
+	void ModelShader::setShaderParameters(ID3D11DeviceContext* deviceContext, XMMATRIX worldMatrix, XMMATRIX viewMatrix, XMMATRIX projectionMatrix)
 	{
 		HRESULT hr;
 		D3D11_MAPPED_SUBRESOURCE mappedRes;
@@ -173,29 +163,22 @@ namespace MyEngine
 		if (m_texture[2] != NULL)
 			deviceContext->PSSetShaderResources(2, 1, &m_texture[2]);
 
-		return true;
+		return;
 	}
 
 	void ModelShader::render(ID3D11DeviceContext* deviceContext, int numIndices, XMMATRIX worldMatrix, XMMATRIX viewMatrix, XMMATRIX projectionMatrix)
 	{
-		bool res = setShaderParameters(deviceContext, worldMatrix, viewMatrix, projectionMatrix);
-		if (!res)
-		{
-			return;
-		}
+		setShaderParameters(deviceContext, worldMatrix, viewMatrix, projectionMatrix);
 
 		deviceContext->IASetInputLayout(m_layout);
 		deviceContext->VSSetShader(m_vShader, NULL, 0);
 		deviceContext->PSSetShader(m_pShader, NULL, 0);
-	//	if (m_texture)
-	//		deviceContext->PSSetShaderResources(0, 1, &m_texture[0]);//////// надо ли это тут????
 		if (m_sampleState)
 			deviceContext->PSSetSamplers(0, 1, &m_sampleState);
 		deviceContext->DrawIndexed(numIndices, 0, 0);
 		return;
 	}
 
-	// инициализация вершинного и пиксельного шейдеров и создание буфера матриц
 	void ModelShader::initShaders(ID3D11Device* device, const char* vShaderFile, const char* pShaderFile)
 	{
 		initVertexShaders(device, vShaderFile, "VS");
@@ -204,7 +187,7 @@ namespace MyEngine
 		return;
 	}
 
-	// загружаем текстуру
+
 	void TextShader::loadTextures(ID3D11Device* device, const char* caption)
 	{
 		std::string filename;
@@ -219,12 +202,11 @@ namespace MyEngine
 		setSampleState(device);
 	}
 
-
-	bool TextShader::setShaderParameters(ID3D11DeviceContext* deviceContext, XMFLOAT4 color, XMFLOAT2 pos, XMMATRIX m_orthoMatrix)
+	void TextShader::setShaderParameters(ID3D11DeviceContext* deviceContext, XMFLOAT4 color, XMFLOAT2 pos, XMMATRIX m_orthoMatrix)
 	{
 		XMMATRIX objMatrix = XMMatrixTranslation(pos.x, -pos.y, 0.0f);
 
-		XMMATRIX wvp = objMatrix * m_orthoMatrix;////////////////////////////
+		XMMATRIX wvp = objMatrix * m_orthoMatrix;
 		ConstantBuffer cb;
 		cb.wvp = XMMatrixTranspose(wvp);
 		deviceContext->UpdateSubresource(m_constantBuffer, 0, NULL, &cb, 0, 0);
@@ -233,29 +215,23 @@ namespace MyEngine
 		pb.color = color;
 		deviceContext->UpdateSubresource(m_pixelBuffer, 0, NULL, &pb, 0, 0);
 		deviceContext->PSSetConstantBuffers(0, 1, &m_pixelBuffer);
-		return true;
+		deviceContext->PSSetShaderResources(0, 1, &m_texture);
+		return;
 	}
 
 	void TextShader::render(ID3D11DeviceContext* deviceContext, int numIndices, XMFLOAT4 color, XMFLOAT2 pos, XMMATRIX projectionMatrix)
 	{
-		bool res = setShaderParameters(deviceContext, color, pos, projectionMatrix);
-		if (!res)
-		{
-			return;
-		}
+		setShaderParameters(deviceContext, color, pos, projectionMatrix);
 
 		deviceContext->IASetInputLayout(m_layout);
 		deviceContext->VSSetShader(m_vShader, NULL, 0);
 		deviceContext->PSSetShader(m_pShader, NULL, 0);
-		if (m_texture)
-			deviceContext->PSSetShaderResources(0, 1, &m_texture);//////// надо ли это тут????
 		if (m_sampleState)
 			deviceContext->PSSetSamplers(0, 1, &m_sampleState);
 		deviceContext->DrawIndexed(numIndices, 0, 0);
 		return;
 	}
 
-	// инициализация вершинного и пиксельного шейдеров и создание буфера матриц
 	void TextShader::initShaders(ID3D11Device* device, const char* vShaderFile, const char* pShaderFile)
 	{
 		initVertexShaders(device, vShaderFile, "VS");
@@ -331,21 +307,6 @@ namespace MyEngine
 		return;
 	}
 
-	// загружаем текстуру
-	void LightShader::loadTextures(ID3D11Device* device, const char* caption)
-	{
-		std::string filename;
-		filename = caption;
-		filename += "_font.png";
-		HRESULT hr = D3DX11CreateShaderResourceViewFromFileA(device, caption, NULL, NULL, &m_texture, NULL);
-		if (FAILED(hr))
-			Log::Get()->Error("Can't create texture from file.");
-		else
-			Log::Get()->Debug("Created texture from file.");
-
-		setSampleState(device);
-	}
-
 	// инициализация вершинного и пиксельного шейдеров
 	void LightShader::initShaders(ID3D11Device* device, const char* vShaderFile, const char* pShaderFile)
 	{
@@ -379,6 +340,46 @@ namespace MyEngine
 		if (m_sampleState)
 			deviceContext->PSSetSamplers(0, 1, &m_sampleState);
 		deviceContext->DrawIndexed(numIndices, 0, 0);
+		return;
+	}
+
+
+	void FogShader::setShaderParameters(ID3D11DeviceContext* deviceContext, XMMATRIX viewMatrix)
+	{
+		HRESULT hr;
+		D3D11_MAPPED_SUBRESOURCE mappedRes;
+		ConstantBuffer* p_data;
+		unsigned int bufferNum = 0;
+
+		viewMatrix = XMMatrixTranspose(viewMatrix);
+
+		hr = deviceContext->Map(m_matrixBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedRes);
+		p_data = (ConstantBuffer*)mappedRes.pData;
+		p_data->wvp = viewMatrix;
+		deviceContext->Unmap(m_matrixBuffer, 0);
+		deviceContext->VSSetConstantBuffers(bufferNum, 1, &m_matrixBuffer);
+
+		return;
+	}
+
+	void FogShader::render(ID3D11DeviceContext* deviceContext, XMMATRIX viewMatrix)
+	{
+		setShaderParameters(deviceContext, viewMatrix);
+
+		deviceContext->IASetInputLayout(m_layout);
+		deviceContext->VSSetShader(m_vShader, NULL, 0);
+		deviceContext->PSSetShader(m_pShader, NULL, 0);
+		if (m_sampleState)
+			deviceContext->PSSetSamplers(0, 1, &m_sampleState);
+		deviceContext->DrawIndexed(3, 0, 0);
+		return;
+	}
+
+	void FogShader::initShaders(ID3D11Device* device, const char* vShaderFile, const char* pShaderFile)
+	{
+		initVertexShaders(device, vShaderFile, "VS");
+		initPixelShaders(device, pShaderFile, "PS");
+		m_matrixBuffer = Buffer::createConstantBuffer(device, sizeof(MatrixBufferType), true);
 		return;
 	}
 

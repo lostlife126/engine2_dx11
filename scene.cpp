@@ -35,6 +35,12 @@ namespace MyEngine
 
 		addObject();
 		light.push_back(new Light(1.0, 1.0, 0.0));
+		fogShader = new FogShader;
+		fogShader->addInputElement("POSITION", DXGI_FORMAT_R32G32B32_FLOAT);
+		fogShader->addInputElement("TEXCOORD", DXGI_FORMAT_R32G32_FLOAT);
+		fogShader->initShaders(driver->getDevice(), "fog_vs.fx", "fog_ps.fx");
+
+
 		return;
 	}
 
@@ -89,6 +95,12 @@ namespace MyEngine
 			m_shader[(*iter)->typeTexture]->render(driver->getDeviceContext(), mesh[(*iter)->typeMesh]->numIndices, (*iter)->getWorldMatrix(), m_camera->getViewMatrix(), m_camera->getProjectionMatrix());
 			iter = visible_objects.erase(iter);
 		}
+		renderFog();
+	}
+
+	void Scene::renderFog()
+	{
+		fogShader->render(driver->getDeviceContext(), getCamera()->getViewMatrix());
 	}
 
 	void Scene::frustrumCulling()
