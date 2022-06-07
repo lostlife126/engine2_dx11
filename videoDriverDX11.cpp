@@ -340,7 +340,7 @@ namespace MyEngine
 
 	void VideoDriverDX11::renderShader(Light* light, Camera* camera)
 	{
-		m_lightShader->render(m_deviceContext, 6, m_baseWorldMatrix, m_baseViewMatrix, m_matrixOrtho, m_shaderResourceViewArray, light, camera->getDirection());
+		m_lightShader->render(m_deviceContext, 6, m_baseWorldMatrix, m_baseViewMatrix, m_matrixOrtho, m_shaderResourceViewArray, light);
 	}
 
 	void VideoDriverDX11::renderText(Text* text, XMFLOAT4 color, XMFLOAT2 pos)

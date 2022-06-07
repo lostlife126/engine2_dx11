@@ -6,10 +6,15 @@ cbuffer MatrixBuffer
 	matrix projectionMatrix;
 };
 
+cbuffer CameraBuffer
+{
+    float3 cameraPos;
+};
+
 struct VertexInputType
 {
     float4 position : POSITION;
-    float2 tex : TEXCOORD0;
+    float2 tex : TEXCOORD;
 	float3 normal : NORMAL;
 	float3 tangent : TANGENT;
 	float3 binormal : BINORMAL;
@@ -18,10 +23,11 @@ struct VertexInputType
 struct PixelInputType
 {
     float4 position : SV_POSITION;
-    float2 tex : TEXCOORD0;
+    float2 tex : TEXCOORD;
 	float3 normal : NORMAL;
 	float3 tangent : TANGENT;
 	float3 binormal : BINORMAL;
+	float3 cameraDir : POSITION;
 };
 
 PixelInputType VS(VertexInputType input)
@@ -36,6 +42,13 @@ PixelInputType VS(VertexInputType input)
     output.position = mul(output.position, projectionMatrix);
     
     output.tex = input.tex;
+	
+	worldPos = mul(input.position, worldMatrix);
+	output.cameraDir.x = worldPos.x;
+	output.cameraDir.y = worldPos.y;
+	output.cameraDir.z = worldPos.z;
+	output.cameraDir = output.cameraDir - cameraPos;
+	output.cameraDir = normalize(output.cameraDir);
 
     output.normal = mul(input.normal, (float3x3)worldMatrix);
     output.normal = normalize(output.normal);

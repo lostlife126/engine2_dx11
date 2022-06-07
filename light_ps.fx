@@ -11,11 +11,6 @@ cbuffer LightBuffer
     float specPower;
 };
 
-cbuffer CameraBuffer
-{
-    float3 cameraDir;
-};
-
 struct PixelInputType
 {
     float4 position : SV_POSITION;
@@ -26,7 +21,7 @@ float4 PS(PixelInputType input) : SV_TARGET
 {
     float4 colors;
     float4 normals;
-	float4 roughness;
+	float4 cameraDirs;
     float3 lightDir;
     float4 totalIntensity;
     float4 outputColor;
@@ -35,7 +30,8 @@ float4 PS(PixelInputType input) : SV_TARGET
 
     colors = shaderTexture[0].Sample(SampleTypePoint, input.tex);
     normals = shaderTexture[1].Sample(SampleTypePoint, input.tex);
-	
+	cameraDirs = shaderTexture[2].Sample(SampleTypePoint, input.tex);
+	cameraDirs = cameraDirs * 2.0f - 1.0f;
 
     lightDir = -lightDirection;
 	
@@ -47,16 +43,15 @@ float4 PS(PixelInputType input) : SV_TARGET
 	
 	if(diffIntensity>0.0f)
 	{
-	    roughness = shaderTexture[2].Sample(SampleTypePoint, input.tex);
 		reflection = normalize(2 * diffIntensity * normals - lightDirection);
-		specPart = lightSpec * pow(saturate(dot(reflection, -cameraDir)), specPower);
+		specPart = lightSpec * pow(saturate(dot(reflection, -cameraDirs)), specPower);
 	}
 
-	//totalIntensity = saturate(lightAmb + diffPart + specPart);
-	totalIntensity = saturate(lightAmb + diffPart);
+	totalIntensity = saturate(lightAmb + specPart);
+	//totalIntensity = saturate(lightAmb + diffPart);
 	
 	outputColor = colors * totalIntensity;
-	//outputColor = float4(reflection, 1.0);
+	//outputColor = cameraDirs;
 	//outputColor = totalIntensity;
     return outputColor;
 }

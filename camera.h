@@ -69,6 +69,11 @@ namespace MyEngine
 			return XMFLOAT3(direction.x, direction.y, direction.z);
 		}
 
+		XMFLOAT3 getPosition()
+		{
+			return XMFLOAT3(position.x, position.y, position.z);
+		}
+
 	protected:
 
 		XMMATRIX m_View;// видовая матрица

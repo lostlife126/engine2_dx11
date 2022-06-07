@@ -87,7 +87,7 @@ namespace MyEngine
 		if (timeFPS > 0.25)
 		{
 			char bufferFPS[12];
-			char bufferNum[4];
+			char bufferNum[5];
 			strcpy_s(bufferFPS, "fps = ");
 			_itoa_s( int(1.0 / dt), bufferNum, 10);
 			strcat_s(bufferFPS, bufferNum);
