@@ -80,5 +80,5 @@ namespace MyEngine
 			direction = XMFLOAT3(-cosf(a), -sinf(a), 0.0f);
 		}
 	};
-
+	//
 }
