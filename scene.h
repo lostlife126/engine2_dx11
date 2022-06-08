@@ -148,7 +148,13 @@ namespace MyEngine
 				double x = pos.x;
 				for (int i = 0; i < nNodesX; i++)
 				{
-					nodes[posNode].hei = bitmapBuffer[offset] / 25.5;
+					int tem;
+					int hei;
+					int hum;
+					tem = bitmapBuffer[offset];
+					hei = bitmapBuffer[offset + 1];
+					hum = bitmapBuffer[offset + 2];
+					nodes[posNode].set(tem, hei, hum);
 					posNode++;
 					offset += 3;
 				}
@@ -157,9 +163,32 @@ namespace MyEngine
 
 		}
 
-		void createMap()
+		void createMap(int sizeMap)
 		{
-			
+			NodeField pTemp(sizeMap, sizeMap);
+			pTemp.addNoise(1.0, 2.0);
+
+			NodeField pHei(sizeMap, sizeMap);
+			pHei.addNoise(1.0, 5.0);
+			pHei.setChains();
+			pHei.addNoise(0.3, 10.0);
+			pHei.addNoise(0.12, 20.0);
+			pHei.addNoise(0.05, 50.0);
+			pHei.normalize();
+			pHei.setExpBorder(0.1);
+
+			NodeField pHum(sizeMap, sizeMap);
+			pHum.addNoise(1.0, 2.0);
+			nodes.resize(sizeMap * sizeMap);
+
+			for (int i = 0; i < nodes.size(); i++)
+			{
+				nodes[i].set(pTemp.data[i] * 255.0, pHei.data[i] * 255.0, pHum.data[i] * 255.0);
+			}
+			nNodesX = sizeMap;
+			nNodesY = sizeMap;
+
+			saveToBMP("map1.bmp");
 		}
 
 		void saveToBMP(const char* filename)
@@ -219,29 +248,10 @@ namespace MyEngine
 
 		void init(ID3D11Device* device)
 		{
-			readFile("map.bmp");
-
-			NodeField pTemp(100, 100);
-			pTemp.addNoise(1.0, 2.0);
-
-			NodeField pHei(100, 100);
-			pHei.addNoise(1.0, 5.0);
-			pHei.setChains();
-			pHei.addNoise(0.3, 10.0);
-			pHei.addNoise(0.12, 20.0);
-			pHei.addNoise(0.05, 50.0);
-			pHei.normalize();
-			pHei.setExpBorder(0.1);
-
-			NodeField pHum(100, 100);
-			pHum.addNoise(1.0, 2.0);
-
-			for (int i = 0; i < nodes.size(); i++)
-			{
-				nodes[i].set(pTemp.data[i] * 255.0, pHei.data[i] * 255.0, pHum.data[i] * 255.0);
-			}
-
-			saveToBMP("map1.bmp");
+			if (true)
+				readFile("map.bmp");
+			else
+				createMap(100);
 
 			nCellsX = nNodesX - 1;
 			nCellsY = nNodesY - 1;

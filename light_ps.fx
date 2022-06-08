@@ -1,4 +1,4 @@
-Texture2D shaderTexture[3];
+Texture2D shaderTexture[4];
 
 SamplerState SampleTypePoint : register(s0);
 
@@ -27,10 +27,12 @@ float4 PS(PixelInputType input) : SV_TARGET
     float4 outputColor;
 	float4 viewDir = float4(0.0, -1.0, 0.0, 0.0);
 	float3 reflection;
+	float4 roughness;
 
     colors = shaderTexture[0].Sample(SampleTypePoint, input.tex);
     normals = shaderTexture[1].Sample(SampleTypePoint, input.tex);
 	cameraDirs = shaderTexture[2].Sample(SampleTypePoint, input.tex);
+	roughness = shaderTexture[3].Sample(SampleTypePoint, input.tex);
 	cameraDirs = cameraDirs * 2.0f - 1.0f;
 
     lightDir = -lightDirection;
@@ -44,14 +46,14 @@ float4 PS(PixelInputType input) : SV_TARGET
 	if(diffIntensity>0.0f)
 	{
 		reflection = normalize(2 * diffIntensity * normals - lightDirection);
-		specPart = lightSpec * pow(saturate(dot(reflection, -cameraDirs)), specPower);
+		specPart = lightSpec * pow(saturate(dot(reflection, -cameraDirs)), roughness.x * 1000.0);
 	}
 
-	totalIntensity = saturate(lightAmb + specPart);
-	//totalIntensity = saturate(lightAmb + diffPart);
+	totalIntensity = saturate(lightAmb + diffPart + specPart);
+	//totalIntensity = saturate(lightAmb );
 	
 	outputColor = colors * totalIntensity;
-	//outputColor = cameraDirs;
+	//outputColor = roughness;
 	//outputColor = totalIntensity;
     return outputColor;
 }

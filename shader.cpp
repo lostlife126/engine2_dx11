@@ -283,6 +283,7 @@ namespace MyEngine
 		deviceContext->PSSetShaderResources(0, 1, &texture[0]);
 		deviceContext->PSSetShaderResources(1, 1, &texture[1]);
 		deviceContext->PSSetShaderResources(2, 1, &texture[2]);
+		deviceContext->PSSetShaderResources(3, 1, &texture[3]);
 
 		D3D11_MAPPED_SUBRESOURCE mappedResL;
 		LightBufferType* p_dataL;

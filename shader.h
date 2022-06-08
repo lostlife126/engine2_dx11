@@ -101,7 +101,7 @@ namespace MyEngine
 		// инициализация вершинного и пиксельного шейдеров и создание буфера матриц
 		void initShaders(ID3D11Device* device, const char* vShaderFile, const char* pShaderFile);
 
-		ID3D11ShaderResourceView* m_texture[5]; // diffuse, normal, ao, metal, rough
+		ID3D11ShaderResourceView* m_texture[4]; // diffuse, normal, position, rough
 		ID3D11Buffer* m_matrixBuffer = nullptr; // константный буфер матрицы
 		ID3D11Buffer* m_cameraBuffer;
 	};

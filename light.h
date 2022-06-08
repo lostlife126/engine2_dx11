@@ -23,7 +23,7 @@ namespace MyEngine
 			direction = XMFLOAT3(-cosf(a), 0.0f, -sinf(a));
 			ambientColor = XMFLOAT4(0.1f, 0.1f, 0.1f, 0.1f);
 			diffuseColor = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
-			specularColor = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+			specularColor = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
 		}
 		// создать свет в точке xyz
 		Light(float x, float y, float z)
@@ -33,7 +33,7 @@ namespace MyEngine
 			direction = XMFLOAT3(-cosf(a), 0.0f, -sinf(a));
 			ambientColor = XMFLOAT4(0.1f, 0.1f, 0.1f, 1.0f);
 			diffuseColor = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
-			specularColor = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+			specularColor = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
 		}
 		// обновить положение и направление света
 		void update(float dt)
@@ -70,8 +70,11 @@ namespace MyEngine
 					}
 				}
 			}
+			redFrac *= 0.5;
+			otherFrac *= 0.5;
 
 			diffuseColor = XMFLOAT4(redFrac, otherFrac, otherFrac, 1.0f);
+			specularColor = XMFLOAT4(redFrac, otherFrac, otherFrac, 1.0f);
 
 			pos = XMFLOAT3(50.0 * cosf(a), 50.0 * sinf(a), 0.0);
 			direction = XMFLOAT3(-cosf(a), -sinf(a), 0.0f);

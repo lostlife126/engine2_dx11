@@ -1,11 +1,11 @@
 
-Texture2D shaderTexture[3];
+Texture2D shaderTexture[4];
 SamplerState SampleType;
 
 struct PixelInputType
 {
     float4 position : SV_POSITION;
-    float2 tex : TEXCOORD0;
+    float2 tex : TEXCOORD;
 	float3 normal : NORMAL;
 	float3 tangent : TANGENT;
 	float3 binormal : BINORMAL;
@@ -17,6 +17,7 @@ struct PixelOutputType
     float4 color : SV_Target0;
     float4 normal : SV_Target1;
 	float4 position : SV_Target2;
+	float4 roughness : SV_Target3;
 };
 
 PixelOutputType PS(PixelInputType input) : SV_TARGET
@@ -24,11 +25,13 @@ PixelOutputType PS(PixelInputType input) : SV_TARGET
     float4 textureColor;
 	float4 bumpMap;
 	float3 bumpNormal;
+	float3 textureRoughness;
 	
 	PixelOutputType output;
 
 	textureColor = shaderTexture[0].Sample(SampleType, input.tex);
 	bumpMap = shaderTexture[1].Sample(SampleType, input.tex);
+	textureRoughness = shaderTexture[2].Sample(SampleType, input.tex);
 	bumpMap = (2.0f * bumpMap) - 1.0f;
 	bumpNormal = (bumpMap.x * input.tangent) + (bumpMap.y * input.binormal) + (bumpMap.z * input.normal);
 	bumpNormal = normalize(bumpNormal);
@@ -36,6 +39,7 @@ PixelOutputType PS(PixelInputType input) : SV_TARGET
     output.color = textureColor;
 	output.normal = float4(bumpNormal, 1.0);
 	output.position = float4((input.cameraDir + 1.0f) * 0.5, 1.0f);
+	output.roughness = float4(textureRoughness, 1.0);
 
     return output;
 }

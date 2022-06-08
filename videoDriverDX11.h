@@ -28,7 +28,7 @@ namespace MyEngine
 		XMFLOAT2  tex;
 	};
 	// число буферов. диффузный, нормаль и амбиент оклюжн (в будущем)
-	const int NUM_BUFFERS = 3; // diffuse, normal, ao
+	const int NUM_BUFFERS = 4; // diffuse, normal, positions, roughness
 
 	// класс видеодрайвера в дх11. здесь будут сидеть все действия над рендерингом
 	class VideoDriverDX11
