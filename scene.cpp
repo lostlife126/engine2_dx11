@@ -95,7 +95,7 @@ namespace MyEngine
 			m_shader[(*iter)->typeTexture]->render(driver->getDeviceContext(), mesh[(*iter)->typeMesh]->numIndices, (*iter)->getWorldMatrix(), m_camera->getViewMatrix(), m_camera->getProjectionMatrix(), m_camera->getPosition());
 			iter = visible_objects.erase(iter);
 		}
-		renderFog();
+		//renderFog();
 	}
 
 	void Scene::renderFog()

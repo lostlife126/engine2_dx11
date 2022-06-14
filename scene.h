@@ -248,7 +248,7 @@ namespace MyEngine
 
 		void init(ID3D11Device* device)
 		{
-			if (true)
+			if (false)
 				readFile("map.bmp");
 			else
 				createMap(100);
@@ -278,7 +278,6 @@ namespace MyEngine
 						cellTypes[ind] = 1;
 					if (nodes[nLB].hei > 1000.0 || nodes[nRB].hei > 1000.0 || nodes[nLT].hei > 1000.0 || nodes[nRT].hei > 1000.0)
 						cellTypes[ind] = 0;
-					//cellTypes[ind] = (rand() % 4);
 					ind++;
 				}
 			}

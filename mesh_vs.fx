@@ -27,13 +27,12 @@ struct PixelInputType
 	float3 normal : NORMAL;
 	float3 tangent : TANGENT;
 	float3 binormal : BINORMAL;
-	float3 cameraDir : POSITION;
+	float3 posPixel : POSITION;
 };
 
 PixelInputType VS(VertexInputType input)
 {
     PixelInputType output;
-	float4 worldPos;
     
     input.position.w = 1.0f;
 
@@ -43,12 +42,7 @@ PixelInputType VS(VertexInputType input)
     
     output.tex = input.tex;
 	
-	worldPos = mul(input.position, worldMatrix);
-	output.cameraDir.x = worldPos.x;
-	output.cameraDir.y = worldPos.y;
-	output.cameraDir.z = worldPos.z;
-	output.cameraDir = output.cameraDir - cameraPos;
-	output.cameraDir = normalize(output.cameraDir);
+	output.posPixel = mul(input.position, worldMatrix);
 
     output.normal = mul(input.normal, (float3x3)worldMatrix);
     output.normal = normalize(output.normal);

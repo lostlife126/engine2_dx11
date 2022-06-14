@@ -3,7 +3,7 @@
 
 namespace MyEngine
 {
-
+	////////////////////////////////////    Shader   ///////////////////////////////////////////////
 	void Shader::addInputElement(const char* name, DXGI_FORMAT format)
 	{
 		if (numLayout == 0)
@@ -111,6 +111,8 @@ namespace MyEngine
 
 	}
 
+	////////////////////////////////////   Model Shader   ///////////////////////////////////////////////
+
 	void ModelShader::loadTextures(ID3D11Device* device, const char* caption)
 	{
 		std::string filename;
@@ -131,6 +133,20 @@ namespace MyEngine
 		filename = caption;
 		filename += "_roughness.png";
 		hr = D3DX11CreateShaderResourceViewFromFileA(device, filename.c_str(), NULL, NULL, &m_texture[2], NULL);
+		if (FAILED(hr))
+			Log::Get()->Error("%s %s", "Can't create texture from file:", filename.c_str());
+		else
+			Log::Get()->Debug("%s %s", "Created texture from file:", filename.c_str());
+		filename = caption;
+		filename += "_metallness.png";
+		hr = D3DX11CreateShaderResourceViewFromFileA(device, filename.c_str(), NULL, NULL, &m_texture[3], NULL);
+		if (FAILED(hr))
+			Log::Get()->Error("%s %s", "Can't create texture from file:", filename.c_str());
+		else
+			Log::Get()->Debug("%s %s", "Created texture from file:", filename.c_str());
+		filename = caption;
+		filename += "_ao.png";
+		hr = D3DX11CreateShaderResourceViewFromFileA(device, filename.c_str(), NULL, NULL, &m_texture[4], NULL);
 		if (FAILED(hr))
 			Log::Get()->Error("%s %s", "Can't create texture from file:", filename.c_str());
 		else
@@ -162,6 +178,10 @@ namespace MyEngine
 			deviceContext->PSSetShaderResources(1, 1, &m_texture[1]);
 		if (m_texture[2] != NULL)
 			deviceContext->PSSetShaderResources(2, 1, &m_texture[2]);
+		if (m_texture[3] != NULL)
+			deviceContext->PSSetShaderResources(3, 1, &m_texture[3]);
+		if (m_texture[4] != NULL)
+			deviceContext->PSSetShaderResources(4, 1, &m_texture[4]);
 
 		D3D11_MAPPED_SUBRESOURCE mappedResC;
 		CameraBufferType* p_dataC;
@@ -198,6 +218,7 @@ namespace MyEngine
 		return;
 	}
 
+	////////////////////////////////////   Text Shader   ///////////////////////////////////////////////
 
 	void TextShader::loadTextures(ID3D11Device* device, const char* caption)
 	{
@@ -253,6 +274,7 @@ namespace MyEngine
 		return;
 	}
 
+	////////////////////////////////////   Light Shader   ///////////////////////////////////////////////
 
 	void LightShader::setShaderParameters
 	(
@@ -261,7 +283,8 @@ namespace MyEngine
 		XMMATRIX viewMatrix,
 		XMMATRIX projectionMatrix,
 		ID3D11ShaderResourceView* texture[],
-		Light* light
+		Light* light,
+		XMFLOAT3 cameraPos
 	)
 	{
 		HRESULT hr;
@@ -280,6 +303,17 @@ namespace MyEngine
 		p_data->m_Projection = projectionMatrix;
 		deviceContext->Unmap(m_matrixBuffer, 0);
 		deviceContext->VSSetConstantBuffers(bufferNum, 1, &m_matrixBuffer);
+
+		D3D11_MAPPED_SUBRESOURCE mappedResC;
+		CameraBufferType* p_dataC;
+
+		hr = deviceContext->Map(m_cameraBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResC);
+		p_dataC = (CameraBufferType*)mappedResC.pData;
+		p_dataC->position = cameraPos;
+		deviceContext->Unmap(m_cameraBuffer, 0);
+		bufferNum = 1;
+		deviceContext->PSSetConstantBuffers(bufferNum, 1, &m_cameraBuffer);
+
 		deviceContext->PSSetShaderResources(0, 1, &texture[0]);
 		deviceContext->PSSetShaderResources(1, 1, &texture[1]);
 		deviceContext->PSSetShaderResources(2, 1, &texture[2]);
@@ -301,20 +335,13 @@ namespace MyEngine
 
 	}
 
-	void LightShader::createConstantBuffer(ID3D11Device* device)
-	{
-		m_matrixBuffer = Buffer::createConstantBuffer(device, sizeof(MatrixBufferType), true);
-		m_lightBuffer = Buffer::createConstantBuffer(device, sizeof(LightBufferType), true);
-		return;
-	}
-
-	// инициализация вершинного и пиксельного шейдеров
 	void LightShader::initShaders(ID3D11Device* device, const char* vShaderFile, const char* pShaderFile)
 	{
 		initVertexShaders(device, vShaderFile, "VS");
 		initPixelShaders(device, pShaderFile, "PS");
 		m_matrixBuffer = Buffer::createConstantBuffer(device, sizeof(MatrixBufferType), true);
 		m_lightBuffer = Buffer::createConstantBuffer(device, sizeof(LightBufferType), true);
+		m_cameraBuffer = Buffer::createConstantBuffer(device, sizeof(CameraBufferType), true);
 
 		return;
 	}
@@ -327,11 +354,12 @@ namespace MyEngine
 		XMMATRIX viewMatrix,
 		XMMATRIX projectionMatrix,
 		ID3D11ShaderResourceView* texture[],
-		Light* light
+		Light* light,
+		XMFLOAT3 cameraPos
 	)
 	{
 		setShaderParameters(deviceContext, worldMatrix,
-			viewMatrix, projectionMatrix, texture, light);
+			viewMatrix, projectionMatrix, texture, light, cameraPos);
 
 		deviceContext->IASetInputLayout(m_layout);
 		deviceContext->VSSetShader(m_vShader, NULL, 0);
@@ -342,6 +370,7 @@ namespace MyEngine
 		return;
 	}
 
+	////////////////////////////////////   Fog Shader   ///////////////////////////////////////////////
 
 	void FogShader::setShaderParameters(ID3D11DeviceContext* deviceContext, XMMATRIX viewMatrix)
 	{
