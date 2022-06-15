@@ -110,6 +110,10 @@ float4 PS(PixelInputType input) : SV_TARGET
 	
 	float3 ambient = 0.002 * textureAlbedo.a * textureAlbedo.rgb ;
 	float3 color = ambient + lo;
+	// correction with exposition
+	//float exposure = 1.0;
+	//color = float3(1.0, 1.0, 1.0) - exp(- exposure * color);
+	// correction tone
 	color = color / (color + float3(1.0, 1.0, 1.0));
 	color = pow (color, (1.0/2.2));
 	

@@ -248,7 +248,7 @@ namespace MyEngine
 
 		void init(ID3D11Device* device)
 		{
-			if (true)
+			if (false)
 				readFile("map.bmp");
 			else
 				createMap(100);
@@ -280,6 +280,10 @@ namespace MyEngine
 						cellTypes[ind] = 0;
 					ind++;
 				}
+			}
+			for (int i = 0; i < nodes.size(); i++)
+			{
+				heis[i] = myMax(heis[i], 0.0);
 			}
 
 			mesh->createRectan(heis, cellTypes, nCellsX + 1, nCellsY + 1);
