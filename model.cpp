@@ -68,6 +68,7 @@ namespace MyEngine
 
 		vertices.resize(numVertices);
 		indices.resize(numIndices);
+		float eps = 1e-1;
 		int indVer = 0;
 		int indCell = 0;
 		float sizeTex = 0.5;
@@ -83,51 +84,63 @@ namespace MyEngine
 				int indNodeLT = i + (j + 1) * nNodesX;
 				int indNodeRT = i + 1 + (j + 1) * nNodesX;
 
-				vertices[indVer].pos.x = pos.x;
+				vertices[indVer].pos.x = pos.x; /////// left bottom
 				vertices[indVer].pos.y = hei[indNodeLB] * coefHei;
 				vertices[indVer].pos.z = pos.y;
 				vertices[indVer].tex = texType[types[indCell]];
+				vertices[indVer].tex.x -= eps;
+				vertices[indVer].tex.y += eps;
 				indices[indVer] = indVer;
 				indVer++;
 
-				vertices[indVer].pos.x = pos.x + 1.0;
+				vertices[indVer].pos.x = pos.x + 1.0; ////////// right bottom
 				vertices[indVer].pos.y = hei[indNodeRB] *coefHei;
 				vertices[indVer].pos.z = pos.y;
 				vertices[indVer].tex = texType[types[indCell]];
 				vertices[indVer].tex.x -= sizeTex;
+				vertices[indVer].tex.x += eps;
+				vertices[indVer].tex.y += eps;
 				indices[indVer] = indVer;
 				indVer++;
 
-				vertices[indVer].pos.x = pos.x;
+				vertices[indVer].pos.x = pos.x; ////////// left top
 				vertices[indVer].pos.y = hei[indNodeLT] * coefHei;;
 				vertices[indVer].pos.z = pos.y + 1.0;
 				vertices[indVer].tex = texType[types[indCell]];
 				vertices[indVer].tex.y += sizeTex;
+				vertices[indVer].tex.x -= eps;
+				vertices[indVer].tex.y -= eps;
 				indices[indVer] = indVer;
 				indVer++;
 
-				vertices[indVer].pos.x = pos.x + 1.0;
+				vertices[indVer].pos.x = pos.x + 1.0;   //////// right bottom
 				vertices[indVer].pos.y = hei[indNodeRB] * coefHei;;
 				vertices[indVer].pos.z = pos.y;
 				vertices[indVer].tex = texType[types[indCell]];
 				vertices[indVer].tex.x -= sizeTex;
+				vertices[indVer].tex.x += eps;
+				vertices[indVer].tex.y += eps;
 				indices[indVer] = indVer;
 				indVer++;
 
-				vertices[indVer].pos.x = pos.x + 1.0;
+				vertices[indVer].pos.x = pos.x + 1.0;  ////////// right top
 				vertices[indVer].pos.y = hei[indNodeRT] * coefHei;;
 				vertices[indVer].pos.z = pos.y + 1.0;
 				vertices[indVer].tex = texType[types[indCell]];
 				vertices[indVer].tex.x -= sizeTex;
 				vertices[indVer].tex.y += sizeTex;
+				vertices[indVer].tex.x += eps;
+				vertices[indVer].tex.y -= eps;
 				indices[indVer] = indVer;
 				indVer++;
 
-				vertices[indVer].pos.x = pos.x;
-				vertices[indVer].pos.y = hei[indNodeLT] * coefHei;;
+				vertices[indVer].pos.x = pos.x; ////////////// left top
+				vertices[indVer].pos.y = hei[indNodeLT] * coefHei;
 				vertices[indVer].pos.z = pos.y + 1.0;
 				vertices[indVer].tex = texType[types[indCell]];
 				vertices[indVer].tex.y += sizeTex;
+				vertices[indVer].tex.x -= eps;
+				vertices[indVer].tex.y -= eps;
 				indices[indVer] = indVer;
 				indVer++;
 				pos.x += 1.0;

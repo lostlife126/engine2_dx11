@@ -248,7 +248,7 @@ namespace MyEngine
 
 		void init(ID3D11Device* device)
 		{
-			if (false)
+			if (true)
 				readFile("map.bmp");
 			else
 				createMap(100);

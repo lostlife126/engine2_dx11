@@ -30,7 +30,7 @@ float distributionGGX(float3 n, float3 h, float roughness)
     float a = roughness * roughness;
 	float a2 = a*a;
 	float nDotH = max(dot(n, h), 0.0);
-	float nDotH2 = nDotH* nDotH;
+	float nDotH2 = nDotH * nDotH;
 	float num = a2;
 	float denom = (nDotH2 * (a2 - 1.0) + 1.0);
 	denom = PI * denom * denom;
@@ -39,7 +39,7 @@ float distributionGGX(float3 n, float3 h, float roughness)
 
 float geometrySchlickGGX(float nDotV, float roughness)
 {
-    float r = roughness +1.0;
+    float r = roughness + 1.0;
 	float k = (r * r) / 8.0;
 	float num = nDotV;
 	float denom = nDotV * (1.0 - k) + k;
@@ -91,7 +91,7 @@ float4 PS(PixelInputType input) : SV_TARGET
 		float3 radiance = lightDiff * attenuation;
 		
 		float ndf = distributionGGX(n, h, roughness);
-		float g = geometrySmith(n,v,l,roughness);
+		float g = geometrySmith(n, v, l, roughness);
 		float3 f = fresnelSchlick(max(dot(h,v), 0.0), f0);
 		
 		float3 kS = f;
@@ -103,11 +103,13 @@ float4 PS(PixelInputType input) : SV_TARGET
 		float3 specular = numerator / max(denominator, 0.001);
 		
 		float nDotL = max(dot(n,l), 0.0);
-		lo +=(kD * textureAlbedo.rgb / PI + specular) * radiance * nDotL;
+		lo += (kD * textureAlbedo.rgb / PI + specular) * radiance * nDotL;
+		//lo = f;
+		//lo = float3(g, g, g);
 	}
 	
-	float3 ambient = 0.1 * textureAlbedo.a * textureAlbedo.rgb ;
-	float3 color = ambient;// + lo;
+	float3 ambient = 0.002 * textureAlbedo.a * textureAlbedo.rgb ;
+	float3 color = ambient + lo;
 	color = color / (color + float3(1.0, 1.0, 1.0));
 	color = pow (color, (1.0/2.2));
 	

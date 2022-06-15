@@ -174,13 +174,13 @@ namespace MyEngine
 		deviceContext->Unmap(m_matrixBuffer, 0);
 		deviceContext->VSSetConstantBuffers(bufferNum, 1, &m_matrixBuffer);
 		deviceContext->PSSetShaderResources(0, 1, &m_texture[0]);
-		if(m_texture[1]!=NULL)
+	//	if(m_texture[1]!=NULL)
 			deviceContext->PSSetShaderResources(1, 1, &m_texture[1]);
-		if (m_texture[2] != NULL)
+	//	if (m_texture[2] != NULL)
 			deviceContext->PSSetShaderResources(2, 1, &m_texture[2]);
-		if (m_texture[3] != NULL)
+	//	if (m_texture[3] != NULL)
 			deviceContext->PSSetShaderResources(3, 1, &m_texture[3]);
-		if (m_texture[4] != NULL)
+	//	if (m_texture[4] != NULL)
 			deviceContext->PSSetShaderResources(4, 1, &m_texture[4]);
 
 		D3D11_MAPPED_SUBRESOURCE mappedResC;
