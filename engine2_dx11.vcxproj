@@ -178,6 +178,7 @@
     <ClInclude Include="log.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="model.h" />
+    <ClInclude Include="particles.h" />
     <ClInclude Include="saverBMP.h" />
     <ClInclude Include="scene.h" />
     <ClInclude Include="shader.h" />
