@@ -87,9 +87,7 @@ namespace MyEngine
 		LightShader* m_lightShader; // шейдер света
 
 	public:
-		Text* textFPS; // текст: fps = ...
-		Text* textControl; // текст подсказки по управлению
-		Text* textTimeDay; // текст подсказки по управлению
+
 		// рендеринг шейдера освещения
 		void renderShader(Light* light, Camera* camera);
 		// вывод текста на экран

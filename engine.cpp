@@ -46,6 +46,9 @@ namespace MyEngine
 		inputManager->addListener(this);
 
 		isInitialized = true;
+
+		gui = new GUIManager(renderer->driverDX11->getDevice(), renderer->driverDX11->getDeviceContext());
+		gui->init();
 	}
 
 	Engine::~Engine()
@@ -84,42 +87,12 @@ namespace MyEngine
 
 		renderer->driverDX11->renderShader(scene->getLight(), scene->getCamera()); // рендерим наши буферы на задний буфер использу€ свет
 
-		if (timeFPS > 0.25)
-		{
-			char bufferFPS[12];
-			char bufferNum[5];
-			strcpy_s(bufferFPS, "fps = ");
-			_itoa_s( int(1.0 / dt), bufferNum, 10);
-			strcat_s(bufferFPS, bufferNum);
-			renderer->driverDX11->textFPS->setText(bufferFPS);
-			timeFPS = 0.0;
-			int hours = timeDay;
-			int minutes = (timeDay - hours) * 60.0f;
-			strcpy_s(bufferFPS, "time: ");
-			_itoa_s(hours, bufferNum, 10);
-			if(hours < 10)
-				strcat_s(bufferFPS, "0");
-			strcat_s(bufferFPS, bufferNum);
-			strcat_s(bufferFPS, ":");
-			if (minutes < 10)
-				strcat_s(bufferFPS, "0");
-			_itoa_s(minutes, bufferNum, 10);
-			strcat_s(bufferFPS, bufferNum);
-			renderer->driverDX11->textTimeDay->setText(bufferFPS);
-		}
-		XMFLOAT4 colorFPS(0.0, 1.0, 0.0, 1.0);
-		if (1.0 / dt < 300.0)
-		{
-			colorFPS = XMFLOAT4(1.0, 0.0, 0.0, 1.0);
-		}
-		renderer->driverDX11->renderText(renderer->driverDX11->textFPS, colorFPS, XMFLOAT2(0, 0));
-		renderer->driverDX11->renderText(renderer->driverDX11->textControl, XMFLOAT4(1.0, 1.0, 1.0, 1.0), XMFLOAT2(0, 450));
-		renderer->driverDX11->renderText(renderer->driverDX11->textTimeDay, XMFLOAT4(1.0, 1.0, 1.0, 1.0), XMFLOAT2(0, 40));
+		gui->render(renderer->driverDX11, dt, timeDay, scene->getCamera()->getPosition(), scene->getCamera()->getDirection());
+
 		renderer->driverDX11->turnZBufferOn();
 
 		renderer->driverDX11->endScene();
 
-		timeFPS += dt;
 		timeDay += dt;
 		if (timeDay > 24.0f)
 		{

@@ -8,6 +8,7 @@
 #include <d3d11.h>
 #include <d3dx11.h>
 #include <omp.h>
+#include "GUI.h"
 
 namespace MyEngine
 {
@@ -72,7 +73,6 @@ namespace MyEngine
 		DescWindow desc; // описание окна (зачем оно тут?)
 		FPSCounter fpsCounter; // таймер и счетчик фпс
 		double dt; // дельта времени с последнего шага
-		double timeFPS; // время прошедшее с последнего изменения строки с фпс (для обновления раз в 0.25 сек)
 		bool isRun = false; // запущен ли главный цикл движка?
 		bool isInitialized = false; // инициализирован ли движок
 		Log log; // логер
@@ -80,6 +80,8 @@ namespace MyEngine
 		void drawScene();
 
 		float timeDay = 6.0f; // время суток
+
+		GUIManager* gui;
 
 	};
 }

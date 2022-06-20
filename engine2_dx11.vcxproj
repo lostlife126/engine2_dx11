@@ -171,6 +171,7 @@
     <ClInclude Include="chunk.h" />
     <ClInclude Include="engine.h" />
     <ClInclude Include="font.h" />
+    <ClInclude Include="GUI.h" />
     <ClInclude Include="inputDefines.h" />
     <ClInclude Include="inputManager.h" />
     <ClInclude Include="light.h" />

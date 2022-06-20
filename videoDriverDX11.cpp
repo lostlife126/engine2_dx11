@@ -54,17 +54,6 @@ namespace MyEngine
 		m_lightShader->initShaders(m_device, "light_vs.fx", "light_ps.fx");
 		m_lightShader->setSampleState(m_device);
 
-		fontFPS = new Font(m_device, m_deviceContext);
-		fontFPS->init(m_widthScreen, m_heightScreen, 10);
-		textFPS = new Text(fontFPS);
-		textFPS->init("fps = ", 12, true);
-		fontControl = new Font(m_device, m_deviceContext);
-		fontControl->init(m_widthScreen, m_heightScreen, 7);
-		textControl = new Text(fontControl);
-		textControl->init("w - forward, s - back, a - left, d - right, q - lock mouse, esc - exit", 72, false);
-		textTimeDay = new Text(fontControl);
-		textTimeDay->init("time: ", 12, true);
-
 		D3D11_BLEND_DESC blendStateDesc;
 		ZeroMemory(&blendStateDesc, sizeof(D3D11_BLEND_DESC));
 
