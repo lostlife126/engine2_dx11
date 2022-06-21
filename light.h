@@ -36,9 +36,10 @@ namespace MyEngine
 			specularColor = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
 		}
 		// обновить положение и направление света
-		void update(float dt)
+		void update(float timeDay)
 		{
-			a += M_PI / 12.0 * dt;
+			//a += M_PI / 12.0 * dt;
+			a = (timeDay - 6.0) / 12.0 * M_PI;
 			float redFrac = 1.0f;
 			float otherFrac = 1.0f;	
 			if (a > M_PI * 2.0)

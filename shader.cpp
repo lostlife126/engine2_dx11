@@ -193,6 +193,17 @@ namespace MyEngine
 		bufferNum = 1;
 		deviceContext->VSSetConstantBuffers(bufferNum, 1, &m_cameraBuffer);
 
+		D3D11_MAPPED_SUBRESOURCE mappedResF;
+		FogLinearType* p_dataF;
+
+		hr = deviceContext->Map(m_fogBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResF);
+		p_dataF = (FogLinearType*)mappedResF.pData;
+		p_dataF->start = 0.0f;
+		p_dataF->end = 10.0f;
+		deviceContext->Unmap(m_fogBuffer, 0);
+		bufferNum = 2;
+		deviceContext->VSSetConstantBuffers(bufferNum, 1, &m_fogBuffer);
+
 		return;
 	}
 
@@ -215,6 +226,7 @@ namespace MyEngine
 		initPixelShaders(device, pShaderFile, "PS");
 		m_matrixBuffer = Buffer::createConstantBuffer(device, sizeof(MatrixBufferType), true);
 		m_cameraBuffer = Buffer::createConstantBuffer(device, sizeof(CameraBufferType), true);
+		m_fogBuffer = Buffer::createConstantBuffer(device, sizeof(FogLinearType), true);
 		return;
 	}
 

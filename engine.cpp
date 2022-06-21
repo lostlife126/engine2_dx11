@@ -8,12 +8,18 @@ namespace MyEngine
 	{
 		isRun = true;
 		fpsCounter.nulling();
+		dt = 0.0;
 		while (isRun)
 		{
-			dt = fpsCounter.frame();
-			scene->update(dt);
+			scene->update(dt, timeDay);
 			drawScene();
 			m_window->runEvent();
+			dt = fpsCounter.frame();
+			if (dt < 0.01)
+			{
+				Sleep(int(1000.0 * (0.01 - dt)));
+				dt = 0.01;
+			}
 		}
 		return;
 	}
@@ -66,6 +72,10 @@ namespace MyEngine
 		printf("key press %c\n", arg.wc);
 			if (arg.code == VK_ESCAPE)
 				isRun = false;
+			if (arg.wc == 'z')
+				isStopped = false;
+			if (arg.wc == 'x')
+				isStopped = true;
 
 		return false;
 	}
@@ -93,7 +103,10 @@ namespace MyEngine
 
 		renderer->driverDX11->endScene();
 
-		timeDay += dt;
+		if (!isStopped)
+		{
+			timeDay += dt;
+		}
 		if (timeDay > 24.0f)
 		{
 			timeDay -= 24.0f;

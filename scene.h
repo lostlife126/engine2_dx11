@@ -418,7 +418,7 @@ namespace MyEngine
 
 		void init(VideoDriverDX11* driver);
 
-		void update(float dt);
+		void update(float dt, float timeDay);
 		void drawAll();
 
 		void addObject();
@@ -443,6 +443,7 @@ namespace MyEngine
 		std::list<Object*> visible_objects;
 		Region region;
 		FogShader* fogShader;
+		bool stopped = true;
 
 		void frustrumCulling();
 	};

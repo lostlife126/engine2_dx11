@@ -80,6 +80,7 @@ namespace MyEngine
 		void drawScene();
 
 		float timeDay = 6.0f; // время суток
+		bool isStopped = false;
 
 		GUIManager* gui;
 

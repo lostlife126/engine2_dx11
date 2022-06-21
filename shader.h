@@ -40,6 +40,13 @@ namespace MyEngine
 		XMMATRIX wvp;
 	};
 
+	struct FogLinearType
+	{
+		float start;
+		float end;
+		float padding[2];
+	};
+
 	struct PixelBufferType
 	{
 		XMFLOAT4 color;
@@ -104,6 +111,7 @@ namespace MyEngine
 		ID3D11ShaderResourceView* m_texture[5]; // albedo, normal, roughness, metallness, ao 
 		ID3D11Buffer* m_matrixBuffer = nullptr; // константный буфер матрицы
 		ID3D11Buffer* m_cameraBuffer;
+		ID3D11Buffer* m_fogBuffer;
 	};
 	
 	class TextShader : public Shader

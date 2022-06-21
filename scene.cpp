@@ -7,11 +7,11 @@ namespace MyEngine
 		return m_camera;
 	}
 
-	void Scene::update(float dt)
+	void Scene::update(float dt, float timeDay)
 	{
 		m_camera->render(dt);
 		frustrum.constructPlanes(100.0, m_camera);
-		light[0]->update(dt);
+		light[0]->update(timeDay);
 		return;
 	}
 

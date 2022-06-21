@@ -10,6 +10,7 @@ struct PixelInputType
 	float3 tangent : TANGENT;
 	float3 binormal : BINORMAL;
 	float3 posPixel : POSITION;
+	float fogFactor : FOG;
 };
 
 struct PixelOutputType
@@ -28,6 +29,8 @@ PixelOutputType PS(PixelInputType input) : SV_TARGET
 	float4 textureMetal;
 	float4 textureAo;
 	float3 bumpNormal;
+	
+	float4 fogColor = float4(0.5f, 0.5f, 0.5f, 1.0f);
 	
 	PixelOutputType output;
 
@@ -50,6 +53,8 @@ PixelOutputType PS(PixelInputType input) : SV_TARGET
 	
 	output.specular.r = textureRough.r;
 	output.specular.g = textureMetal.r;
+	
+	output.color = float4(input.fogFactor,input.fogFactor,input.fogFactor,1.0);//fogColor * input.fogFactor + (1.0 - input.fogFactor) * textureAlbedo;
 
     return output;
 }
