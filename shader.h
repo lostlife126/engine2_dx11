@@ -44,7 +44,8 @@ namespace MyEngine
 	{
 		float start;
 		float end;
-		float padding[2];
+		float padding1;
+		float padding2;
 	};
 
 	struct PixelBufferType

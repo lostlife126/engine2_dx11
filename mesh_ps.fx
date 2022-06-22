@@ -19,6 +19,7 @@ struct PixelOutputType
     float4 normal : SV_Target1;
 	float4 posPixel : SV_Target2;
 	float4 specular : SV_Target3;
+	float4 zBuff : SV_Target4;
 };
 
 PixelOutputType PS(PixelInputType input) : SV_TARGET
@@ -54,7 +55,7 @@ PixelOutputType PS(PixelInputType input) : SV_TARGET
 	output.specular.r = textureRough.r;
 	output.specular.g = textureMetal.r;
 	
-	output.color = float4(input.fogFactor,input.fogFactor,input.fogFactor,1.0);//fogColor * input.fogFactor + (1.0 - input.fogFactor) * textureAlbedo;
+	output.zBuff = float4(input.fogFactor, input.fogFactor, input.fogFactor, 1.0);
 
     return output;
 }

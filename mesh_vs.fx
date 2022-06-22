@@ -13,8 +13,8 @@ cbuffer CameraBuffer
 
 cbuffer FogBuffer
 {
-    float start;
-	float end;
+    float fogStart;
+	float fogEnd;
 };
 
 struct VertexInputType
@@ -63,7 +63,7 @@ PixelInputType VS(VertexInputType input)
 	output.tangent = mul(input.tangent, (float3x3)worldMatrix);
     output.tangent = normalize(output.tangent);
 
-	output.fogFactor = saturate((end - camPos.z)/(end - start));
+	output.fogFactor = saturate(camPos.z * 0.01f);
 	
 	return output;
 }

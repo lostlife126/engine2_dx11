@@ -1,4 +1,4 @@
-Texture2D shaderTexture[4];
+Texture2D shaderTexture[5];
 
 SamplerState SampleTypePoint : register(s0);
 
@@ -68,11 +68,14 @@ float4 PS(PixelInputType input) : SV_TARGET
 	float4 texturePixelPos;
 	float4 textureSpecular;
     float4 outputColor;
+	float4 textureZBuff;
+	float3 fogColor = float3(0.5f, 0.5f, 0.5f);
 
     textureAlbedo = shaderTexture[0].Sample(SampleTypePoint, input.tex);
     textureNormal = shaderTexture[1].Sample(SampleTypePoint, input.tex);
 	texturePixelPos = shaderTexture[2].Sample(SampleTypePoint, input.tex);
 	textureSpecular = shaderTexture[3].Sample(SampleTypePoint, input.tex);
+	textureZBuff = shaderTexture[4].Sample(SampleTypePoint, input.tex);
 	
 	float roughness = textureSpecular.r;
 	float metalness = textureSpecular.g;
@@ -110,12 +113,19 @@ float4 PS(PixelInputType input) : SV_TARGET
 	
 	float3 ambient = 0.002 * textureAlbedo.a * textureAlbedo.rgb ;
 	float3 color = ambient + lo;
+	
+    color = color * (1.0 - textureZBuff.x) + fogColor * (textureZBuff.x);
+	
+	
 	// correction with exposition
 	//float exposure = 1.0;
 	//color = float3(1.0, 1.0, 1.0) - exp(- exposure * color);
+	
 	// correction tone
 	color = color / (color + float3(1.0, 1.0, 1.0));
 	color = pow (color, (1.0/2.2));
+	
+	
 	
 	outputColor = float4(color, 1.0);
     return outputColor;
