@@ -275,15 +275,11 @@ namespace MyEngine
 					if (nodes[nLB].hei < 0.0 || nodes[nRB].hei < 0.0 || nodes[nLT].hei < 0.0 || nodes[nRT].hei < 0.0)
 						cellTypes[ind] = 2;
 					if(nodes[nLB].hei<0.0 && nodes[nRB].hei < 0.0 && nodes[nLT].hei < 0.0 && nodes[nRT].hei < 0.0)
-						cellTypes[ind] = 1;
+						cellTypes[ind] = 2;
 					if (nodes[nLB].hei > 1000.0 || nodes[nRB].hei > 1000.0 || nodes[nLT].hei > 1000.0 || nodes[nRT].hei > 1000.0)
 						cellTypes[ind] = 0;
 					ind++;
 				}
-			}
-			for (int i = 0; i < nodes.size(); i++)
-			{
-				heis[i] = myMax(heis[i], 0.0);
 			}
 
 			mesh->createRectan(heis, cellTypes, nCellsX + 1, nCellsY + 1);
@@ -423,7 +419,7 @@ namespace MyEngine
 
 		void addObject();
 
-		void renderFog();
+		void renderWater();
 
 		Camera* getCamera();
 		void loadGraph(ID3D11Device* device, const char* caption, bool invert = false);
@@ -434,6 +430,7 @@ namespace MyEngine
 	private:
 
 		Object* skybox;
+		Object* water;
 		Camera* m_camera;
 		std::vector<Light*> light;
 		std::vector<Mesh*> mesh;
@@ -442,7 +439,7 @@ namespace MyEngine
 		std::vector<Object*> object;
 		std::list<Object*> visible_objects;
 		Region region;
-		FogShader* fogShader;
+		ModelShader* transparentShader;
 		bool stopped = true;
 
 		void frustrumCulling();

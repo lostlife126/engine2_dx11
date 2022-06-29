@@ -28,17 +28,25 @@ namespace MyEngine
 		region.init(driver->getDevice());
 		region.typeTexture = 1;
 		loadGraph(driver->getDevice(), "skybox");
-		loadGraph(driver->getDevice(), "floor");
+		loadGraph(driver->getDevice(), "terrain");
 		loadGraph(driver->getDevice(),"chest", true);
 		loadGraph(driver->getDevice(), "cube");
 		loadGraph(driver->getDevice(), "firehydrant", true);
 
+		mesh.push_back(new Mesh);
+		mesh.back()->createWater(XMFLOAT2(100.0, 100.0));
+		mesh.back()->createBuffers(driver->getDevice());
+
 		addObject();
 		light.push_back(new Light(1.0, 1.0, 0.0));
-		fogShader = new FogShader;
-		fogShader->addInputElement("POSITION", DXGI_FORMAT_R32G32B32_FLOAT);
-		fogShader->addInputElement("TEXCOORD", DXGI_FORMAT_R32G32_FLOAT);
-		fogShader->initShaders(driver->getDevice(), "fog_vs.fx", "fog_ps.fx");
+		transparentShader = new ModelShader;
+		transparentShader->addInputElement("POSITION", DXGI_FORMAT_R32G32B32_FLOAT);
+		transparentShader->addInputElement("TEXCOORD", DXGI_FORMAT_R32G32_FLOAT);
+		transparentShader->addInputElement("NORMAL", DXGI_FORMAT_R32G32B32_FLOAT);
+		transparentShader->addInputElement("TANGENT", DXGI_FORMAT_R32G32B32_FLOAT);
+		transparentShader->addInputElement("BINORMAL", DXGI_FORMAT_R32G32B32_FLOAT);
+		transparentShader->initShaders(driver->getDevice(), "water_vs.fx", "water_ps.fx");
+		transparentShader->loadTextures(driver->getDevice(), "water");
 
 
 		return;
@@ -62,6 +70,7 @@ namespace MyEngine
 	void Scene::addObject()
 	{
 		skybox = new Object(0, 0, 0.0, 0.0, 0.0);
+		water = new Object(5, 0, 0.0, 0.0, 0.0);
 	//	object.push_back(new Object(5, 1, 0.0, 0.0, 0.0)); // floor
 		object.push_back(new Object(2, 2, -10.0, 0.25, 0.0)); // chest
 		object.push_back(new Object(3, 3, 10.0, 0.5, 0.0)); // cube
@@ -95,12 +104,13 @@ namespace MyEngine
 			m_shader[(*iter)->typeTexture]->render(driver->getDeviceContext(), mesh[(*iter)->typeMesh]->numIndices, (*iter)->getWorldMatrix(), m_camera->getViewMatrix(), m_camera->getProjectionMatrix(), m_camera->getPosition());
 			iter = visible_objects.erase(iter);
 		}
-		//renderFog();
+		renderWater();
 	}
 
-	void Scene::renderFog()
+	void Scene::renderWater()
 	{
-		fogShader->render(driver->getDeviceContext(), getCamera()->getViewMatrix());
+		mesh[water->typeMesh]->render(driver->getDeviceContext());
+		transparentShader->render(driver->getDeviceContext(), mesh[water->typeMesh]->numIndices, water->getWorldMatrix(), m_camera->getViewMatrix(), m_camera->getProjectionMatrix(), m_camera->getPosition());
 	}
 
 	void Scene::frustrumCulling()

@@ -56,7 +56,7 @@ namespace MyEngine
 		XMFLOAT3 binorm;
 	};
 	// загрузить из obj файла число точек, текселей, нормалей и граней
-	void loadObjInfo(const char* path, int& nVertices, int& nTexels, int& nNormals, int& nFaces);
+	static bool loadObjInfo(const char* path, int& nVertices, int& nTexels, int& nNormals, int& nFaces);
 
 	// класс реализующий 3d модель объекта - сетку (вершины нормали индексы и т.д.)
 	class Mesh
@@ -91,12 +91,14 @@ namespace MyEngine
 
 		void createRectan(std::vector<float>& hei, std::vector<int>& types, int nNodesX, int nNodesY);
 
+		void createWater(XMFLOAT2 size);
+
 		ID3D11Buffer* p_vBuff = nullptr; // буфер вершин
 		ID3D11Buffer* p_iBuff = nullptr;// буфер индексов
 
 	protected:
 		// загрузка obj файла и его парсинг
-		void loadObj(const char* path, bool invert);
+		bool loadObj(const char* path, bool invert);
 
 		void calcNormals();
 	};

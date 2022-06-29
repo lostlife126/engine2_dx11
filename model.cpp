@@ -13,7 +13,7 @@ namespace MyEngine
 		XMFLOAT2(1.0, 0.5) // grass
 	};
 
-	void loadObjInfo(const char* path, int& nVertices, int& nTexels, int& nNormals, int& nFaces)
+	bool loadObjInfo(const char* path, int& nVertices, int& nTexels, int& nNormals, int& nFaces)
 	{
 		nVertices = 0;
 		nTexels = 0;
@@ -23,8 +23,8 @@ namespace MyEngine
 		file.open(path);
 		if (!file.good())
 		{
-			Log::Get()->Error("Error opening file: ", path);
-			return;
+			Log::Get()->Error("Error opening file: %s", path);
+			return false;
 		}
 		std::string line, key;
 		while (!file.eof())
@@ -55,7 +55,61 @@ namespace MyEngine
 			}
 		}
 		file.close();
-		return;
+		Log::Get()->Debug("File: %s loaded. Vertices: %d. Normals: %d. Texels: %d. Faces: %d", path, nVertices, nNormals, nTexels, nFaces);
+		return true;
+	}
+
+	void Mesh::createWater(XMFLOAT2 size)
+	{
+		numVertices = 6;
+		numIndices = 6;
+		numFaces = 2;
+
+		vertices.resize(6);
+		indices.resize(6);
+
+		vertices[0].pos.x = -size.x * 0.5; /////// left bottom
+		vertices[0].pos.y = 0.0;
+		vertices[0].pos.z = -size.y * 0.5;
+		vertices[0].tex.x = 0.0;
+		vertices[0].tex.y = 1.0;
+		indices[0] = 0;
+
+		vertices[1].pos.x = size.x * 0.5; ////////// right bottom
+		vertices[1].pos.y = 0.0;
+		vertices[1].pos.z = -size.y * 0.5;
+		vertices[1].tex.x = 1.0;
+		vertices[1].tex.y = 1.0;
+		indices[1] = 1;
+
+		vertices[2].pos.x = -size.x * 0.5; ////////// left top
+		vertices[2].pos.y = 0.0;
+		vertices[2].pos.z = size.y * 0.5;
+		vertices[2].tex.x = 0.0;
+		vertices[2].tex.y = 0.0;
+		indices[2] = 2;
+
+		vertices[3].pos.x = size.x * 0.5; ////////// right bottom
+		vertices[3].pos.y = 0.0;
+		vertices[3].pos.z = -size.y * 0.5;
+		vertices[3].tex.x = 1.0;
+		vertices[3].tex.y = 1.0;
+		indices[3] = 3;
+
+		vertices[4].pos.x = size.x * 0.5;  ////////// right top
+		vertices[4].pos.y = 0.0;
+		vertices[4].pos.z = size.y * 0.5;
+		vertices[4].tex.x = 1.0;
+		vertices[4].tex.y = 0.0;
+		indices[4] = 4;
+
+		vertices[5].pos.x = -size.x * 0.5; ////////////// left top
+		vertices[5].pos.y = 0.0;
+		vertices[5].pos.z = size.y * 0.5;
+		vertices[5].tex.x = 0.0;
+		vertices[5].tex.y = 0.0;
+		indices[5] = 5;
+		calcNormals();
 	}
 
 	void Mesh::createRectan(std::vector<float>& hei, std::vector<int>& types, int nNodesX, int nNodesY)
@@ -151,7 +205,7 @@ namespace MyEngine
 		calcNormals();
 	}
 
-	void Mesh::loadObj(const char* captionFile, bool invert)
+	bool Mesh::loadObj(const char* captionFile, bool invert)
 	{
 
 		std::vector<XMFLOAT3> v;
@@ -168,7 +222,10 @@ namespace MyEngine
 		int num_f = 0;
 		std::string filename = captionFile;
 		filename += "_mesh.obj";
-		loadObjInfo(filename.c_str(), num_v, num_t, num_n, num_f);
+		if (!loadObjInfo(filename.c_str(), num_v, num_t, num_n, num_f))
+		{
+			return false;
+		}
 		numVertices = num_f * 3; // num_t
 		numFaces = num_f;
 		numIndices = num_f * 3;
@@ -187,8 +244,8 @@ namespace MyEngine
 		file.open(filename);
 		if (!file.good())
 		{
-			Log::Get()->Error("Error opening file: ", filename);
-			return;
+			Log::Get()->Error("Error opening file: %s", filename);
+			return false;
 		}
 
 		std::string line, key, x, y, z;
@@ -294,7 +351,7 @@ namespace MyEngine
 		}
 		calcNormals();
 
-		return;
+		return true;
 	}
 
 	void Mesh::calcNormals()
@@ -367,9 +424,14 @@ namespace MyEngine
 
 	void Mesh::load(ID3D11Device* device, const char* caption, bool invert)
 	{
-		loadObj(caption, invert);
+		if (!loadObj(caption, invert))
+		{
+			Log::Get()->Error("Error loading mesh: %s", caption);
+			return;
+		}
 		p_vBuff = Buffer::createVertexBuffer(device, sizeof(VertexData) * numVertices, &(vertices[0]), false);
 		p_iBuff = Buffer::createIndexBuffer(device, sizeof(DWORD) * numIndices, &(indices[0]), false);
+		return;
 	}
 
 	void Mesh::createBuffers(ID3D11Device* device)
