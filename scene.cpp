@@ -10,7 +10,7 @@ namespace MyEngine
 	void Scene::update(float dt, float timeDay)
 	{
 		m_camera->render(dt);
-		frustrum.constructPlanes(100.0, m_camera);
+		
 		light[0]->update(timeDay);
 		return;
 	}
@@ -38,7 +38,7 @@ namespace MyEngine
 		mesh.back()->createBuffers(driver->getDevice());
 
 		addObject();
-		light.push_back(new Light(1.0, 1.0, 0.0));
+		light.push_back(new Light(0));
 		transparentShader = new ModelShader;
 		transparentShader->addInputElement("POSITION", DXGI_FORMAT_R32G32B32_FLOAT);
 		transparentShader->addInputElement("TEXCOORD", DXGI_FORMAT_R32G32_FLOAT);
@@ -89,7 +89,12 @@ namespace MyEngine
 		}
 	}
 
-	void Scene::drawAll()
+	void Scene::constructFrustrum()
+	{
+		frustrum.constructPlanes(100.0, m_camera);
+	}
+
+	void Scene::drawAllOpaque()
 	{
 		mesh[skybox->typeMesh]->render(driver->getDeviceContext());
 		m_shader[skybox->typeTexture]->render(driver->getDeviceContext(), mesh[skybox->typeMesh]->numIndices, skybox->getWorldMatrix(), m_camera->getViewMatrix(), m_camera->getProjectionMatrix(), m_camera->getPosition());
@@ -104,10 +109,9 @@ namespace MyEngine
 			m_shader[(*iter)->typeTexture]->render(driver->getDeviceContext(), mesh[(*iter)->typeMesh]->numIndices, (*iter)->getWorldMatrix(), m_camera->getViewMatrix(), m_camera->getProjectionMatrix(), m_camera->getPosition());
 			iter = visible_objects.erase(iter);
 		}
-		renderWater();
 	}
 
-	void Scene::renderWater()
+	void Scene::drawAllTransparent()
 	{
 		mesh[water->typeMesh]->render(driver->getDeviceContext());
 		transparentShader->render(driver->getDeviceContext(), mesh[water->typeMesh]->numIndices, water->getWorldMatrix(), m_camera->getViewMatrix(), m_camera->getProjectionMatrix(), m_camera->getPosition());

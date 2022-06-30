@@ -28,10 +28,8 @@ namespace MyEngine
 
 	struct LightBufferType
 	{
-		XMFLOAT4 ambientColor;
-		XMFLOAT4 diffuseColor;
-		XMFLOAT4 specularColor;
-		XMFLOAT3 direction;
+		XMFLOAT4 color;
+		XMFLOAT3 dir;
 		float specularPower;
 	};
 
@@ -112,7 +110,6 @@ namespace MyEngine
 		ID3D11ShaderResourceView* m_texture[5]; // albedo, normal, roughness, metallness, ao 
 		ID3D11Buffer* m_matrixBuffer = nullptr; // константный буфер матрицы
 		ID3D11Buffer* m_cameraBuffer;
-		ID3D11Buffer* m_fogBuffer;
 	};
 	
 	class TextShader : public Shader

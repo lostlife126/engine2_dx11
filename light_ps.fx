@@ -4,12 +4,9 @@ SamplerState SampleTypePoint : register(s0);
 
 cbuffer LightBuffer
 { 
-	float4 lightAmb;
-	float4 lightDiff;
-	float4 lightSpec;
-	float3 lightDirection;
-	//float3 lightPos;
-    float specPower;
+	float4 colorSource;
+	float3 dirSource;
+    float padding;
 };
 
 cbuffer CameraBuffer
@@ -87,11 +84,11 @@ float4 PS(PixelInputType input) : SV_TARGET
 	
 	for(int i = 0; i < 1; i++)
 	{
-	    float3 l = normalize(-lightDirection);
+	    float3 l = normalize(-dirSource);
 		float3 h = normalize(v + l);
 		float dist  = 1.0;
 		float attenuation = 1.0 / (dist * dist);
-		float3 radiance = lightDiff * attenuation;
+		float3 radiance = colorSource * attenuation;
 		
 		float ndf = distributionGGX(n, h, roughness);
 		float g = geometrySmith(n, v, l, roughness);
@@ -107,8 +104,6 @@ float4 PS(PixelInputType input) : SV_TARGET
 		
 		float nDotL = max(dot(n,l), 0.0);
 		lo += (kD * textureAlbedo.rgb / PI + specular) * radiance * nDotL;
-		//lo = f;
-		//lo = float3(g, g, g);
 	}
 	
 	float3 ambient = 0.002 * textureAlbedo.a * textureAlbedo.rgb ;

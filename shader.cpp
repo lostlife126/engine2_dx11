@@ -174,14 +174,10 @@ namespace MyEngine
 		deviceContext->Unmap(m_matrixBuffer, 0);
 		deviceContext->VSSetConstantBuffers(bufferNum, 1, &m_matrixBuffer);
 		deviceContext->PSSetShaderResources(0, 1, &m_texture[0]);
-	//	if(m_texture[1]!=NULL)
-			deviceContext->PSSetShaderResources(1, 1, &m_texture[1]);
-	//	if (m_texture[2] != NULL)
-			deviceContext->PSSetShaderResources(2, 1, &m_texture[2]);
-	//	if (m_texture[3] != NULL)
-			deviceContext->PSSetShaderResources(3, 1, &m_texture[3]);
-	//	if (m_texture[4] != NULL)
-			deviceContext->PSSetShaderResources(4, 1, &m_texture[4]);
+		deviceContext->PSSetShaderResources(1, 1, &m_texture[1]);
+		deviceContext->PSSetShaderResources(2, 1, &m_texture[2]);
+		deviceContext->PSSetShaderResources(3, 1, &m_texture[3]);
+		deviceContext->PSSetShaderResources(4, 1, &m_texture[4]);
 
 		D3D11_MAPPED_SUBRESOURCE mappedResC;
 		CameraBufferType* p_dataC;
@@ -192,17 +188,6 @@ namespace MyEngine
 		deviceContext->Unmap(m_cameraBuffer, 0);
 		bufferNum = 1;
 		deviceContext->VSSetConstantBuffers(bufferNum, 1, &m_cameraBuffer);
-
-		D3D11_MAPPED_SUBRESOURCE mappedResF;
-		FogLinearType* p_dataF;
-
-		hr = deviceContext->Map(m_fogBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResF);
-		p_dataF = (FogLinearType*)mappedResF.pData;
-		p_dataF->start = 0.0f;
-		p_dataF->end = 10.0f;
-		deviceContext->Unmap(m_fogBuffer, 0);
-		bufferNum = 2;
-		deviceContext->VSSetConstantBuffers(bufferNum, 1, &m_fogBuffer);
 
 		return;
 	}
@@ -226,7 +211,6 @@ namespace MyEngine
 		initPixelShaders(device, pShaderFile, "PS");
 		m_matrixBuffer = Buffer::createConstantBuffer(device, sizeof(MatrixBufferType), true);
 		m_cameraBuffer = Buffer::createConstantBuffer(device, sizeof(CameraBufferType), true);
-		m_fogBuffer = Buffer::createConstantBuffer(device, sizeof(FogLinearType), true);
 		return;
 	}
 
@@ -337,11 +321,8 @@ namespace MyEngine
 
 		hr = deviceContext->Map(m_lightBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResL);
 		p_dataL = (LightBufferType*)mappedResL.pData;
-		p_dataL->ambientColor = light->ambientColor;
-		p_dataL->diffuseColor = light->diffuseColor;
-		p_dataL->specularColor = light->specularColor;
-		p_dataL->direction = light->direction;
-		p_dataL->specularPower = light->specularPower;
+		p_dataL->color = light->color;
+		p_dataL->dir = light->dir;
 		deviceContext->Unmap(m_lightBuffer, 0);
 		bufferNum = 0;
 		deviceContext->PSSetConstantBuffers(bufferNum, 1, &m_lightBuffer);

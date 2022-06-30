@@ -415,11 +415,12 @@ namespace MyEngine
 		void init(VideoDriverDX11* driver);
 
 		void update(float dt, float timeDay);
-		void drawAll();
+		void drawAllOpaque();
+		void drawAllTransparent();
+
+		void constructFrustrum();
 
 		void addObject();
-
-		void renderWater();
 
 		Camera* getCamera();
 		void loadGraph(ID3D11Device* device, const char* caption, bool invert = false);
