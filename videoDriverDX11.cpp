@@ -51,7 +51,7 @@ namespace MyEngine
 		m_lightShader = new LightShader;
 		m_lightShader->addInputElement("POSITION", DXGI_FORMAT_R32G32B32_FLOAT);
 		m_lightShader->addInputElement("TEXCOORD", DXGI_FORMAT_R32G32_FLOAT);
-		m_lightShader->initShaders(m_device, "light_vs.fx", "light_ps.fx");
+		m_lightShader->initShaders(m_device, "light.vs", "light.ps");
 		m_lightShader->setSampleState(m_device);
 
 		D3D11_BLEND_DESC blendStateDesc;
@@ -107,6 +107,10 @@ namespace MyEngine
 				Log::Get()->Error("Error creation texture in driver.");
 		}
 
+		hr = m_device->CreateTexture2D(&texDesc, NULL, &m_renderTargetTextureShadows);
+		if (FAILED(hr))
+			Log::Get()->Error("Error creation shadows texture in driver.");
+
 		D3D11_RENDER_TARGET_VIEW_DESC rtvDesc;
 		rtvDesc.Format = texDesc.Format;
 		rtvDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
@@ -117,6 +121,10 @@ namespace MyEngine
 			if (FAILED(hr))
 				Log::Get()->Error("Error creation render target view in driver.");
 		}
+
+		hr = m_device->CreateRenderTargetView(m_renderTargetTextureShadows, &rtvDesc, &m_renderTargetShadows);
+		if (FAILED(hr))
+			Log::Get()->Error("Error creation render target shadows in driver.");
 
 		D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
 		srvDesc.Format = texDesc.Format;
@@ -129,6 +137,10 @@ namespace MyEngine
 			if (FAILED(hr))
 				Log::Get()->Error("Error creation shader resource view in driver.");
 		}
+
+		hr = m_device->CreateShaderResourceView(m_renderTargetTextureShadows, &srvDesc, &m_shaderResourceShadows);
+		if (FAILED(hr))
+			Log::Get()->Error("Error creation shader resource view in driver.");
 
 		D3D11_TEXTURE2D_DESC depthBuffDesc;
 		ZeroMemory(&depthBuffDesc, sizeof(depthBuffDesc));
@@ -268,6 +280,13 @@ namespace MyEngine
 		return true;
 	}
 
+	void VideoDriverDX11::setRenderTargetShadows()
+	{
+		m_deviceContext->OMSetRenderTargets(1, &m_renderTargetShadows, m_depthStencilView);
+		m_deviceContext->RSSetViewports(1, &m_viewport);
+		return;
+	}
+
 	void VideoDriverDX11::setRenderTargetBuffers()
 	{
 		m_deviceContext->OMSetRenderTargets(NUM_BUFFERS, m_renderTargetViewArray, m_depthStencilView);
@@ -289,6 +308,7 @@ namespace MyEngine
 		{
 			m_deviceContext->ClearRenderTargetView(m_renderTargetViewArray[i], colorClear);
 		}
+		m_deviceContext->ClearRenderTargetView(m_renderTargetShadows, colorClear);
 		m_deviceContext->ClearDepthStencilView(m_depthStencilView, D3D10_CLEAR_DEPTH, 1.0f, 0);
 		
 	}

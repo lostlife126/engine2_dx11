@@ -103,7 +103,7 @@ namespace MyEngine
 
 		m_shader->addInputElement("POSITION", DXGI_FORMAT_R32G32B32_FLOAT);
 		m_shader->addInputElement("TEXCOORD", DXGI_FORMAT_R32G32_FLOAT);
-		m_shader->initShaders(device, "text_vs.fx", "text_ps.fx");
+		m_shader->initShaders(device, "text.vs", "text.ps");
 
 		return;
 	}
@@ -218,7 +218,6 @@ namespace MyEngine
 			Log::Get()->Error("Attempt to change static text!");
 		}
 	}
-
 
 	void Text::renderBuffers()
 	{

@@ -46,6 +46,10 @@ namespace MyEngine
 		ID3D11Texture2D* m_renderTargetTextureArray[NUM_BUFFERS]; // текстуры буферов (3 буфера)
 		ID3D11ShaderResourceView* m_shaderResourceViewArray[NUM_BUFFERS]; // 
 		ID3D11RenderTargetView* m_renderTargetViewArray[NUM_BUFFERS]; // тут лежат буферы разных текстур (диффузная и нормали)
+
+		ID3D11Texture2D* m_renderTargetTextureShadows; // текстура теней
+		ID3D11RenderTargetView* m_renderTargetShadows; // буфер(ы) теней 
+		ID3D11ShaderResourceView* m_shaderResourceShadows; // шейдерные ресурсы теней
 		
 		ID3D11RenderTargetView* m_renderTargetView; // задний буфер
 
@@ -56,7 +60,6 @@ namespace MyEngine
 		ID3D11DepthStencilState* m_depthDisabledStencilState;
 
 		ID3D11RasterizerState* m_rasterizerState; // состояние растеризатора 
-
 		D3D11_VIEWPORT m_viewport; // вьюпорт
 
 		ID3D11Buffer* m_vScreen = nullptr; // буфер вершин экрана
@@ -125,6 +128,8 @@ namespace MyEngine
 			m_renderTargetView = nullptr;
 		}
 
+		// установить тени в качестве цели рендеринга
+		void setRenderTargetShadows();
 		// установить буферы в качестве цели рендеринга
 		void setRenderTargetBuffers();
 		// установить задний буфер целью рендеринга

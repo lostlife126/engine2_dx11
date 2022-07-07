@@ -27,17 +27,17 @@ namespace MyEngine
 		//region.setRegion("map.bmp");
 		region.init(driver->getDevice());
 		region.typeTexture = 1;
-		loadGraph(driver->getDevice(), "skybox");
-		loadGraph(driver->getDevice(), "terrain");
-		loadGraph(driver->getDevice(),"chest", true);
-		loadGraph(driver->getDevice(), "cube");
-		loadGraph(driver->getDevice(), "firehydrant", true);
+		loadObject(driver->getDevice(), "skybox");
+		loadObject(driver->getDevice(), "terrain");
+		loadObject(driver->getDevice(), "chest", true);
+		loadObject(driver->getDevice(), "cube");
+		loadObject(driver->getDevice(), "firehydrant", true);
 
 		mesh.push_back(new Mesh);
 		mesh.back()->createWater(XMFLOAT2(100.0, 100.0));
 		mesh.back()->createBuffers(driver->getDevice());
 
-		addObject();
+		addObjects();
 		light.push_back(new Light(0));
 		transparentShader = new ModelShader;
 		transparentShader->addInputElement("POSITION", DXGI_FORMAT_R32G32B32_FLOAT);
@@ -45,14 +45,17 @@ namespace MyEngine
 		transparentShader->addInputElement("NORMAL", DXGI_FORMAT_R32G32B32_FLOAT);
 		transparentShader->addInputElement("TANGENT", DXGI_FORMAT_R32G32B32_FLOAT);
 		transparentShader->addInputElement("BINORMAL", DXGI_FORMAT_R32G32B32_FLOAT);
-		transparentShader->initShaders(driver->getDevice(), "water_vs.fx", "water_ps.fx");
+		transparentShader->initShaders(driver->getDevice(), "water.vs", "water.ps");
 		transparentShader->loadTextures(driver->getDevice(), "water");
 
+		shadowShader = new ShadowShader;
+		shadowShader->addInputElement("POSITION", DXGI_FORMAT_R32G32B32_FLOAT);
+		shadowShader->initShaders(driver->getDevice(), "shadows.vs", "shadows.ps");
 
 		return;
 	}
 
-	void Scene::loadGraph(ID3D11Device* device, const char* caption, bool invert)
+	void Scene::loadObject(ID3D11Device* device, const char* caption, bool invert)
 	{
 		mesh.push_back(new Mesh);
 		mesh.back()->load(driver->getDevice(), caption, invert);
@@ -63,11 +66,11 @@ namespace MyEngine
 		m_shader.back()->addInputElement("NORMAL", DXGI_FORMAT_R32G32B32_FLOAT);
 		m_shader.back()->addInputElement("TANGENT", DXGI_FORMAT_R32G32B32_FLOAT);
 		m_shader.back()->addInputElement("BINORMAL", DXGI_FORMAT_R32G32B32_FLOAT);
-		m_shader.back()->initShaders(device, "mesh_vs.fx", "mesh_ps.fx");
+		m_shader.back()->initShaders(device, "mesh.vs", "mesh.ps");
 		m_shader.back()->loadTextures(device, caption);
 	}
 
-	void Scene::addObject()
+	void Scene::addObjects()
 	{
 		skybox = new Object(0, 0, 0.0, 0.0, 0.0);
 		water = new Object(5, 0, 0.0, 0.0, 0.0);
@@ -111,10 +114,46 @@ namespace MyEngine
 		}
 	}
 
+	void Scene::drawAllOpaqueCam()
+	{
+		light[0]->resetViewMatrix();
+		mesh[skybox->typeMesh]->render(driver->getDeviceContext());
+		m_shader[skybox->typeTexture]->render(driver->getDeviceContext(), mesh[skybox->typeMesh]->numIndices, skybox->getWorldMatrix(), light[0]->getViewMatrix(), m_camera->getProjectionMatrix(), m_camera->getPosition());
+
+		region.mesh->render(driver->getDeviceContext());
+		m_shader[region.typeTexture]->render(driver->getDeviceContext(), region.mesh->numIndices, skybox->getWorldMatrix(), light[0]->getViewMatrix(), m_camera->getProjectionMatrix(), m_camera->getPosition());
+
+		frustrumCulling();
+		for (auto iter = visible_objects.begin(); iter != visible_objects.end();)
+		{
+			mesh[(*iter)->typeMesh]->render(driver->getDeviceContext());
+			m_shader[(*iter)->typeTexture]->render(driver->getDeviceContext(), mesh[(*iter)->typeMesh]->numIndices, (*iter)->getWorldMatrix(), light[0]->getViewMatrix(), m_camera->getProjectionMatrix(), m_camera->getPosition());
+			iter = visible_objects.erase(iter);
+		}
+	}
+
+	void Scene::drawAllShadows()
+	{
+		light[0]->resetViewMatrix();
+		mesh[skybox->typeMesh]->render(driver->getDeviceContext());
+		shadowShader->render(driver->getDeviceContext(), mesh[skybox->typeMesh]->numIndices, skybox->getWorldMatrix(), m_camera->getViewMatrix());
+
+		region.mesh->render(driver->getDeviceContext());
+		shadowShader->render(driver->getDeviceContext(), region.mesh->numIndices, skybox->getWorldMatrix(), m_camera->getViewMatrix());
+
+		frustrumCulling();
+		for (auto iter = visible_objects.begin(); iter != visible_objects.end();)
+		{
+			mesh[(*iter)->typeMesh]->render(driver->getDeviceContext());
+			shadowShader->render(driver->getDeviceContext(), mesh[(*iter)->typeMesh]->numIndices, (*iter)->getWorldMatrix(), m_camera->getViewMatrix());
+			iter = visible_objects.erase(iter);
+		}
+	}
+
 	void Scene::drawAllTransparent()
 	{
 		mesh[water->typeMesh]->render(driver->getDeviceContext());
-		transparentShader->render(driver->getDeviceContext(), mesh[water->typeMesh]->numIndices, water->getWorldMatrix(), m_camera->getViewMatrix(), m_camera->getProjectionMatrix(), m_camera->getPosition());
+		transparentShader->render(driver->getDeviceContext(), mesh[water->typeMesh]->numIndices, water->getWorldMatrix(), light[0]->getViewMatrix(), m_camera->getProjectionMatrix(), m_camera->getPosition());
 	}
 
 	void Scene::frustrumCulling()

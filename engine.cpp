@@ -82,13 +82,30 @@ namespace MyEngine
 
 	void Engine::drawScene()
 	{
+
+		renderer->driverDX11->clearRenderTarget();  // чистим буферы
+
+		//renderer->driverDX11->setRenderTargetBackBuffer(); // устанавливаем цель рендеринга задний буфер
+
+		//renderer->driverDX11->setRenderTargetShadows(); // устанавливаем цель рендеринга наши буферы
+		//scene->drawAllShadows();
+		//renderer->driverDX11->turnZBufferOff(); // выключаем z 
+		//gui->render(renderer->driverDX11, dt, timeDay, scene->getCamera()->getPosition(), scene->getCamera()->getDirection());
+		//renderer->driverDX11->turnZBufferOn();
+
+	//	renderer->driverDX11->endScene();
+		
+
+
 		// делаем рендеринг сцены во все нужные буферы
 		renderer->driverDX11->setRenderTargetBuffers(); // устанавливаем цель рендеринга наши буферы
-		renderer->driverDX11->clearRenderTarget();  // чистим буферы
-		scene->drawAllOpaque(); // рисуем все непрозрачные объекты которые надо
+
+		scene->drawAllOpaqueCam(); // рисуем все непрозрачные объекты которые надо
 
 		//////////////////////
 		//// здесь будем рендерить все прозрачные материалы?
+
+		scene->drawAllTransparent();
 
 		/// <summary>
 		/// теперь рисуем из буферов в задний буфер
@@ -115,6 +132,8 @@ namespace MyEngine
 		{
 			timeDay -= 24.0f;
 		}
+
+		
 
 	}
 }

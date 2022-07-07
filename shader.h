@@ -111,6 +111,22 @@ namespace MyEngine
 		ID3D11Buffer* m_matrixBuffer = nullptr; // константный буфер матрицы
 		ID3D11Buffer* m_cameraBuffer;
 	};
+
+	class ShadowShader : public Shader
+	{
+	public:
+
+		void loadTextures(ID3D11Device* device, const char* filename) override;
+
+		void setShaderParameters(ID3D11DeviceContext* deviceContext, XMMATRIX worldMatrix, XMMATRIX viewMatrix);
+
+		void render(ID3D11DeviceContext* deviceContext, int numIndices, XMMATRIX worldMatrix, XMMATRIX viewMatrix);
+
+		// инициализация вершинного и пиксельного шейдеров и создание буфера матриц
+		void initShaders(ID3D11Device* device, const char* vShaderFile, const char* pShaderFile);
+
+		ID3D11Buffer* m_matrixBuffer = nullptr; // константный буфер матрицы
+	};
 	
 	class TextShader : public Shader
 	{

@@ -214,6 +214,55 @@ namespace MyEngine
 		return;
 	}
 
+	////////////////////////////////////   Shadows Shader   ///////////////////////////////////////////////
+
+	void ShadowShader::loadTextures(ID3D11Device* device, const char* caption)
+	{
+		setSampleState(device);
+		return;
+	}
+
+	void ShadowShader::setShaderParameters(ID3D11DeviceContext* deviceContext, XMMATRIX worldMatrix, XMMATRIX viewMatrix)
+	{
+		HRESULT hr;
+		D3D11_MAPPED_SUBRESOURCE mappedRes;
+		MatrixBufferType* p_data;
+		unsigned int bufferNum = 0;
+
+		worldMatrix = XMMatrixTranspose(worldMatrix);
+		viewMatrix = XMMatrixTranspose(viewMatrix);
+		XMMATRIX m_matrixOrtho = XMMatrixPerspectiveFovLH(1.0, 1.333f, 0.1f, 1000.0f);
+		m_matrixOrtho = XMMatrixTranspose(m_matrixOrtho);
+
+		hr = deviceContext->Map(m_matrixBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedRes);
+		p_data = (MatrixBufferType*)mappedRes.pData;
+		p_data->m_World = worldMatrix;
+		p_data->m_View = viewMatrix;
+		p_data->m_Projection = m_matrixOrtho;
+		deviceContext->Unmap(m_matrixBuffer, 0);
+		deviceContext->VSSetConstantBuffers(bufferNum, 1, &m_matrixBuffer);
+		return;
+	}
+
+	void ShadowShader::render(ID3D11DeviceContext* deviceContext, int numIndices, XMMATRIX worldMatrix, XMMATRIX viewMatrix)
+	{
+		setShaderParameters(deviceContext, worldMatrix, viewMatrix);
+
+		deviceContext->IASetInputLayout(m_layout);
+		deviceContext->VSSetShader(m_vShader, NULL, 0);
+		deviceContext->PSSetShader(m_pShader, NULL, 0);
+		deviceContext->DrawIndexed(numIndices, 0, 0);
+		return;
+	}
+
+	void ShadowShader::initShaders(ID3D11Device* device, const char* vShaderFile, const char* pShaderFile)
+	{
+		initVertexShaders(device, vShaderFile, "VS");
+		initPixelShaders(device, pShaderFile, "PS");
+		m_matrixBuffer = Buffer::createConstantBuffer(device, sizeof(MatrixBufferType), true);
+		return;
+	}
+
 	////////////////////////////////////   Text Shader   ///////////////////////////////////////////////
 
 	void TextShader::loadTextures(ID3D11Device* device, const char* caption)

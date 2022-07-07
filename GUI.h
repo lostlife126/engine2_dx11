@@ -60,12 +60,11 @@ namespace MyEngine
 
 		void resetPos(XMFLOAT3 pos)
 		{
-			char bufferFPS[40];
-			char bufferNum[5];
-			strcpy_s(bufferFPS, "pos: ");
+			char bufferPos[45];
+			strcpy_s(bufferPos, "pos: ");
 			std::string my_val = std::to_string(pos.x) + ", " + std::to_string(pos.y) + ", " + std::to_string(pos.z);
-			strcat_s(bufferFPS, my_val.c_str());
-			textPos->setText(bufferFPS);
+			strcat_s(bufferPos, my_val.c_str());
+			textPos->setText(bufferPos);
 		}
 
 		void resetDir(XMFLOAT3 dir)

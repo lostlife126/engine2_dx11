@@ -13,12 +13,21 @@ namespace MyEngine
 		XMFLOAT3 pos;// текущая координата источника
 		XMFLOAT3 dir; // направление света
 		XMFLOAT4 color; // составляющая среды
+		XMMATRIX m_View;// видовая матрица
 		// конструктор по умолчанию создает свет в точке 1,0,0 и направлен в 0,0,0
 		Light(int type = 0, float a = 0.0)
 		{
 			pos = XMFLOAT3(cosf(a), 0.0f, sinf(a));
 			dir = XMFLOAT3(-cosf(a), 0.0f, -sinf(a));
 			color = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+		}
+
+		void resetViewMatrix()
+		{
+			XMVECTOR pos_ = XMVectorSet(pos.x, pos.y, pos.z, 1.0f);
+			XMVECTOR at_ = XMVectorSet(pos.x + dir.x, pos.y + dir.y, pos.z + dir.z, 0.0f);
+			XMVECTOR up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+			m_View = XMMatrixLookAtLH(pos_, at_, up);
 		}
 		// создать свет в точке xyz
 		Light(int type, XMFLOAT3 pos_, XMFLOAT3 dir_):
@@ -28,6 +37,11 @@ namespace MyEngine
 			pos = XMFLOAT3(cosf(a), 0.0, sinf(a));
 			dir = XMFLOAT3(-cosf(a), 0.0f, -sinf(a));
 			color = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+		}
+
+		XMMATRIX getViewMatrix()
+		{
+			return m_View;
 		}
 		// обновить положение и направление света
 		void update(float timeDay)
@@ -69,7 +83,7 @@ namespace MyEngine
 
 			color = XMFLOAT4(redFrac, otherFrac, otherFrac, 1.0f);
 
-		//	pos = XMFLOAT3(50.0 * cosf(a), 50.0 * sinf(a), 0.0);
+			pos = XMFLOAT3(50.0 * cosf(a), 50.0 * sinf(a), 0.0);
 			dir = XMFLOAT3(-cosf(a), -sinf(a), 0.0f);
 		}
 	};

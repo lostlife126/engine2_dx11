@@ -133,6 +133,7 @@ namespace MyEngine
 	}
 	XMMATRIX Camera::getViewMatrix()
 	{
+
 		return m_View;
 	}
 

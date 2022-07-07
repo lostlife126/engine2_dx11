@@ -415,15 +415,17 @@ namespace MyEngine
 		void init(VideoDriverDX11* driver);
 
 		void update(float dt, float timeDay);
+		void drawAllShadows();
 		void drawAllOpaque();
+		void drawAllOpaqueCam();
 		void drawAllTransparent();
 
 		void constructFrustrum();
 
-		void addObject();
+		void addObjects();
 
 		Camera* getCamera();
-		void loadGraph(ID3D11Device* device, const char* caption, bool invert = false);
+		void loadObject(ID3D11Device* device, const char* caption, bool invert = false);
 
 		Light* getLight();
 		Frustrum frustrum;
@@ -441,6 +443,7 @@ namespace MyEngine
 		std::list<Object*> visible_objects;
 		Region region;
 		ModelShader* transparentShader;
+		ShadowShader* shadowShader;
 		bool stopped = true;
 
 		void frustrumCulling();
