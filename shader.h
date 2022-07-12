@@ -22,6 +22,7 @@ namespace MyEngine
 
 	struct CameraBufferType
 	{
+		XMMATRIX m_View;
 		XMFLOAT3 position;
 		float padding;
 	};
@@ -100,14 +101,14 @@ namespace MyEngine
 
 		void loadTextures(ID3D11Device* device, const char* filename) override;
 
-		void setShaderParameters(ID3D11DeviceContext* deviceContext, XMMATRIX worldMatrix, XMMATRIX viewMatrix, XMMATRIX projectionMatrix, XMFLOAT3 cameraPos);
+		void setShaderParameters(ID3D11DeviceContext* deviceContext, XMMATRIX worldMatrix, XMMATRIX viewMatrix, XMMATRIX projectionMatrix, XMFLOAT3 cameraPos, Light* light, ID3D11ShaderResourceView* shadow);
 
-		void render(ID3D11DeviceContext* deviceContext, int numIndices, XMMATRIX worldMatrix, XMMATRIX viewMatrix, XMMATRIX projectionMatrix, XMFLOAT3 cameraPos);
+		void render(ID3D11DeviceContext* deviceContext, int numIndices, XMMATRIX worldMatrix, XMMATRIX viewMatrix, XMMATRIX projectionMatrix, XMFLOAT3 cameraPos, Light* light, ID3D11ShaderResourceView* shadow);
 
 		// инициализация вершинного и пиксельного шейдеров и создание буфера матриц
 		void initShaders(ID3D11Device* device, const char* vShaderFile, const char* pShaderFile);
 
-		ID3D11ShaderResourceView* m_texture[5]; // albedo, normal, roughness, metallness, ao 
+		ID3D11ShaderResourceView* m_texture[6]; // albedo, normal, roughness, metallness, ao 
 		ID3D11Buffer* m_matrixBuffer = nullptr; // константный буфер матрицы
 		ID3D11Buffer* m_cameraBuffer;
 	};

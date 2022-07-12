@@ -287,6 +287,11 @@ namespace MyEngine
 		return;
 	}
 
+	ID3D11ShaderResourceView* VideoDriverDX11::getShadows()
+	{
+		return m_shaderResourceShadows;
+	}
+
 	void VideoDriverDX11::setRenderTargetBuffers()
 	{
 		m_deviceContext->OMSetRenderTargets(NUM_BUFFERS, m_renderTargetViewArray, m_depthStencilView);
@@ -310,7 +315,12 @@ namespace MyEngine
 		}
 		m_deviceContext->ClearRenderTargetView(m_renderTargetShadows, colorClear);
 		m_deviceContext->ClearDepthStencilView(m_depthStencilView, D3D10_CLEAR_DEPTH, 1.0f, 0);
-		
+	}
+
+	void VideoDriverDX11::clearRenderTargetStencil()
+	{
+		float colorClear[4] = { 0.0, 0.0, 0.0, 1.0 };
+		m_deviceContext->ClearDepthStencilView(m_depthStencilView, D3D10_CLEAR_DEPTH, 1.0f, 0);
 	}
 
 	void VideoDriverDX11::turnZBufferOn()

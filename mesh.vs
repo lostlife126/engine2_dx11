@@ -8,6 +8,7 @@ cbuffer MatrixBuffer
 
 cbuffer CameraBuffer
 {
+	matrix lightViewMatrix;
     float3 cameraPos;
 };
 
@@ -34,6 +35,7 @@ struct PixelInputType
 	float3 tangent : TANGENT;
 	float3 binormal : BINORMAL;
 	float3 posPixel : POSITION;
+	float4 posLightView : TEXCOORD1;
 	float fogFactor: FOG;
 };
 
@@ -50,6 +52,10 @@ PixelInputType VS(VertexInputType input)
 	camPos = output.position;
     output.position = mul(output.position, projectionMatrix);
     
+	output.posLightView = mul(input.position, worldMatrix);
+    output.posLightView = mul(output.posLightView, lightViewMatrix);
+    output.posLightView = mul(output.posLightView, projectionMatrix);
+	
     output.tex = input.tex;
 	
 	output.posPixel = mul(input.position, worldMatrix);

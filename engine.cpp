@@ -85,27 +85,18 @@ namespace MyEngine
 
 		renderer->driverDX11->clearRenderTarget();  // чистим буферы
 
-		//renderer->driverDX11->setRenderTargetBackBuffer(); // устанавливаем цель рендеринга задний буфер
-
-		//renderer->driverDX11->setRenderTargetShadows(); // устанавливаем цель рендеринга наши буферы
-		//scene->drawAllShadows();
-		//renderer->driverDX11->turnZBufferOff(); // выключаем z 
-		//gui->render(renderer->driverDX11, dt, timeDay, scene->getCamera()->getPosition(), scene->getCamera()->getDirection());
-		//renderer->driverDX11->turnZBufferOn();
-
-	//	renderer->driverDX11->endScene();
-		
-
-
+		renderer->driverDX11->setRenderTargetShadows(); // устанавливаем цель рендеринга наши буферы
+		scene->drawAllShadows();
+		renderer->driverDX11->clearRenderTargetStencil();
 		// делаем рендеринг сцены во все нужные буферы
 		renderer->driverDX11->setRenderTargetBuffers(); // устанавливаем цель рендеринга наши буферы
 
-		scene->drawAllOpaqueCam(); // рисуем все непрозрачные объекты которые надо
+		scene->drawAllOpaque(renderer->driverDX11->getShadows()); // рисуем все непрозрачные объекты которые надо
 
 		//////////////////////
 		//// здесь будем рендерить все прозрачные материалы?
 
-		scene->drawAllTransparent();
+		scene->drawAllTransparent(renderer->driverDX11->getShadows());
 
 		/// <summary>
 		/// теперь рисуем из буферов в задний буфер

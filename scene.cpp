@@ -51,7 +51,7 @@ namespace MyEngine
 		shadowShader = new ShadowShader;
 		shadowShader->addInputElement("POSITION", DXGI_FORMAT_R32G32B32_FLOAT);
 		shadowShader->initShaders(driver->getDevice(), "shadows.vs", "shadows.ps");
-
+		shadowShader->setSampleState(driver->getDevice());
 		return;
 	}
 
@@ -97,37 +97,38 @@ namespace MyEngine
 		frustrum.constructPlanes(100.0, m_camera);
 	}
 
-	void Scene::drawAllOpaque()
+	void Scene::drawAllOpaque(ID3D11ShaderResourceView* shadow)
 	{
+		light[0]->resetViewMatrix();
 		mesh[skybox->typeMesh]->render(driver->getDeviceContext());
-		m_shader[skybox->typeTexture]->render(driver->getDeviceContext(), mesh[skybox->typeMesh]->numIndices, skybox->getWorldMatrix(), m_camera->getViewMatrix(), m_camera->getProjectionMatrix(), m_camera->getPosition());
+		m_shader[skybox->typeTexture]->render(driver->getDeviceContext(), mesh[skybox->typeMesh]->numIndices, skybox->getWorldMatrix(), m_camera->getViewMatrix(), m_camera->getProjectionMatrix(), m_camera->getPosition(), light[0], shadow);
 
 		region.mesh->render(driver->getDeviceContext());
-		m_shader[region.typeTexture]->render(driver->getDeviceContext(), region.mesh->numIndices, skybox->getWorldMatrix(), m_camera->getViewMatrix(), m_camera->getProjectionMatrix(), m_camera->getPosition());
+		m_shader[region.typeTexture]->render(driver->getDeviceContext(), region.mesh->numIndices, skybox->getWorldMatrix(), m_camera->getViewMatrix(), m_camera->getProjectionMatrix(), m_camera->getPosition(), light[0], shadow);
 
 		frustrumCulling();
 		for (auto iter = visible_objects.begin(); iter != visible_objects.end();)
 		{
 			mesh[(*iter)->typeMesh]->render(driver->getDeviceContext());
-			m_shader[(*iter)->typeTexture]->render(driver->getDeviceContext(), mesh[(*iter)->typeMesh]->numIndices, (*iter)->getWorldMatrix(), m_camera->getViewMatrix(), m_camera->getProjectionMatrix(), m_camera->getPosition());
+			m_shader[(*iter)->typeTexture]->render(driver->getDeviceContext(), mesh[(*iter)->typeMesh]->numIndices, (*iter)->getWorldMatrix(), m_camera->getViewMatrix(), m_camera->getProjectionMatrix(), m_camera->getPosition(), light[0], shadow);
 			iter = visible_objects.erase(iter);
 		}
 	}
 
-	void Scene::drawAllOpaqueCam()
+	void Scene::drawAllOpaqueCam(ID3D11ShaderResourceView* shadow)
 	{
 		light[0]->resetViewMatrix();
 		mesh[skybox->typeMesh]->render(driver->getDeviceContext());
-		m_shader[skybox->typeTexture]->render(driver->getDeviceContext(), mesh[skybox->typeMesh]->numIndices, skybox->getWorldMatrix(), light[0]->getViewMatrix(), m_camera->getProjectionMatrix(), m_camera->getPosition());
+		m_shader[skybox->typeTexture]->render(driver->getDeviceContext(), mesh[skybox->typeMesh]->numIndices, skybox->getWorldMatrix(), light[0]->getViewMatrix(), m_camera->getProjectionMatrix(), m_camera->getPosition(), light[0], shadow);
 
 		region.mesh->render(driver->getDeviceContext());
-		m_shader[region.typeTexture]->render(driver->getDeviceContext(), region.mesh->numIndices, skybox->getWorldMatrix(), light[0]->getViewMatrix(), m_camera->getProjectionMatrix(), m_camera->getPosition());
+		m_shader[region.typeTexture]->render(driver->getDeviceContext(), region.mesh->numIndices, skybox->getWorldMatrix(), light[0]->getViewMatrix(), m_camera->getProjectionMatrix(), m_camera->getPosition(), light[0], shadow);
 
 		frustrumCulling();
 		for (auto iter = visible_objects.begin(); iter != visible_objects.end();)
 		{
 			mesh[(*iter)->typeMesh]->render(driver->getDeviceContext());
-			m_shader[(*iter)->typeTexture]->render(driver->getDeviceContext(), mesh[(*iter)->typeMesh]->numIndices, (*iter)->getWorldMatrix(), light[0]->getViewMatrix(), m_camera->getProjectionMatrix(), m_camera->getPosition());
+			m_shader[(*iter)->typeTexture]->render(driver->getDeviceContext(), mesh[(*iter)->typeMesh]->numIndices, (*iter)->getWorldMatrix(), light[0]->getViewMatrix(), m_camera->getProjectionMatrix(), m_camera->getPosition(), light[0], shadow);
 			iter = visible_objects.erase(iter);
 		}
 	}
@@ -136,24 +137,24 @@ namespace MyEngine
 	{
 		light[0]->resetViewMatrix();
 		mesh[skybox->typeMesh]->render(driver->getDeviceContext());
-		shadowShader->render(driver->getDeviceContext(), mesh[skybox->typeMesh]->numIndices, skybox->getWorldMatrix(), m_camera->getViewMatrix());
+		shadowShader->render(driver->getDeviceContext(), mesh[skybox->typeMesh]->numIndices, skybox->getWorldMatrix(), light[0]->getViewMatrix());
 
 		region.mesh->render(driver->getDeviceContext());
-		shadowShader->render(driver->getDeviceContext(), region.mesh->numIndices, skybox->getWorldMatrix(), m_camera->getViewMatrix());
+		shadowShader->render(driver->getDeviceContext(), region.mesh->numIndices, skybox->getWorldMatrix(), light[0]->getViewMatrix());
 
 		frustrumCulling();
 		for (auto iter = visible_objects.begin(); iter != visible_objects.end();)
 		{
 			mesh[(*iter)->typeMesh]->render(driver->getDeviceContext());
-			shadowShader->render(driver->getDeviceContext(), mesh[(*iter)->typeMesh]->numIndices, (*iter)->getWorldMatrix(), m_camera->getViewMatrix());
+			shadowShader->render(driver->getDeviceContext(), mesh[(*iter)->typeMesh]->numIndices, (*iter)->getWorldMatrix(), light[0]->getViewMatrix());
 			iter = visible_objects.erase(iter);
 		}
 	}
 
-	void Scene::drawAllTransparent()
+	void Scene::drawAllTransparent(ID3D11ShaderResourceView* shadow)
 	{
 		mesh[water->typeMesh]->render(driver->getDeviceContext());
-		transparentShader->render(driver->getDeviceContext(), mesh[water->typeMesh]->numIndices, water->getWorldMatrix(), light[0]->getViewMatrix(), m_camera->getProjectionMatrix(), m_camera->getPosition());
+		transparentShader->render(driver->getDeviceContext(), mesh[water->typeMesh]->numIndices, water->getWorldMatrix(), m_camera->getViewMatrix(), m_camera->getProjectionMatrix(), m_camera->getPosition(), light[0], shadow);
 	}
 
 	void Scene::frustrumCulling()

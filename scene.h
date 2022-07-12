@@ -416,9 +416,9 @@ namespace MyEngine
 
 		void update(float dt, float timeDay);
 		void drawAllShadows();
-		void drawAllOpaque();
-		void drawAllOpaqueCam();
-		void drawAllTransparent();
+		void drawAllOpaque(ID3D11ShaderResourceView* shadow);
+		void drawAllOpaqueCam(ID3D11ShaderResourceView* shadow);
+		void drawAllTransparent(ID3D11ShaderResourceView* shadow);
 
 		void constructFrustrum();
 

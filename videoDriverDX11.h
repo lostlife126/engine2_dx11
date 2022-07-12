@@ -28,7 +28,7 @@ namespace MyEngine
 		XMFLOAT2  tex;
 	};
 	// число буферов. диффузный, нормаль и амбиент оклюжн (в будущем)
-	const int NUM_BUFFERS = 5; // diffuse3 + ao, normal3 +, positions???, roughness + metallness
+	const int NUM_BUFFERS = 6; // diffuse3 + ao, normal3 +, positions???, roughness + metallness
 
 	// класс видеодрайвера в дх11. здесь будут сидеть все действия над рендерингом
 	class VideoDriverDX11
@@ -91,12 +91,15 @@ namespace MyEngine
 
 	public:
 
+		ID3D11ShaderResourceView* getShadows();
+
 		// рендеринг шейдера освещения
 		void renderShader(Light* light, Camera* camera);
 		// вывод текста на экран
 		void renderText(Text* text, XMFLOAT4 color, XMFLOAT2 pos);
 		// создание буферов???
 		void createBuffers();
+
 		// получить девайс
 		ID3D11Device* getDevice()
 		{
@@ -136,6 +139,8 @@ namespace MyEngine
 		void setRenderTargetBackBuffer();
 		// очистить буферы
 		void clearRenderTarget();
+
+		void clearRenderTargetStencil();
 		// рендерить
 		void renderToScreen();
 		// включить z буфер
@@ -158,9 +163,6 @@ namespace MyEngine
 		void endScene();
 		// общая инициализация драйвера
 		void init(HWND hwnd_);
-
-
-
 
 	};
 	

@@ -1,5 +1,5 @@
 
-Texture2D shaderTexture[5];
+Texture2D shaderTexture[6];
 SamplerState SampleType;
 
 struct PixelInputType
@@ -10,7 +10,8 @@ struct PixelInputType
 	float3 tangent : TANGENT;
 	float3 binormal : BINORMAL;
 	float3 posPixel : POSITION;
-	float fogFactor : FOG;
+	float4 posLightView : TEXCOORD1;
+	float fogFactor: FOG;
 };
 
 struct PixelOutputType
@@ -20,6 +21,7 @@ struct PixelOutputType
 	float4 posPixel : SV_Target2;
 	float4 specular : SV_Target3;
 	float4 zBuff : SV_Target4;
+	float4 isLight : SV_Target5;
 };
 
 PixelOutputType PS(PixelInputType input) : SV_TARGET
@@ -30,6 +32,7 @@ PixelOutputType PS(PixelInputType input) : SV_TARGET
 	float4 textureMetal;
 	float4 textureAo;
 	float3 bumpNormal;
+	float4 shadows;
 	
 	float4 fogColor = float4(0.5f, 0.5f, 0.5f, 1.0f);
 	
@@ -40,6 +43,7 @@ PixelOutputType PS(PixelInputType input) : SV_TARGET
 	textureRough = shaderTexture[2].Sample(SampleType, input.tex);
 	textureMetal = shaderTexture[3].Sample(SampleType, input.tex);
 	textureAo = shaderTexture[4].Sample(SampleType, input.tex);
+	shadows = shaderTexture[5].Sample(SampleType, input.tex);
 	
 	textureNormal = (2.0f * textureNormal) - 1.0f;
 	bumpNormal = (textureNormal.x * input.tangent) + (textureNormal.y * input.binormal) + (textureNormal.z * input.normal);
@@ -56,6 +60,26 @@ PixelOutputType PS(PixelInputType input) : SV_TARGET
 	output.specular.g = textureMetal.r;
 	
 	output.zBuff = float4(input.fogFactor, input.fogFactor, input.fogFactor, 1.0);
+
+    float2 projectTexCoord;
+	projectTexCoord.x =  input.posLightView.x / input.posLightView.w / 2.0f + 0.5f;
+	projectTexCoord.y = -input.posLightView.y / input.posLightView.w / 2.0f + 0.5f;
+	if((saturate(projectTexCoord.x) == projectTexCoord.x) && (saturate(projectTexCoord.y) == projectTexCoord.y))
+	{
+		float depthValue = shaderTexture[5].Sample(SampleType, projectTexCoord).r;
+		float lightDepthValue = input.posLightView.z / input.posLightView.w - 1e-3f;
+		if(lightDepthValue < depthValue)
+		{
+		    output.isLight = 1.0f;
+		}
+		else
+		{
+			output.isLight = 0.0f;
+		}
+		//output.isLight = projectTexCoord.y;
+	}
+
+	//output.isLight = shadows;
 
     return output;
 }

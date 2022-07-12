@@ -28,9 +28,9 @@ namespace MyEngine
 	{
 		D3D11_SAMPLER_DESC sd;
 		sd.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
-		sd.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
-		sd.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
-		sd.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+		sd.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
+		sd.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
+		sd.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
 		sd.MipLODBias = 0.0f;
 		sd.MaxAnisotropy = 1;
 		sd.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
@@ -155,7 +155,7 @@ namespace MyEngine
 		setSampleState(device);
 	}
 
-	void ModelShader::setShaderParameters(ID3D11DeviceContext* deviceContext, XMMATRIX worldMatrix, XMMATRIX viewMatrix, XMMATRIX projectionMatrix, XMFLOAT3 cameraPos)
+	void ModelShader::setShaderParameters(ID3D11DeviceContext* deviceContext, XMMATRIX worldMatrix, XMMATRIX viewMatrix, XMMATRIX projectionMatrix, XMFLOAT3 cameraPos, Light* light, ID3D11ShaderResourceView* shadow)
 	{
 		HRESULT hr;
 		D3D11_MAPPED_SUBRESOURCE mappedRes;
@@ -178,13 +178,17 @@ namespace MyEngine
 		deviceContext->PSSetShaderResources(2, 1, &m_texture[2]);
 		deviceContext->PSSetShaderResources(3, 1, &m_texture[3]);
 		deviceContext->PSSetShaderResources(4, 1, &m_texture[4]);
+		deviceContext->PSSetShaderResources(5, 1, &shadow);
 
+		XMMATRIX viewLightMatrix = light->getViewMatrix();
+		viewLightMatrix = XMMatrixTranspose(viewLightMatrix);
 		D3D11_MAPPED_SUBRESOURCE mappedResC;
 		CameraBufferType* p_dataC;
 
 		hr = deviceContext->Map(m_cameraBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResC);
 		p_dataC = (CameraBufferType*)mappedResC.pData;
 		p_dataC->position = cameraPos;
+		p_dataC->m_View = viewLightMatrix;
 		deviceContext->Unmap(m_cameraBuffer, 0);
 		bufferNum = 1;
 		deviceContext->VSSetConstantBuffers(bufferNum, 1, &m_cameraBuffer);
@@ -192,9 +196,9 @@ namespace MyEngine
 		return;
 	}
 
-	void ModelShader::render(ID3D11DeviceContext* deviceContext, int numIndices, XMMATRIX worldMatrix, XMMATRIX viewMatrix, XMMATRIX projectionMatrix, XMFLOAT3 cameraPos)
+	void ModelShader::render(ID3D11DeviceContext* deviceContext, int numIndices, XMMATRIX worldMatrix, XMMATRIX viewMatrix, XMMATRIX projectionMatrix, XMFLOAT3 cameraPos, Light* light, ID3D11ShaderResourceView* shadow)
 	{
-		setShaderParameters(deviceContext, worldMatrix, viewMatrix, projectionMatrix, cameraPos);
+		setShaderParameters(deviceContext, worldMatrix, viewMatrix, projectionMatrix, cameraPos, light, shadow);
 
 		deviceContext->IASetInputLayout(m_layout);
 		deviceContext->VSSetShader(m_vShader, NULL, 0);
@@ -349,21 +353,26 @@ namespace MyEngine
 		deviceContext->Unmap(m_matrixBuffer, 0);
 		deviceContext->VSSetConstantBuffers(bufferNum, 1, &m_matrixBuffer);
 
+		light->resetViewMatrix();
 		D3D11_MAPPED_SUBRESOURCE mappedResC;
 		CameraBufferType* p_dataC;
 
 		hr = deviceContext->Map(m_cameraBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResC);
 		p_dataC = (CameraBufferType*)mappedResC.pData;
+		XMMATRIX lightMatrix = light->getViewMatrix();
+		lightMatrix = XMMatrixTranspose(lightMatrix);
 		p_dataC->position = cameraPos;
+
 		deviceContext->Unmap(m_cameraBuffer, 0);
 		bufferNum = 1;
-		deviceContext->PSSetConstantBuffers(bufferNum, 1, &m_cameraBuffer);
+
 
 		deviceContext->PSSetShaderResources(0, 1, &texture[0]);
 		deviceContext->PSSetShaderResources(1, 1, &texture[1]);
 		deviceContext->PSSetShaderResources(2, 1, &texture[2]);
 		deviceContext->PSSetShaderResources(3, 1, &texture[3]);
 		deviceContext->PSSetShaderResources(4, 1, &texture[4]);
+		deviceContext->PSSetShaderResources(5, 1, &texture[5]);
 
 		D3D11_MAPPED_SUBRESOURCE mappedResL;
 		LightBufferType* p_dataL;
@@ -374,8 +383,8 @@ namespace MyEngine
 		p_dataL->dir = light->dir;
 		deviceContext->Unmap(m_lightBuffer, 0);
 		bufferNum = 0;
-		deviceContext->PSSetConstantBuffers(bufferNum, 1, &m_lightBuffer);
-
+		deviceContext->PSSetConstantBuffers(1, 1, &m_lightBuffer);
+		deviceContext->PSSetConstantBuffers(0, 1, &m_cameraBuffer);
 	}
 
 	void LightShader::initShaders(ID3D11Device* device, const char* vShaderFile, const char* pShaderFile)

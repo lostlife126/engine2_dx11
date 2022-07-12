@@ -5,6 +5,8 @@ cbuffer MatrixBuffer
     matrix projectionMatrix;
 };
 
+
+
 struct VertexInputType
 {
     float4 position : POSITION;
