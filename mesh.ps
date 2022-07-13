@@ -67,7 +67,7 @@ PixelOutputType PS(PixelInputType input) : SV_TARGET
 	if((saturate(projectTexCoord.x) == projectTexCoord.x) && (saturate(projectTexCoord.y) == projectTexCoord.y))
 	{
 		float depthValue = shaderTexture[5].Sample(SampleType, projectTexCoord).r;
-		float lightDepthValue = input.posLightView.z / input.posLightView.w - 1e-3f;
+		float lightDepthValue = input.posLightView.z / input.posLightView.w - 1e-5f;
 		if(lightDepthValue < depthValue)
 		{
 		    output.isLight = 1.0f;

@@ -173,12 +173,12 @@ namespace MyEngine
 		p_data->m_Projection = projectionMatrix;
 		deviceContext->Unmap(m_matrixBuffer, 0);
 		deviceContext->VSSetConstantBuffers(bufferNum, 1, &m_matrixBuffer);
-		deviceContext->PSSetShaderResources(0, 1, &m_texture[0]);
-		deviceContext->PSSetShaderResources(1, 1, &m_texture[1]);
-		deviceContext->PSSetShaderResources(2, 1, &m_texture[2]);
-		deviceContext->PSSetShaderResources(3, 1, &m_texture[3]);
-		deviceContext->PSSetShaderResources(4, 1, &m_texture[4]);
-		deviceContext->PSSetShaderResources(5, 1, &shadow);
+		deviceContext->PSSetShaderResources(0, 1, &m_texture[0]); // albedo
+		deviceContext->PSSetShaderResources(1, 1, &m_texture[1]); // normals
+		deviceContext->PSSetShaderResources(2, 1, &m_texture[2]); // rough
+		deviceContext->PSSetShaderResources(3, 1, &m_texture[3]); // metal
+		deviceContext->PSSetShaderResources(4, 1, &m_texture[4]); // ao???
+		deviceContext->PSSetShaderResources(5, 1, &shadow); // shadow
 
 		XMMATRIX viewLightMatrix = light->getViewMatrix();
 		viewLightMatrix = XMMatrixTranspose(viewLightMatrix);
