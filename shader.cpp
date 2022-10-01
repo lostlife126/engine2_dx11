@@ -211,6 +211,11 @@ namespace MyEngine
 
 	void ModelShader::initShaders(ID3D11Device* device, const char* vShaderFile, const char* pShaderFile)
 	{
+		addInputElement("POSITION", DXGI_FORMAT_R32G32B32_FLOAT);
+		addInputElement("TEXCOORD", DXGI_FORMAT_R32G32_FLOAT);
+		addInputElement("NORMAL", DXGI_FORMAT_R32G32B32_FLOAT);
+		addInputElement("TANGENT", DXGI_FORMAT_R32G32B32_FLOAT);
+		addInputElement("BINORMAL", DXGI_FORMAT_R32G32B32_FLOAT);
 		initVertexShaders(device, vShaderFile, "VS");
 		initPixelShaders(device, pShaderFile, "PS");
 		m_matrixBuffer = Buffer::createConstantBuffer(device, sizeof(MatrixBufferType), true);
@@ -261,6 +266,7 @@ namespace MyEngine
 
 	void ShadowShader::initShaders(ID3D11Device* device, const char* vShaderFile, const char* pShaderFile)
 	{
+		addInputElement("POSITION", DXGI_FORMAT_R32G32B32_FLOAT);
 		initVertexShaders(device, vShaderFile, "VS");
 		initPixelShaders(device, pShaderFile, "PS");
 		m_matrixBuffer = Buffer::createConstantBuffer(device, sizeof(MatrixBufferType), true);
@@ -353,7 +359,7 @@ namespace MyEngine
 		deviceContext->Unmap(m_matrixBuffer, 0);
 		deviceContext->VSSetConstantBuffers(bufferNum, 1, &m_matrixBuffer);
 
-		light->resetViewMatrix();
+		light->updateViewMatrix();
 		D3D11_MAPPED_SUBRESOURCE mappedResC;
 		CameraBufferType* p_dataC;
 
@@ -379,8 +385,8 @@ namespace MyEngine
 
 		hr = deviceContext->Map(m_lightBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResL);
 		p_dataL = (LightBufferType*)mappedResL.pData;
-		p_dataL->color = light->color;
-		p_dataL->dir = light->dir;
+		p_dataL->color = light->m_color;
+		p_dataL->dir = light->m_dir;
 		deviceContext->Unmap(m_lightBuffer, 0);
 		bufferNum = 0;
 		deviceContext->PSSetConstantBuffers(1, 1, &m_lightBuffer);

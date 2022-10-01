@@ -9,3 +9,7 @@
 /x64/Debug
 /x64/Release
 log.txt
+*.log
+*.tlog
+*.obj
+*.exe

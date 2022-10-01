@@ -8,47 +8,53 @@ namespace MyEngine
 	{
 	public:
 
-		int type; /// 0 - направленный, 1 - точечный, 2 - прожектор????
-		float a; // текущий угол положения источника света
-		XMFLOAT3 pos;// текущая координата источника
-		XMFLOAT3 dir; // направление света
-		XMFLOAT4 color; // составляющая среды
+		int m_type; /// 0 - направленный, 1 - точечный, 2 - прожектор????
+		XMFLOAT3 m_pos;// текущая координата источника
+		XMFLOAT3 m_dir; // направление света
+		XMFLOAT4 m_color; // цвет света
 		XMMATRIX m_View;// видовая матрица
 		// конструктор по умолчанию создает свет в точке 1,0,0 и направлен в 0,0,0
-		Light(int type = 0, float a = 0.0)
+		Light():
+			m_type(0),
+			m_pos(0.0f, 0.0f, 0.0f),
+			m_dir(1.0f, 0.0f, 0.0f),
+			m_color(1.0f, 1.0f, 1.0f, 1.0f)
 		{
-			pos = XMFLOAT3(cosf(a), 0.0f, sinf(a));
-			dir = XMFLOAT3(-cosf(a), 0.0f, -sinf(a));
-			color = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+			updateViewMatrix();
 		}
 
-		void resetViewMatrix()
+		void updateViewMatrix()
 		{
-			XMVECTOR pos_ = XMVectorSet(pos.x, pos.y, pos.z, 1.0f);
-			XMVECTOR at_ = XMVectorSet(pos.x + dir.x, pos.y + dir.y, pos.z + dir.z, 0.0f);
+			XMVECTOR pos = XMVectorSet(m_pos.x, m_pos.y, m_pos.z, 1.0f);
+			XMVECTOR at = XMVectorSet(m_pos.x + m_dir.x, m_pos.y + m_dir.y, m_pos.z + m_dir.z, 0.0f);
 			XMVECTOR up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
-			m_View = XMMatrixLookAtLH(pos_, at_, up);
+			m_View = XMMatrixLookAtLH(pos, at, up);
 		}
 		// создать свет в точке xyz
-		Light(int type, XMFLOAT3 pos_, XMFLOAT3 dir_):
-			pos(pos_),
-			dir(dir_)
+		Light(int type, XMFLOAT3 pos, XMFLOAT3 dir, XMFLOAT4 color):
+			m_type(type),
+			m_pos(pos),
+			m_dir(dir),
+			m_color(color)
 		{
-			pos = XMFLOAT3(cosf(a), 0.0, sinf(a));
-			dir = XMFLOAT3(-cosf(a), 0.0f, -sinf(a));
-			color = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+			updateViewMatrix();
 		}
 
 		XMMATRIX getViewMatrix()
 		{
 			return m_View;
 		}
-		// обновить положение и направление света
+	};
+
+	class Sun : public Light
+	{
+	public:
+
 		void update(float timeDay)
 		{
-			a = (timeDay - 6.0) / 12.0 * M_PI;
+			float a = (timeDay - 6.0) / 12.0 * M_PI;
 			float redFrac = 1.0f;
-			float otherFrac = 1.0f;	
+			float otherFrac = 1.0f;
 			if (a > M_PI * 2.0)
 				a -= M_PI * 2.0;
 			float horizontHei = myMin(a, M_PI - a);
@@ -81,10 +87,11 @@ namespace MyEngine
 			redFrac *= 0.5;
 			otherFrac *= 0.5;
 
-			color = XMFLOAT4(redFrac, otherFrac, otherFrac, 1.0f);
+			m_color = XMFLOAT4(redFrac, otherFrac, otherFrac, 1.0f);
 
-			pos = XMFLOAT3(50.0 * cosf(a), 50.0 * sinf(a), 0.0);
-			dir = XMFLOAT3(-cosf(a), -sinf(a), 0.0f);
+			m_pos = XMFLOAT3(50.0 * cosf(a), 50.0 * sinf(a), 0.0);
+			m_dir = XMFLOAT3(-cosf(a), -sinf(a), 0.0f);
+			updateViewMatrix();
 		}
 	};
 	//

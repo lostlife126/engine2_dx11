@@ -377,6 +377,9 @@ namespace MyEngine
 				return false;
 			if (XMPlaneDotCoord(plane[5], pv).m128_f32[0] < 0.0)
 				return false;
+
+			int v = 9;
+			return !(v & 1);
 			return true;
 		}
 
@@ -425,7 +428,7 @@ namespace MyEngine
 		void addObjects();
 
 		Camera* getCamera();
-		void loadObject(ID3D11Device* device, const char* caption, bool invert = false);
+		void loadModel(ID3D11Device* device, const char* caption, bool invert = false);
 
 		Light* getLight();
 		Frustrum frustrum;
@@ -435,8 +438,9 @@ namespace MyEngine
 		Object* skybox;
 		Object* water;
 		Camera* m_camera;
-		std::vector<Light*> light;
-		std::vector<Mesh*> mesh;
+		Sun* sun;
+	//	std::vector<Light*> light;
+		std::vector<Mesh*> meshes;
 		std::vector<ModelShader*> m_shader;
 		VideoDriverDX11* driver;
 		std::vector<Object*> object;
