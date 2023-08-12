@@ -79,6 +79,8 @@ namespace MyEngine
 		// отрисовать сцену
 		void drawScene();
 
+		void update();
+
 		float timeDay = 6.0f; // время суток
 		bool isStopped = false;
 

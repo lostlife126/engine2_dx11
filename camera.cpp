@@ -90,7 +90,7 @@ namespace MyEngine
 		return;
 	}
 
-	void Camera::render(float dt)
+	void Camera::update(float dt)
 	{
 		if (!moved)
 		{

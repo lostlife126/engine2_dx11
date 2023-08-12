@@ -9,7 +9,7 @@ namespace MyEngine
 
 	void Scene::update(float dt, float timeDay)
 	{
-		m_camera->render(dt);
+		m_camera->update(dt);
 		
 	//	light[0]->update(timeDay);
 		sun->update(timeDay);

@@ -111,10 +111,10 @@ float4 PS(PixelInputType input) : SV_TARGET
 		lo += (kD * textureAlbedo.rgb / PI + specular) * radiance * nDotL;
 	}
 	
-	float3 ambient = 0.002 * textureAlbedo.a * textureAlbedo.rgb ;
+	float3 ambient = 1.0 * textureAlbedo.a * textureAlbedo.rgb ;
 	float3 color = ambient + lo;
 	
-   // color = color * (1.0 - textureZBuff.x) + fogColor * (textureZBuff.x);
+    //color = color * (1.0 - textureZBuff.x) + fogColor * (textureZBuff.x);
 	
 	
 	// correction with exposition
@@ -123,10 +123,12 @@ float4 PS(PixelInputType input) : SV_TARGET
 	
 	// correction tone
 	color = color / (color + float3(1.0, 1.0, 1.0));
+	
+	// gamma correction
 	color = pow (color, (1.0/2.2));
 	
 	outputColor = dep;
-	//outputColor = textureLightSource;
-	//outputColor = float4(color, 1.0);
+	//outputColor = textureAlbedo;
+	outputColor = float4(color, 1.0);
     return outputColor;
 }

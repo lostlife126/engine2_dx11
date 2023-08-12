@@ -58,7 +58,7 @@ namespace MyEngine
 			setInit();
 		}
 		// отработать движение камеры (поменять координаты и перестроить матрицу вида)
-		void render(float dt);
+		void update(float dt);
 		// получить видовую мастрицу
 		XMMATRIX getViewMatrix();
 		// получить проекционную матрицу

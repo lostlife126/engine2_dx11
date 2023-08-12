@@ -4,6 +4,25 @@
 namespace MyEngine
 {
 
+	void Engine::update()
+	{
+		if (!isStopped)
+		{
+			timeDay += dt;
+		}
+		if (timeDay > 24.0f)
+		{
+			timeDay -= 24.0f;
+		}
+
+		dt = fpsCounter.frame();
+		if (dt < 0.01)
+		{
+			Sleep(int(1000.0 * (0.01 - dt)));
+			dt = 0.01;
+		}
+	}
+
 	void Engine::run()
 	{
 		isRun = true;
@@ -11,15 +30,21 @@ namespace MyEngine
 		dt = 0.0;
 		while (isRun)
 		{
-			scene->update(dt, timeDay);
-			drawScene();
+
+			// input 
 			m_window->runEvent();
-			dt = fpsCounter.frame();
-			if (dt < 0.01)
-			{
-				Sleep(int(1000.0 * (0.01 - dt)));
-				dt = 0.01;
-			}
+
+			// обновление мира
+			// world->update();
+
+			scene->update(dt, timeDay);
+			
+			//отрисовка сцены
+			drawScene();
+
+			// прочая чушь
+			update();
+
 		}
 		return;
 	}
@@ -86,7 +111,9 @@ namespace MyEngine
 		renderer->driverDX11->clearRenderTarget();  // чистим буферы
 
 		renderer->driverDX11->setRenderTargetShadows(); // устанавливаем цель рендеринга наши буферы
+
 		scene->drawAllShadows();
+
 		renderer->driverDX11->clearRenderTargetStencil();
 		// делаем рендеринг сцены во все нужные буферы
 		renderer->driverDX11->setRenderTargetBuffers(); // устанавливаем цель рендеринга наши буферы
@@ -114,17 +141,6 @@ namespace MyEngine
 		renderer->driverDX11->turnZBufferOn();
 
 		renderer->driverDX11->endScene();
-
-		if (!isStopped)
-		{
-			timeDay += dt;
-		}
-		if (timeDay > 24.0f)
-		{
-			timeDay -= 24.0f;
-		}
-
-		
 
 	}
 }
